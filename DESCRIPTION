@@ -20,3 +20,5 @@ Imports:
     tibble,
     tictoc,
     tidyr
+URL: https://github.com/AJAbkemeier/measlespkg
+BugReports: https://github.com/AJAbkemeier/measlespkg/issues
