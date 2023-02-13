@@ -1,12 +1,22 @@
 Package: measlespkg
-Title: What the Package Does (One Line, Title Case)
+Title: Fit POMP Models to Measles Data
 Version: 0.0.0.9000
 Authors@R: 
     person("Aaron", "Abkemeier", , "aaronabk@umich.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: A collection of functions to make fitting POMP models to UK measles data easier.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Imports: 
+    doParallel,
+    doRNG,
+    dplyr,
+    ggplot2,
+    magrittr,
+    panelPomp,
+    pomp,
+    tibble,
+    tictoc,
+    tidyr
