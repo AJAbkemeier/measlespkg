@@ -66,7 +66,7 @@ height = 10){
         guides(color = "none")
       if(print_plots) print(traces_ggplot)
       if(!is.null(save_dir)){
-        ggsave(filename = paste0("trace_plot_",plot_col,".png"),
+        ggsave(filename = paste0("trace_plot_", plot_col, ".png"),
                plot = traces_ggplot, path = save_dir,
                width = width, height = height)
       }

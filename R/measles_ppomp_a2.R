@@ -1,16 +1,27 @@
-measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu", 
-                         sim_model = NULL, AK_interp = FALSE){
+#' Title
+#'
+#' @param use_nbinom
+#' @param shared_str
+#' @param sim_model
+#' @param AK_interp
+#'
+#' @return
+#' @export
+#'
+#' @examples
+measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
+sim_model = NULL, AK_interp = FALSE){
   ## ----rproc-------------------------------------------------
   rproc <- Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
-    
+
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
       br = cohort*birthrate/dt + (1-cohort)*birthrate;
     else
       br = (1.0-cohort)*birthrate;
-  
+
     // term-time seasonality
     t = (t-floor(t))*365.25;
     if ((t>=7 && t<=100) ||
@@ -20,31 +31,31 @@ measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
         seas = 1.0+amplitude*0.2411/0.7589;
     else
         seas = 1.0-amplitude;
-  
+
     // transmission rate
     beta = R0*seas*(1.0-exp(-(gamma+mu)*dt))/dt;
-  
+
     // expected force of infection
     foi = pow(S/(S_0*pop_1950),alpha)*beta*(I+iota)/pop;
-    
+
     // white noise (extrademographic stochasticity)
     dw = rgammawn(sigmaSE,dt);
-    
+
     rate[0] = foi*dw/dt;  // stochastic force of infection
     rate[1] = mu;         // natural S death
     rate[2] = sigma;      // rate of ending of latent stage
     rate[3] = mu;         // natural E death
     rate[4] = gamma;      // recovery
     rate[5] = mu;         // natural I death
-  
+
     // Poisson births
     births = rpois(br*dt);
-    
+
     // transitions between classes
     reulermultinom(2,S,&rate[0],dt,&trans[0]);
     reulermultinom(2,E,&rate[2],dt,&trans[2]);
     reulermultinom(2,I,&rate[4],dt,&trans[4]);
-  
+
     S += births   - trans[0] - trans[1];
     E += trans[0] - trans[2] - trans[3];
     I += trans[2] - trans[4] - trans[5];
@@ -52,14 +63,14 @@ measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
     W += (dw - dt)/sigmaSE;  // standardized i.i.d. white noise
     C += trans[4];           // true incidence
   ")
-  
+
   ## ----dmeasure-------------------------------------------------
   if(use_nbinom == FALSE){
     dmeas <- Csnippet("
       double m = rho*C;
       double v = m*(1.0-rho+psi*psi*m);
       double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
-      if(ISNA(cases)) {lik=1;} else { 
+      if(ISNA(cases)) {lik=1;} else {
           if (C < 0) {lik = 0;} else {
             if (cases > tol) {
               lik = pnorm(cases+0.5,m,sqrt(v)+tol,1,0)-
@@ -75,7 +86,7 @@ measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
     dmeas <- Csnippet("
       // Note that this psi is different from the normal psi.
       double m = rho*C;
-      if(ISNA(cases)) {lik=1;} else { 
+      if(ISNA(cases)) {lik=1;} else {
           if (C == 0) {lik = 1;} else {
             lik = dnbinom_mu(cases, C/(psi*psi+2*psi), m, 0);
           }
@@ -104,19 +115,19 @@ measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
       cases = rnbinom_mu(C/(psi*psi+2*psi), m);
     ")
   }
-  
+
   ## ----transforms-----------------------------------------------
   pt <- parameter_trans(
     log=c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota"),
     logit=c("cohort","amplitude", "rho"),
     barycentric=c("S_0","E_0","I_0","R_0")
   )
-  
+
   ## ----param-names-----------------------------------------------
   paramnames = c("R0","mu","sigma","gamma","alpha","iota",
                  "rho","sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
-  
+
   ## ----everything-else-------------------------------------------------
   measles_ppomp_skel(
     rproc = rproc,
@@ -124,8 +135,8 @@ measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
     rmeas = rmeas,
     extra_param_start = NULL,
     pt = pt,
-    paramnames = paramnames, 
-    shared_str = shared_str, 
+    paramnames = paramnames,
+    shared_str = shared_str,
     sim_model = sim_model,
     AK_interp = AK_interp
   )

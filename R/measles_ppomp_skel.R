@@ -1,29 +1,41 @@
-measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
-                               paramnames, AK_interp,
-                               shared_str = "mu", sim_model = NULL,
-                               alternate_data = NULL){
-  ## ----rinit-------------------------------------------------
-  rinit <- Csnippet("
-    double m = pop/(S_0+E_0+I_0+R_0);
-    S = nearbyint(m*S_0);
-    E = nearbyint(m*E_0);
-    I = nearbyint(m*I_0);
-    R = nearbyint(m*R_0);
-    W = 0;
-    C = 0;
-  ")
-  
+#' Skeleton for measles_ppomp functions.
+#'
+#' @param rproc
+#' @param dmeas
+#' @param rmeas
+#' @param rinit
+#' @param extra_param_start
+#' @param pt
+#' @param paramnames
+#' @param AK_interp
+#' @param shared_str
+#' @param sim_model
+#' @param alternate_data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+measles_ppomp_skel = function(
+    rproc,
+    dmeas,
+    rmeas,
+    rinit,
+    extra_param_start,
+    pt,
+    paramnames,
+    AK_interp,
+    shared_str = "mu",
+    sim_model = NULL,
+    alternate_data = NULL){
   ## ----load-data-------------------------------------------------
-  # daturl <- "https://kingaa.github.io/pomp/vignettes/twentycities.rda"
-  # datfile <- file.path(tempdir(),"twentycities.rda")
-  # download.file(daturl,destfile=datfile,mode="wb")
   if(is.null(alternate_data)){
     # Loaded as "measles"
     load("input/twentycities.rda")
-    
+
     # data used for He et al 2010, following their decision
     # to remove 3 data points
-    
+
     # > measles[13769+1:5,]
     #            town       date cases
     # 13770 Liverpool 1955-11-04    10
@@ -31,9 +43,9 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
     # 13772 Liverpool 1955-11-18   116
     # 13773 Liverpool 1955-11-25    17
     # 13774 Liverpool 1955-12-02    18
-    
+
     measles[13772,"cases"] <- NA
-    
+
     # > measles[13949+1:5,]
     #            town       date cases
     # 13950 Liverpool 1959-04-17   143
@@ -41,9 +53,9 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
     # 13952 Liverpool 1959-05-01   450
     # 13953 Liverpool 1959-05-08    96
     # 13954 Liverpool 1959-05-15   157
-    
+
     measles[13952,"cases"] <- NA
-    
+
     # > measles[19551+1:5,]
     #             town       date cases
     # 19552 Nottingham 1961-08-18     6
@@ -51,9 +63,9 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
     # 19554 Nottingham 1961-09-01    66
     # 19555 Nottingham 1961-09-08     8
     # 19556 Nottingham 1961-09-15     7
-    
+
     measles[19554,"cases"] <- NA
-    
+
     ## ----mles-----------------------------------------------
     read_csv("
       town,loglik,loglik.sd,mu,delay,sigma,gamma,rho,R0,amplitude,alpha,iota,cohort,psi,S_0,E_0,I_0,R_0,sigmaSE
@@ -77,14 +89,14 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
       Nottingham,-2703.5,0.53,0.02,4,70.2,115,0.609,22.6,0.157,0.982,0.17,0.34,0.258,0.05,1.36e-05,1.41e-05,0.95,0.038
       Oswestry,-696.1,0.49,0.02,4,37.3,168,0.631,52.9,0.339,1.04,0.0298,0.263,0.476,0.0218,1.56e-05,1.61e-05,0.978,0.0699
       Sheffield,-2810.7,0.21,0.02,4,54.3,62.2,0.649,33.1,0.313,1.02,0.853,0.225,0.175,0.0291,6.04e-05,8.86e-05,0.971,0.0428",
-             show_col_types = FALSE
-     ) -> mles
+      show_col_types = FALSE
+    ) -> mles
   } else {
     demog = alternate_data[["demog"]]
     measles = alternate_data[["measles"]]
     mles = alternate_data[["mles"]]
   }
-  
+
   ## ----prep-data-------------------------------------------------
   towns = mles[["town"]]
   # Obs list
@@ -94,17 +106,17 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
   for(i in seq_along(towns)){
     measles %>%
       mutate(year=as.integer(format(date,"%Y"))) %>%
-      filter(town==towns[[i]] & year>=1950 & year<1964) %>%
+      filter(town==towns[[i]] & year >= 1950 & year < 1964) %>%
       mutate(
-        time=(julian(date,origin=as.Date("1950-01-01")))/365.25+1950
+        time=(julian(date, origin = as.Date("1950-01-01")))/365.25 + 1950
       ) %>%
-      filter(time>1950 & time<1964) %>%
+      filter(time > 1950 & time < 1964) %>%
       select(time,cases) -> dat_list[[i]]
-    
+
     if(is.null(sim_model) == FALSE){
       dat_list[[i]][["cases"]] = as.numeric(obs(sim_model[[i]]))
     }
-    
+
     demog %>%
       filter(town==towns[[i]]) %>%
       select(-town) -> demog2_list[[i]]
@@ -135,40 +147,41 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
   for(i in seq_along(towns)){
     covar_list[[i]] = covar_list[[i]] %>%
       mutate(
-        std_log_pop_1950 = (log(pop_1950)-mean(sapply(seq_along(towns), 
+        std_log_pop_1950 = (log(pop_1950) - mean(sapply(seq_along(towns),
           function(x) log(covar_list[[x]][["pop_1950"]][[1]]))))/
           sd(sapply(seq_along(towns), function(x)
             log(covar_list[[x]][["pop_1950"]][[1]])))
       )
   }
-  
+
   ## ----pomp-construction-----------------------------------------------
   pomp_list = vector("list", length(towns))
   for(i in seq_along(towns)){
     time = covar_list[[i]][[1]]
     dat_list[[i]] %>%
-      pomp(t0=with(dat_list[[i]],2*time[1]-time[2]),
-           time="time",
-           rprocess=euler(rproc,delta.t=1/365.25),
-           rinit=rinit,
-           dmeasure=dmeas,
-           rmeasure=rmeas,
-           covar=covariate_table(covar_list[[i]],times="time"),
-           accumvars = c("C","W"),
-           partrans = pt,
-           statenames = c("S","E","I","R","C","W"),
-           paramnames = paramnames
+      pomp::pomp(
+        t0 = with(dat_list[[i]], 2*time[1] - time[2]),
+        time = "time",
+        rprocess = euler(rproc, delta.t = 1/365.25),
+        rinit = rinit,
+        dmeasure = dmeas,
+        rmeasure = rmeas,
+        covar = covariate_table(covar_list[[i]], times="time"),
+        accumvars = c("C","W"),
+        partrans = pt,
+        statenames = c("S","E","I","R","C","W"),
+        paramnames = paramnames
       ) -> pomp_list[[i]]
   }
   names(pomp_list) = towns
-  
+
   ## ----panelPomp-construction-----------------------------------------------
   if(is.null(extra_param_start)){
     shared_str_full = shared_str
     shared = colMeans(as.matrix(mles[shared_str]))
   } else {
     shared_str_full = c(shared_str, extra_param_start[["param"]])
-    shared = c(colMeans(as.matrix(mles[shared_str])), 
+    shared = c(colMeans(as.matrix(mles[shared_str])),
                extra_param_start[["value"]])
   }
   specific_str = paramnames[!(paramnames %in% shared_str_full)]
@@ -176,7 +189,9 @@ measles_ppomp_skel = function(rproc, dmeas, rmeas, extra_param_start, pt,
   specific = t(as.matrix(mles[mles[["town"]] %in% towns,specific_str]))
   rownames(specific) = specific_str
   colnames(specific) = names(pomp_list)
-  
-  measles_ppomp = panelPomp(pomp_list, shared = shared, specific = specific)
-  measles_ppomp
+  panelPomp::panelPomp(
+    pomp_list,
+    shared = shared,
+    specific = specific
+  )
 }

@@ -17,8 +17,13 @@ Imports:
     magrittr,
     panelPomp,
     pomp,
+    rlang,
+    stats,
     tibble,
     tictoc,
     tidyr
 URL: https://github.com/AJAbkemeier/measlespkg
 BugReports: https://github.com/AJAbkemeier/measlespkg/issues
+Depends: 
+    R (>= 2.10)
+LazyData: true

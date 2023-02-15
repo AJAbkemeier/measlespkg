@@ -2,13 +2,14 @@
 % Please edit documentation in R/coef_to_pparams.R
 \name{coef_to_pparams}
 \alias{coef_to_pparams}
-\title{Title}
+\title{Convert coef-style object to pparams-style object.}
 \usage{
 coef_to_pparams(coef)
 }
 \arguments{
-\item{coef}{}
+\item{coef}{Vector in the style of coef(panelPomp_obj). That is, a numeric
+vector with names styled as "shared_parameter" or "specific_parameter\link{unit}".}
 }
 \description{
-Title
+Convert coef-style object to pparams-style object.
 }

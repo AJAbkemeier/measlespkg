@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param pf_logLik_frame
+#' @param pf_unitlogLik_frame
+#' @param top_n
+#'
+#' @return
+#' @export
+#'
+#' @examples
 grab_top_unit_params = function(pf_logLik_frame, pf_unitlogLik_frame, top_n = 1){
   unit_names = coef_to_pparams(pf_logLik_frame[1,-(1:2)]) %>%
     .[[2]] %>%
@@ -8,7 +18,7 @@ grab_top_unit_params = function(pf_logLik_frame, pf_unitlogLik_frame, top_n = 1)
       pf_logLik_frame[top_indices,] %>%
         select(contains(x))
     }
-  ) %>% 
+  ) %>%
     bind_cols() -> out
   for(shared_name in names(best_shared)){
     out = out %>%
@@ -17,5 +27,3 @@ grab_top_unit_params = function(pf_logLik_frame, pf_unitlogLik_frame, top_n = 1)
   }
   out
 }
-# grab_top_unit_params(pf_logLik_frame, pf_unitlogLik_frame, top_n = 12) |> View()
-#coef_to_pparams(pf_logLik_frame[1,-(1:2)])
