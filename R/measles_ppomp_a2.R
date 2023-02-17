@@ -1,16 +1,9 @@
-#' Title
-#'
-#' @param use_nbinom
-#' @param shared_str
-#' @param sim_model
-#' @param AK_interp
-#'
-#' @return
-#' @export
-#'
-#' @examples
-measles_ppomp_a2 = function(use_nbinom = FALSE, shared_str = "mu",
-sim_model = NULL, AK_interp = FALSE){
+measles_ppomp_a2 = function(
+    use_nbinom = FALSE,
+    shared_str = "mu",
+    sim_model = NULL,
+    AK_interp = FALSE
+  ){
   ## ----rproc-------------------------------------------------
   rproc <- Csnippet("
     double beta, br, seas, foi, dw, births;

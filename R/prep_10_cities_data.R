@@ -1,15 +1,8 @@
-#' Title
-#'
-#' @param measles_filepath
-#' @param demog_filepath
-#' @param start_params_filepath
-#'
-#' @return
-#' @export
-#'
-#' @examples
-prep_10_cities_data = function(measles_filepath, demog_filepath,
-start_params_filepath){
+prep_10_cities_data = function(
+    measles_filepath,
+    demog_filepath,
+    start_params_filepath
+  ){
   measles = read_csv("input/ten_cities_measles/measles.csv",
                      show_col_types = FALSE) %>%
     as.data.frame()

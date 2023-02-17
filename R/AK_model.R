@@ -13,7 +13,7 @@
 AK_model = function(){
   shared = c(mu = AK_mles$mu[[1]])
   specific = AK_mles %>%
-    dplyr::select(-loglik, -loglik.sd, -mu, -delay) %>%
+    dplyr::select(-.data$loglik, -.data$loglik.sd, -.data$mu, -.data$delay) %>%
     tibble::column_to_rownames(var = "town") %>%
     t()
   pparams = list(shared = shared, specific = specific)

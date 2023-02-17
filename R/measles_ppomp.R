@@ -1,5 +1,6 @@
 #' He10-based POMP model for UK measles.
 #'
+#' @inheritParams measles_ppomp_skel
 #' @param data
 #' @param starting_pparams
 #' @param shared_str
@@ -15,7 +16,8 @@ measles_ppomp = function(
     starting_pparams,
     shared_str = "mu",
     sim_model = NULL,
-    AK_interp = FALSE){
+    AK_interp = FALSE
+  ){
   ## ----rproc-------------------------------------------------
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;

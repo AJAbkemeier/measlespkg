@@ -1,4 +1,4 @@
-#' Skeleton for measles_ppomp functions.
+#' Skeleton for measles_ppomp functions
 #'
 #' @param data
 #' @param starting_pparams
@@ -27,7 +27,8 @@ measles_ppomp_skel = function(
     paramnames,
     AK_interp,
     shared_str = "mu",
-    sim_model = NULL){
+    sim_model = NULL
+  ){
   measles = data[["measles"]]
   demog = data[["demog"]]
   coord = data[["coord"]]
@@ -41,18 +42,20 @@ measles_ppomp_skel = function(
   for(i in seq_along(units)){
     dat_list[[i]] = measles %>%
       dplyr::mutate(year = as.integer(format(date,"%Y"))) %>%
-      dplyr::filter(unit == units[[i]] & year >= 1950 & year < 1964) %>%
-      dplyr::mutate(
-        time = (julian(date, origin = as.Date("1950-01-01")))/365.25 + 1950
+      dplyr::filter(
+        .data$unit == units[[i]] & .data$year >= 1950 & .data$year < 1964
       ) %>%
-      dplyr::filter(time > 1950 & time < 1964) %>%
-      dplyr::select(time, cases)
+      dplyr::mutate(
+        time = julian(.data$date, origin = as.Date("1950-01-01"))/365.25 + 1950
+      ) %>%
+      dplyr::filter(.data$time > 1950 & .data$time < 1964) %>%
+      dplyr::select(.data$time, .data$cases)
     if(is.null(sim_model) == FALSE){
       dat_list[[i]][["cases"]] = as.numeric(pomp::obs(sim_model[[i]]))
     }
     demog_list[[i]] = demog %>%
-      dplyr::filter(unit == units[[i]]) %>%
-      dplyr::select(-unit)
+      dplyr::filter(.data$unit == units[[i]]) %>%
+      dplyr::select(-.data$unit)
   }
   ## ----prep-covariates-------------------------------------------------
   covar_list = vector("list", length(units))
@@ -81,12 +84,15 @@ measles_ppomp_skel = function(
       )$y
     }
     covar_list[[i]] = dmgi %>%
-      dplyr::summarize(
+    dplyr::summarize(
         time = times,
         pop = pop_interp,
         birthrate = births_interp
-      ) %>%
-      dplyr::mutate(pop_1950 = .[.[["time"]] == 1950, "pop"])
+    )
+    covar_list[[i]] = covar_list[[i]] %>%
+    dplyr::mutate(
+      pop_1950 = dplyr::filter(covar_list[[i]],covar_list[[i]]$time == 1950)$pop
+    )
   }
   for(i in seq_along(units)){
     log_pop_1950 = sapply(seq_along(units), function(x)
@@ -94,8 +100,8 @@ measles_ppomp_skel = function(
     )
     covar_list[[i]] = covar_list[[i]] %>%
       dplyr::mutate(
-        std_log_pop_1950 =
-          (log(pop_1950) - mean(log_pop_1950))/stats::sd(log_pop_1950)
+        std_log_pop_1950 = (log(.data$pop_1950) - mean(log_pop_1950))/
+          stats::sd(log_pop_1950)
       )
   }
 

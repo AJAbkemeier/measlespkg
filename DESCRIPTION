@@ -13,6 +13,7 @@ Imports:
     doParallel,
     doRNG,
     dplyr,
+    foreach,
     ggplot2,
     magrittr,
     panelPomp,

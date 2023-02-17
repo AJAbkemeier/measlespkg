@@ -1,6 +1,6 @@
 #' Evaluate log likelihood of model using particle filter, then save output.
 #'
-#' @param model_obj Model object to evaluate log likelihood of.
+#' @param model_obj_list List of model objects to evaluate log likelihood of.
 #' @param ncores Number of cores to use for parallel computing.
 #' @param np_pf Number of particles to use.
 #' @param nreps Number of particle filter repetitions.
@@ -9,41 +9,45 @@
 #' If NULL, does not set new seed.
 #' @param return_pfilter_obj Should the returned list include a pfilter object?
 #' repetition. If NULL, pfilter object is not saved.
-#' @param print_time Should time to run pfilter be printed?
 #'
-#' @return Nothing is returned, but several files are saved.
+#' @return A list of data frames. Each row of `fits` contains the estimated
+#' total log likelihood, standard error, and parameters for
 #' @export
 #'
 #' @examples
+#' model_list = list(AK_model())
+#' eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
 eval_logLik = function(
-    model_obj,
+    model_obj_list,
     ncores,
     np_pf,
     nreps,
     seed = NULL,
     divisor = NULL,
-    return_pfilter_obj = FALSE,
-    print_time = TRUE){
+    return_pfilter_obj = FALSE
+  ){
   pf_logLik_frame = data.frame(
-    logLik = rep(0, length(model_obj)),
-    se = rep(0, length(model_obj))
+    logLik = rep(0, length(model_obj_list)),
+    se = rep(0, length(model_obj_list))
   ) %>% cbind(
-    rbind(t(sapply(model_obj, coef)))
+    rbind(t(sapply(model_obj_list, coef)))
   )
 
-  pf_unitlogLik_list = vector("list", length(model_obj))
-  pf_unitSE_list = vector("list", length(model_obj))
+  pf_unitlogLik_list = vector("list", length(model_obj_list))
+  pf_unitSE_list = vector("list", length(model_obj_list))
 
-  for(i in seq_along(model_obj)){
+  for(i in seq_along(model_obj_list)){
     doParallel::registerDoParallel(cores = ncores)
     seed_i = if(is.null(seed) | is.null(divisor)) NULL else (seed*i) %% divisor
     doRNG::registerDoRNG(seed_i)
-    if(print_time) tictoc::tic()
-    foreach(j = 1:nreps, .packages = "panelPomp", .combine = rbind) %dopar% {
-      pfilter_obj = panelPomp::pfilter(model_obj[[i]], Np = np_pf)
+    foreach::foreach(
+      j = 1:nreps,
+      .packages = "panelPomp",
+      .combine = rbind) %dopar%
+    {
+      pfilter_obj = panelPomp::pfilter(model_obj_list[[i]], Np = np_pf)
       panelPomp::unitlogLik(pfilter_obj)
     } -> pf_unitlogLik_matrix
-    if(print_time) tictoc::toc()
     pf_logLik_frame[i, 1:2] = panelPomp::panel_logmeanexp(
       pf_unitlogLik_matrix,
       MARGIN = 2,

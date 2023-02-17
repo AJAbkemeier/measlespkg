@@ -1,15 +1,8 @@
-#' Title
-#'
-#' @param measles_filepath
-#' @param demog_filepath
-#' @param start_params_filepath
-#'
-#' @return
-#' @export
-#'
-#' @examples
-prep_london_boroughs_data = function(measles_filepath, demog_filepath,
-start_params_filepath){
+prep_london_boroughs_data = function(
+    measles_filepath,
+    demog_filepath,
+    start_params_filepath
+  ){
   london_measles = read.csv(measles_filepath) %>%
     select(borough, date, measles) %>%
     rename(town = borough, cases = measles) %>%

@@ -7,11 +7,12 @@
 coef_to_pparams(coef)
 }
 \arguments{
-\item{coef}{Vector in the style of coef(panelPomp_obj). That is, a numeric
-vector with names styled as "shared_parameter" or "specific_parameter\link{unit}".}
+\item{coef}{Vector in the style of \code{coef(panelPomp_obj)}. That is, a numeric
+vector with names styled as "\code{shared_parameter}" or
+"\code{specific_parameter[unit]}".}
 }
 \value{
-A list of length 2 in the style of pparams(panelPomp_obj). That is,
+A list of length 2 in the style of \code{pparams(panelPomp_obj)}. That is,
 a numeric vector with shared parameter names, and a matrix with specific
 parameters as row names and units as column names.
 }

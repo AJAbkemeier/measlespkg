@@ -20,3 +20,7 @@ sim_plots(
 \description{
 Title
 }
+\examples{
+mod = AK_model()
+sim_plots(mod, mod, n_sims = 10)
+}

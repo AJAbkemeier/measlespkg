@@ -2,7 +2,7 @@
 % Please edit documentation in R/measles_ppomp_skel.R
 \name{measles_ppomp_skel}
 \alias{measles_ppomp_skel}
-\title{Skeleton for measles_ppomp functions.}
+\title{Skeleton for measles_ppomp functions}
 \usage{
 measles_ppomp_skel(
   data,
@@ -22,5 +22,5 @@ measles_ppomp_skel(
 \item{sim_model}{}
 }
 \description{
-Skeleton for measles_ppomp functions.
+Skeleton for measles_ppomp functions
 }

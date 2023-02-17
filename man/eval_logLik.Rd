@@ -5,18 +5,17 @@
 \title{Evaluate log likelihood of model using particle filter, then save output.}
 \usage{
 eval_logLik(
-  model_obj,
+  model_obj_list,
   ncores,
   np_pf,
   nreps,
   seed = NULL,
   divisor = NULL,
-  return_pfilter_obj = FALSE,
-  print_time = TRUE
+  return_pfilter_obj = FALSE
 )
 }
 \arguments{
-\item{model_obj}{Model object to evaluate log likelihood of.}
+\item{model_obj_list}{List of model objects to evaluate log likelihood of.}
 
 \item{ncores}{Number of cores to use for parallel computing.}
 
@@ -31,12 +30,15 @@ If NULL, does not set new seed.}
 
 \item{return_pfilter_obj}{Should the returned list include a pfilter object?
 repetition. If NULL, pfilter object is not saved.}
-
-\item{print_time}{Should time to run pfilter be printed?}
 }
 \value{
-Nothing is returned, but several files are saved.
+A list of data frames. Each row of \code{fits} contains the estimated
+total log likelihood, standard error, and parameters for
 }
 \description{
 Evaluate log likelihood of model using particle filter, then save output.
+}
+\examples{
+model_list = list(AK_model())
+eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
 }

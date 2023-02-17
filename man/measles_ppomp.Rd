@@ -2,7 +2,7 @@
 % Please edit documentation in R/measles_ppomp.R
 \name{measles_ppomp}
 \alias{measles_ppomp}
-\title{He10 POMP model for UK measles.}
+\title{He10-based POMP model for UK measles.}
 \usage{
 measles_ppomp(
   data,
@@ -13,8 +13,10 @@ measles_ppomp(
 )
 }
 \arguments{
+\item{sim_model}{}
+
 \item{AK_interp}{}
 }
 \description{
-He10 POMP model for UK measles.
+He10-based POMP model for UK measles.
 }

@@ -1,24 +1,12 @@
-#' panelPOMP model for UK measles with linear model parameterization for
-#' gamma
-#'
-#' @param use_nbinom
-#' @param shared_str
-#' @param reduced_model
-#' @param sim_model
-#' @param AK_interp
-#'
-#' @return
-#' @export
-#'
-#' @examples
 measles_ppomp_lmp_g = function(
     use_nbinom = FALSE,
     shared_str = "mu",
     reduced_model = FALSE,
     sim_model = NULL,
-    AK_interp = FALSE){
+    AK_interp = FALSE
+  ){
   ## ----rproc-------------------------------------------------
-  rproc <- Csnippet("
+  rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
