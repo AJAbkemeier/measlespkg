@@ -6,20 +6,17 @@
 \usage{
 eval_logLik(
   model_obj,
-  write_to,
   ncores,
   np_pf,
   nreps,
   seed = NULL,
   divisor = NULL,
-  pfilter_obj_write_to = NULL,
+  return_pfilter_obj = FALSE,
   print_time = TRUE
 )
 }
 \arguments{
 \item{model_obj}{Model object to evaluate log likelihood of.}
-
-\item{write_to}{path/file to write output to.}
 
 \item{ncores}{Number of cores to use for parallel computing.}
 
@@ -32,7 +29,7 @@ eval_logLik(
 \item{divisor}{seed mod divisor*i is used to obtain seed for ith repetition.
 If NULL, does not set new seed.}
 
-\item{pfilter_obj_write_to}{Where to save pfilter object from first
+\item{return_pfilter_obj}{Should the returned list include a pfilter object?
 repetition. If NULL, pfilter object is not saved.}
 
 \item{print_time}{Should time to run pfilter be printed?}

@@ -10,6 +10,11 @@ coef_to_pparams(coef)
 \item{coef}{Vector in the style of coef(panelPomp_obj). That is, a numeric
 vector with names styled as "shared_parameter" or "specific_parameter\link{unit}".}
 }
+\value{
+A list of length 2 in the style of pparams(panelPomp_obj). That is,
+a numeric vector with shared parameter names, and a matrix with specific
+parameters as row names and units as column names.
+}
 \description{
 Convert coef-style object to pparams-style object.
 }

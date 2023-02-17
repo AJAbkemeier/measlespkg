@@ -5,20 +5,21 @@
 \title{Skeleton for measles_ppomp functions.}
 \usage{
 measles_ppomp_skel(
+  data,
+  starting_pparams,
   rproc,
   dmeas,
   rmeas,
-  extra_param_start,
+  rinit,
   pt,
   paramnames,
   AK_interp,
   shared_str = "mu",
-  sim_model = NULL,
-  alternate_data = NULL
+  sim_model = NULL
 )
 }
 \arguments{
-\item{alternate_data}{}
+\item{sim_model}{}
 }
 \description{
 Skeleton for measles_ppomp functions.

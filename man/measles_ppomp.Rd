@@ -5,15 +5,15 @@
 \title{He10 POMP model for UK measles.}
 \usage{
 measles_ppomp(
-  use_nbinom = FALSE,
+  data,
+  starting_pparams,
   shared_str = "mu",
   sim_model = NULL,
-  AK_interp = FALSE,
-  ...
+  AK_interp = FALSE
 )
 }
 \arguments{
-\item{...}{}
+\item{AK_interp}{}
 }
 \description{
 He10 POMP model for UK measles.
