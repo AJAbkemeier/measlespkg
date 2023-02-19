@@ -2,36 +2,31 @@
 #'
 #' @param data
 #' @param starting_pparams
-#' @param rproc
-#' @param dmeas
-#' @param rmeas
-#' @param rinit
-#' @param pt
-#' @param paramnames
+#' @param model
 #' @param AK_interp
-#' @param shared_str
-#' @param sim_model
+#' @param sim_obs_list
 #'
 #' @return
 #' @export
 #'
 #' @examples
-measles_ppomp_skel = function(
+#' make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
+make_measlesPomp = function(
     data,
     starting_pparams,
-    rproc,
-    dmeas,
-    rmeas,
-    rinit,
-    pt,
-    paramnames,
-    AK_interp,
-    shared_str = "mu",
-    sim_model = NULL
+    model,
+    AK_interp = TRUE,
+    sim_obs_list = NULL
   ){
-  measles = data[["measles"]]
-  demog = data[["demog"]]
-  coord = data[["coord"]]
+  rproc = model$rproc
+  dmeas = model$dmeas
+  rmeas = model$rmeas
+  rinit = model$rinit
+  pt = model$pt
+  paramnames = model$paramnames
+  measles = data$measles
+  demog = data$demog
+  coord = data$coord
 
   ## ----prep-data-------------------------------------------------
   units = unique(measles$unit)
@@ -50,9 +45,8 @@ measles_ppomp_skel = function(
       ) %>%
       dplyr::filter(.data$time > 1950 & .data$time < 1964) %>%
       dplyr::select(.data$time, .data$cases)
-    if(is.null(sim_model) == FALSE){
-      dat_list[[i]][["cases"]] = as.numeric(pomp::obs(sim_model[[i]]))
-    }
+    if(!is.null(sim_obs_list)) dat_list[[i]]$cases = sim_obs_list[[i]]
+
     demog_list[[i]] = demog %>%
       dplyr::filter(.data$unit == units[[i]]) %>%
       dplyr::select(-.data$unit)

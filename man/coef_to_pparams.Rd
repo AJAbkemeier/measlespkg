@@ -19,3 +19,7 @@ parameters as row names and units as column names.
 \description{
 Convert coef-style object to pparams-style object.
 }
+\examples{
+coef_out = panelPomp::coef(AK_model())
+coef_to_pparams(coef_out)
+}

@@ -8,7 +8,11 @@
 #' @export
 #'
 #' @examples
-grab_top_unit_params = function(pf_logLik_frame, pf_unitlogLik_frame, top_n = 1){
+grab_top_unit_params = function(
+    pf_logLik_frame,
+    pf_unitlogLik_frame,
+    top_n = 1
+  ){
   unit_names = coef_to_pparams(pf_logLik_frame[1,-(1:2)]) %>%
     .[[2]] %>%
     colnames()

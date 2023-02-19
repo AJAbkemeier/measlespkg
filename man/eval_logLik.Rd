@@ -2,7 +2,7 @@
 % Please edit documentation in R/eval_logLik.R
 \name{eval_logLik}
 \alias{eval_logLik}
-\title{Evaluate log likelihood of model using particle filter, then save output.}
+\title{Evaluate log likelihood of model using particle filter}
 \usage{
 eval_logLik(
   model_obj_list,
@@ -32,11 +32,10 @@ If NULL, does not set new seed.}
 repetition. If NULL, pfilter object is not saved.}
 }
 \value{
-A list of data frames. Each row of \code{fits} contains the estimated
-total log likelihood, standard error, and parameters for
+A list of data frames.
 }
 \description{
-Evaluate log likelihood of model using particle filter, then save output.
+Evaluate log likelihood of model using particle filter
 }
 \examples{
 model_list = list(AK_model())

@@ -1,4 +1,4 @@
-#' Evaluate log likelihood of model using particle filter, then save output.
+#' Evaluate log likelihood of model using particle filter
 #'
 #' @param model_obj_list List of model objects to evaluate log likelihood of.
 #' @param ncores Number of cores to use for parallel computing.
@@ -10,8 +10,7 @@
 #' @param return_pfilter_obj Should the returned list include a pfilter object?
 #' repetition. If NULL, pfilter object is not saved.
 #'
-#' @return A list of data frames. Each row of `fits` contains the estimated
-#' total log likelihood, standard error, and parameters for
+#' @return A list of data frames.
 #' @export
 #'
 #' @examples
@@ -30,7 +29,7 @@ eval_logLik = function(
     logLik = rep(0, length(model_obj_list)),
     se = rep(0, length(model_obj_list))
   ) %>% cbind(
-    rbind(t(sapply(model_obj_list, coef)))
+    rbind(t(sapply(model_obj_list, panelPomp::coef)))
   )
 
   pf_unitlogLik_list = vector("list", length(model_obj_list))
@@ -43,8 +42,8 @@ eval_logLik = function(
     foreach::foreach(
       j = 1:nreps,
       .packages = "panelPomp",
-      .combine = rbind) %dopar%
-    {
+      .combine = rbind
+    ) %dopar% {
       pfilter_obj = panelPomp::pfilter(model_obj_list[[i]], Np = np_pf)
       panelPomp::unitlogLik(pfilter_obj)
     } -> pf_unitlogLik_matrix

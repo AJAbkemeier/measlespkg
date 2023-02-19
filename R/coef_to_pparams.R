@@ -10,6 +10,8 @@
 #' @export
 #'
 #' @examples
+#' coef_out = panelPomp::coef(AK_model())
+#' coef_to_pparams(coef_out)
 coef_to_pparams = function(coef){
   coef_tibble = tibble::tibble(sp = names(coef), value = as.numeric(coef)) %>%
     tidyr::separate(.data$sp, into = c("param", "unit"), sep = "\\[",

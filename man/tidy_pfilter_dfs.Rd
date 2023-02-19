@@ -2,13 +2,21 @@
 % Please edit documentation in R/tidy_pfilter_dfs.R
 \name{tidy_pfilter_dfs}
 \alias{tidy_pfilter_dfs}
-\title{Create tidy data frame from saved pfilter output.}
+\title{Create tidy data frame from saved \code{eval_logLik()} output.}
 \usage{
-tidy_pfilter_dfs(LL_df, ULL_df)
+tidy_pfilter_dfs(EL_list)
 }
 \arguments{
-\item{ULL_df}{}
+\item{EL_out}{List shaped like the output of \code{eval_logLik()}.}
+}
+\value{
+Tibble of \code{EL_out} data in tidy format.
 }
 \description{
-Create tidy data frame from saved pfilter output.
+Create tidy data frame from saved \code{eval_logLik()} output.
+}
+\examples{
+model_list = list(AK_model())
+EL_out = eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
+tidy_pfilter_dfs(EL_out)
 }

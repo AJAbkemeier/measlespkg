@@ -17,10 +17,10 @@ AK_model = function(){
     tibble::column_to_rownames(var = "town") %>%
     t()
   pparams = list(shared = shared, specific = specific)
-  measles_ppomp(
+  make_measlesPomp(
     twentycities,
     starting_pparams = pparams,
+    model = model_mechanics_001(),
     AK_interp = TRUE,
-    shared_str = "mu"
   )
 }

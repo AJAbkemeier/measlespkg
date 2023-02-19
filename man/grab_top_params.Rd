@@ -2,13 +2,32 @@
 % Please edit documentation in R/grab_top_params.R
 \name{grab_top_params}
 \alias{grab_top_params}
-\title{Title}
+\title{Grab rows for top \code{n} fits based on log likelihood}
 \usage{
-grab_top_params(pf_logLik_frame, top_n = 1)
+grab_top_params(EL_list, top_n = 1, se_penalty = 0)
 }
 \arguments{
-\item{top_n}{}
+\item{EL_list}{List output from \code{eval_logLik}.}
+
+\item{top_n}{How many rows to grab.}
+
+\item{se_penalty}{Penalizes log likelihood in ranking based on
+\code{se*se_penalty}.}
+}
+\value{
+Data frame of rows for top \code{n} fits.
 }
 \description{
-Title
+Grab rows for top \code{n} fits based on log likelihood
+}
+\examples{
+AK_mod = AK_model()
+EL_out = eval_logLik(
+  list(AK_mod, AK_mod, AK_mod),
+  ncores = 1,
+  np_pf = 1,
+  nreps = 2
+)
+EL_out$fits[, 1:4]
+grab_top_params(EL_out)$fits[, 1:4]
 }

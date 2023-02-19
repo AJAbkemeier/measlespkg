@@ -1,23 +1,11 @@
-#' He10-based POMP model for UK measles.
+#' He10 POMP model for UK measles
 #'
-#' @inheritParams measles_ppomp_skel
-#' @param data
-#' @param starting_pparams
-#' @param shared_str
-#' @param sim_model
-#' @param AK_interp
-#'
-#' @return
+#' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
 #' @examples
-measles_ppomp = function(
-    data,
-    starting_pparams,
-    shared_str = "mu",
-    sim_model = NULL,
-    AK_interp = FALSE
-  ){
+#' make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
+model_mechanics_001 = function(){
   ## ----rproc-------------------------------------------------
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
@@ -125,18 +113,13 @@ measles_ppomp = function(
                  "sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
 
-  ## ----everything-else-------------------------------------------------
-  measles_ppomp_skel(
-    data = data,
-    starting_pparams = starting_pparams,
+  ## ----output-------------------------------------------------
+  list(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    paramnames = paramnames,
-    shared_str = shared_str,
-    sim_model = sim_model,
-    AK_interp = AK_interp
+    paramnames = paramnames
   )
 }
