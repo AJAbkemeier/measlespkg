@@ -17,7 +17,7 @@ make_measlesPomp = function(
     model,
     AK_interp = TRUE,
     sim_obs_list = NULL
-  ){
+){
   rproc = model$rproc
   dmeas = model$dmeas
   rmeas = model$rmeas

@@ -29,5 +29,5 @@ EL_out = eval_logLik(
   nreps = 2
 )
 EL_out$fits
-combine_top_specific_fits(EL_out, top_n = 2)
+combine_top_fits(EL_out, top_n = 2)
 }

@@ -16,8 +16,7 @@
 #'   np_pf = 1,
 #'   nreps = 2
 #' )
-#' EL_out$fits[, 1:4]
-#' grab_top_params(EL_out)$fits[, 1:4]
+#' grab_top_fits(EL_out)$fits[, 1:4]
 grab_top_fits = function(
     x,
     top_n = 1,

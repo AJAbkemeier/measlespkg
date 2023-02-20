@@ -12,7 +12,7 @@ print(get_cmd_args())
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
-if(is.na(ncores)) ncores = detectCores()/2
+if(is.na(ncores)) ncores = parallel::detectCores()/2
 print(ncores)
 
 # Set fitting and filter parameters
@@ -39,13 +39,6 @@ EVAL_PARAM = NULL
 # Set seeds other than MAIN_SEED equal to NULL in order to base RNG entirely on
 # MAIN_SEED.
 MAIN_SEED = 169566665
-SIM_MODEL_SEED = NULL
-INITIAL_PARAMS_SEED = NULL
-MIF2_START_SEED = NULL
-MIF2_BAKE_SEED = NULL
-PFILTER_EVAL_SEED = NULL
-BEST_EVAL_SEED = NULL
-PLOT_SIMS_SEED = NULL
 
 (array_job_id = as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", unset = NA)))
 
@@ -135,15 +128,20 @@ if(!is.null(EVAL_POINTS)){
 ########################################################################
 
 # Specify box to sample initial shared parameters from
-shared_box_specs = tribble(
+shared_box_specs = tibble::tribble(
   ~param, ~center, ~radius,
   #gamma1",    -0.63695, 0.05,
   #"gamma0",    4.61215,    0.5,
   "mu",        0.02,        0
 )
 
+shared_box_specs = tibble::tribble(
+  ~param, ~lower,     ~upper,
+  "mu",        0.02,     0.02
+)
+
 # Specify box to sample initial specific parameters from
-specific_radii = tribble(
+specific_radii = tibble::tribble(
   ~param, ~radius,
   "R0",        6,
   "rho",       0.05,
@@ -163,7 +161,7 @@ specific_radii = tribble(
 if(!is.null(EVAL_PARAM))
   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
 
-specific_bounds = tribble(
+specific_bounds = tibble::tribble(
   ~param,       ~lower,        ~upper,
   "R0",             10,            60,
   "rho",           0.1,           0.9,
@@ -194,22 +192,21 @@ if(USE_SPECIFIC_BOUNDS){
     coef_choices = centers
   )
   specific_radii = specific_bounds %>%
-    transmute(param = param, radius = (upper-lower)/2)
+    transmute(param = param, radius = (upper - lower)/2)
 } else {
-  specific_centers = pparams(measles_ppomp_mod)[[2]]
+  specific_centers = pparams(measles_ppomp_mod)$specific
 }
 
 specific_box_specs = construct_specific_box_specs(
-  specific_pparams = specific_centers,
+  specific_pparams_df = specific_centers,
   radii_tbl = specific_radii
 )
 
 # Sample initial parameters and place into lists
-param_guess_list = construct_param_guess_list(
+param_guess_list = sample_initial_pparams(
   shared_box_specs = shared_box_specs,
   specific_box_specs = specific_box_specs,
-  nseq = NREPS_MIF,
-  seed = INITIAL_PARAMS_SEED,
+  n_draws = NREPS_MIF,
   pos_params = c("R0", "mu", "sigmaSE", "psi", "iota", "sigma", "alpha"),
   unit_interval_params = c("S_0", "E_0", "I_0", "R_0", "cohort", "rho",
                            "amplitude")
@@ -219,23 +216,11 @@ param_guess_list = construct_param_guess_list(
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
   load(PREVIOUS_FIT_PATH)
-  if(length(measles_ppomp_mod) == 1){
-    grabbed_params = grab_top_fits(
-      EL_out,
-      top_n = TOP_N_FITS
-    )$fits %>%
-      select(!logLik & !se)
-  } else {
-    grabbed_params = combine_top_fits(
-      EL_out,
-      top_n = TOP_N_FITS
-    )$fits %>%
-      select(!logLik & !se)
-  }
-  top_params = slice(rep(1:nrow(grabbed_params), each = NREPS_MIF/TOP_N_FITS))
-  pparam_list = lapply(1:nrow(top_params), function(x){
-    coef_to_pparams(top_params[x,])
-  })
+  starting_pparams_list = duplicate_top_pparams(
+    EL_out,
+    out_length = NREPS_MIF,
+    top_n = TOP_N_FITS
+  )
 }
 
 ##################### mif2 ##################################

@@ -12,7 +12,7 @@ mif2_alt = function(
     shared_first = TRUE,
     seed = NULL,
     write_mif2_to
-  ){
+){
   bake(
     file = write_mif2_to,
     seed = seed,
