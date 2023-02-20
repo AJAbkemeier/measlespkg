@@ -86,7 +86,7 @@ if(!is.null(EVAL_PARAM))
 
 # Specify names of output files
 MIF2_FILE = "mif2_out.rds"
-LL_FILE = "pf_logLik_frames.rda"
+LL_FILE = "EL_out.rda"
 
 ### Diagnostic parameters ###
 # For plots and final loglik calc, use combination of parameters which yields
@@ -220,30 +220,21 @@ param_guess_list = construct_param_guess_list(
 if(!is.null(PREVIOUS_FIT_PATH)){
   load(PREVIOUS_FIT_PATH)
   if(length(measles_ppomp_mod) == 1){
-    grabbed_params = grab_top_params(
-      pf_logLik_frame,
+    grabbed_params = grab_top_fits(
+      EL_out,
       top_n = TOP_N_FITS
-    ) %>%
+    )$fits %>%
       select(!logLik & !se)
   } else {
-    grabbed_params = grab_top_unit_params(
-      pf_logLik_frame,
-      pf_unitlogLik_frame,
+    grabbed_params = combine_top_fits(
+      EL_out,
       top_n = TOP_N_FITS
-    ) %>%
+    )$fits %>%
       select(!logLik & !se)
   }
-  top_params = grabbed_params %>%
-    slice(rep(1:nrow(.), each = NREPS_MIF/TOP_N_FITS))
+  top_params = slice(rep(1:nrow(grabbed_params), each = NREPS_MIF/TOP_N_FITS))
   pparam_list = lapply(1:nrow(top_params), function(x){
     coef_to_pparams(top_params[x,])
-  })
-  param_guess_list = list(shared = NULL, specific = NULL)
-  param_guess_list[["shared"]] = lapply(seq_along(pparam_list), function(x){
-    pparam_list[[x]][[1]]
-  })
-  param_guess_list[["specific"]] = lapply(seq_along(pparam_list), function(x){
-    pparam_list[[x]][[2]]
   })
 }
 
@@ -281,14 +272,6 @@ EL_out = eval_logLik(
   divisor = 8164
 )
 save(EL_out, file = write_LL_to)
-# Show top 5 likelihoods
-grab_top_params(pf_logLik_frame = pf_logLik_frame, 5)[,1:2]
-# Show best ULL combination (might not be valid)
-combine_best_ull(
-  pf_logLik_frame,
-  pf_unitlogLik_frame,
-  pf_unitSE_frame
-)[1:2]
 
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
@@ -311,7 +294,8 @@ if(USE_BEST_COMBO){
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_params(pf_logLik_frame = pf_logLik_frame)[,-(1:2)] %>%
+  top_params = grab_top_params(EL_out)$fits %>%
+    dplyr::select(-logLik, -se)
     unlist()
 }
 

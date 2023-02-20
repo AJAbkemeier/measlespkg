@@ -32,7 +32,8 @@ If NULL, does not set new seed.}
 repetition. If NULL, pfilter object is not saved.}
 }
 \value{
-A list of data frames.
+Object of type \code{EL_list}, a list of data frames containing
+log likelihood and se estimates.
 }
 \description{
 Evaluate log likelihood of model using particle filter

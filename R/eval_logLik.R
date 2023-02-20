@@ -10,7 +10,8 @@
 #' @param return_pfilter_obj Should the returned list include a pfilter object?
 #' repetition. If NULL, pfilter object is not saved.
 #'
-#' @return A list of data frames.
+#' @return Object of type `EL_list`, a list of data frames containing
+#' log likelihood and se estimates.
 #' @export
 #'
 #' @examples
@@ -71,7 +72,7 @@ eval_logLik = function(
   rownames(pf_unitlogLik_frame) = 1:nrow(pf_unitlogLik_frame)
   pf_unitSE_frame = data.frame(dplyr::bind_rows(pf_unitSE_list))
   rownames(pf_unitSE_frame) = 1:nrow(pf_unitSE_frame)
-  pf_frames_list = list(
+  pf_frames_list = new_EL_list(
     fits = pf_logLik_frame,
     ull = pf_unitlogLik_frame,
     se = pf_unitSE_frame

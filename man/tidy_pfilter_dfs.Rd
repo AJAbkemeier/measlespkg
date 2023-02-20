@@ -4,13 +4,13 @@
 \alias{tidy_pfilter_dfs}
 \title{Create tidy data frame from saved \code{eval_logLik()} output.}
 \usage{
-tidy_pfilter_dfs(EL_list)
+tidy_pfilter_dfs(x)
 }
 \arguments{
-\item{EL_out}{List shaped like the output of \code{eval_logLik()}.}
+\item{x}{Object of class \code{EL_list}.}
 }
 \value{
-Tibble of \code{EL_out} data in tidy format.
+Tibble of \code{x} data in tidy format.
 }
 \description{
 Create tidy data frame from saved \code{eval_logLik()} output.
