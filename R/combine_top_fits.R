@@ -22,10 +22,10 @@ combine_top_fits = function(
     x,
     top_n = 1,
     se_penalty = 0
-  ){
+){
   unit_names = colnames(x$ull)
   best_shared = coef_to_pparams(
-    dplyr::select(x$fits[1,], -logLik, -se)
+    dplyr::select(x$fits[1,], -.data$logLik, -.data$se)
   )[[1]]
   shared_names = names(best_shared)
   is_unique = sapply(shared_names, function(z)
@@ -63,7 +63,7 @@ combine_top_fits = function(
         sqrt(sum(se[z,]^2))
       )
     ) %>%
-    dplyr::select(logLik, se, dplyr::everything())
+    dplyr::select(.data$logLik, .data$se, dplyr::everything())
   new_EL_list(
     fits = fits,
     ull = ull,

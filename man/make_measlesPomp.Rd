@@ -2,21 +2,36 @@
 % Please edit documentation in R/make_measlesPomp.R
 \name{make_measlesPomp}
 \alias{make_measlesPomp}
-\title{Skeleton for measles_ppomp functions}
+\title{Make a panelPomp model using measles data}
 \usage{
 make_measlesPomp(
   data,
   starting_pparams,
   model,
-  AK_interp = TRUE,
-  sim_obs_list = NULL
+  interp_method = c("shifted_splines", "linear"),
+  custom_obs_list = NULL
 )
 }
 \arguments{
-\item{sim_obs_list}{}
+\item{data}{List in the format of \code{twentycities}.}
+
+\item{starting_pparams}{Parameters in the format of \code{pparams()} output.}
+
+\item{model}{List of objects in the format of the output for the
+\code{model_mechanics_XXX()} functions.}
+
+\item{interp_method}{Method used to interpolate population and births.
+Possible options are \code{"shifted_splines"} and \verb{"linear}.}
+
+\item{custom_obs_list}{List of observations where each element supplies
+observations for a different city. Useful when using simulated observations.
+Set to \code{NULL} to use real observations.}
+}
+\value{
+A panelPomp object using the data and model supplied.
 }
 \description{
-Skeleton for measles_ppomp functions
+Make a panelPomp model using measles data
 }
 \examples{
 make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())

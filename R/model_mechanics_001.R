@@ -6,7 +6,6 @@
 #' @examples
 #' make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
 model_mechanics_001 = function(){
-  ## ----rproc-------------------------------------------------
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
@@ -59,7 +58,6 @@ model_mechanics_001 = function(){
     C += trans[4];           // true incidence
   ")
 
-  ## ----dmeasure-------------------------------------------------
   dmeas <- pomp::Csnippet("
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
@@ -77,7 +75,6 @@ model_mechanics_001 = function(){
     if (give_log) lik = log(lik);
   ")
 
-  ## ----rmeasure-------------------------------------------------
   rmeas <- pomp::Csnippet("
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
@@ -90,7 +87,6 @@ model_mechanics_001 = function(){
     }
   ")
 
-  ## ----rinit-------------------------------------------------
   rinit <- pomp::Csnippet("
     double m = pop/(S_0+E_0+I_0+R_0);
     S = nearbyint(m*S_0);
@@ -101,19 +97,16 @@ model_mechanics_001 = function(){
     C = 0;
   ")
 
-  ## ----transforms-----------------------------------------------
   pt <- pomp::parameter_trans(
     log = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota"),
     logit = c("cohort","amplitude", "rho"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
 
-  ## ----param-names-----------------------------------------------
   paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
                  "sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
 
-  ## ----output-------------------------------------------------
   list(
     rproc = rproc,
     dmeas = dmeas,

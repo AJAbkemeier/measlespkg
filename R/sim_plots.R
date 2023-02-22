@@ -1,14 +1,15 @@
-#' Title
+#' Plot simulated observations against real observations
 #'
-#' @param true_model
-#' @param sim_model
-#' @param n_sims
-#' @param print_plots
-#' @param save_dir
-#' @param width
-#' @param height
+#' @param true_model `panelPomp` object to get true observations from.
+#' @param sim_model `panelPomp` object to simulate observations from.
+#' @param n_sims Number of simulations to generate.
+#' @param print_plots Boolean specifying whether plots should be printed.
+#' @param save_dir String specifying where plots should be saved. No plots are
+#' saved if `NULL`.
+#' @param width Width of plots.
+#' @param height Height of plots.
 #'
-#' @return
+#' @return Returns `NULL`.
 #' @export
 #'
 #' @examples
@@ -60,7 +61,7 @@ sim_plots = function(
     dplyr::left_join(bound_tibble, by = c("time","unit"))
 
   first_10_sim_tibble = sim_tibble %>%
-    dplyr::filter(rep_name %in% paste0("sim", 1:10))
+    dplyr::filter(.data$rep_name %in% paste0("sim", 1:10))
 
   ggplot_list = vector("list", 4)
   # Individual sims plots
@@ -71,7 +72,7 @@ sim_plots = function(
     ggplot2::geom_line() +
     ggplot2::facet_wrap(ggplot2::vars(.data$unit), scales = "free") +
     ggplot2::geom_line(
-      dplyr::filter(sim_tibble, rep_name == "real"),
+      dplyr::filter(sim_tibble, .data$rep_name == "real"),
       mapping = ggplot2::aes(x = .data$time, y = .data$cases),
       color = "black"
     ) +
@@ -85,7 +86,7 @@ sim_plots = function(
     ggplot2::geom_line() +
     ggplot2::facet_wrap(ggplot2::vars(.data$unit), scales = "free") +
     ggplot2::geom_line(
-      dplyr::filter(sim_tibble, rep_name == "real"),
+      dplyr::filter(sim_tibble, .data$rep_name == "real"),
       mapping = ggplot2::aes(x = .data$time, y = .data$cases + 1),
       color = "black"
     ) +
@@ -101,7 +102,7 @@ sim_plots = function(
     ) +
     ggplot2::facet_wrap(ggplot2::vars(.data$unit), scales = "free") +
     ggplot2::geom_line(
-      dplyr::filter(sim_tibble, rep_name == "real"),
+      dplyr::filter(sim_tibble, .data$rep_name == "real"),
       mapping = ggplot2::aes(x = .data$time, y = .data$cases),
       color = "black"
     ) +
@@ -116,7 +117,7 @@ sim_plots = function(
     ) +
     ggplot2::facet_wrap(ggplot2::vars(.data$unit), scales = "free") +
     ggplot2::geom_line(
-      dplyr::filter(sim_tibble, rep_name == "real"),
+      dplyr::filter(sim_tibble, .data$rep_name == "real"),
       mapping = ggplot2::aes(x = .data$time, y = .data$cases + 1),
       color = "black"
     ) +

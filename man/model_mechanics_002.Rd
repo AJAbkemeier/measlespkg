@@ -2,15 +2,17 @@
 % Please edit documentation in R/model_mechanics_002.R
 \name{model_mechanics_002}
 \alias{model_mechanics_002}
-\title{panelPOMP model with log-log relationship between gamma and 1950 population}
+\title{panelPOMP model with log-log relationship between gamma and standardized
+1950 population}
 \usage{
 model_mechanics_002()
 }
 \value{
-List of objects required for make_measlesPomp
+List of objects required for \code{make_measlesPomp()}.
 }
 \description{
-panelPOMP model with log-log relationship between gamma and 1950 population
+panelPOMP model with log-log relationship between gamma and standardized
+1950 population
 }
 \examples{
 new_pparams = AK_pparams

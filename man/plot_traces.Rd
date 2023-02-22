@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_traces.R
 \name{plot_traces}
 \alias{plot_traces}
-\title{Title}
+\title{Plot traces from \code{mif2} objects}
 \usage{
 plot_traces(
-  mif2_alt_list,
+  mif2_list,
   plot_shared = ".ALL",
   plot_specific = ".ALL",
   print_plots = TRUE,
@@ -15,8 +15,28 @@ plot_traces(
 )
 }
 \arguments{
-\item{height}{}
+\item{mif2_list}{List of \code{mif2} objects.}
+
+\item{plot_shared}{String specifying which shared value traces should be
+plotted. This includes log-likelihoods and shared parameters. Set to \code{".ALL"}
+to plot all shared value traces.}
+
+\item{plot_specific}{String specifying which unit-specific value traces
+should be plotted. This includes unit log-likelihoods and specific
+parameters. Set to \code{".ALL"} to plot all unit-specific value traces.}
+
+\item{print_plots}{Boolean specifying whether plots should be printed.}
+
+\item{save_dir}{String specifying where plots should be saved. No plots are
+saved if \code{NULL}.}
+
+\item{width}{Width of plots.}
+
+\item{height}{Height of plots.}
+}
+\value{
+Returns \code{NULL}
 }
 \description{
-Title
+Plot traces from \code{mif2} objects
 }

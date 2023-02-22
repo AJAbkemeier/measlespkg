@@ -25,7 +25,7 @@ eval_logLik = function(
     seed = NULL,
     divisor = NULL,
     return_pfilter_obj = FALSE
-  ){
+){
   pf_logLik_frame = data.frame(
     logLik = rep(0, length(model_obj_list)),
     se = rep(0, length(model_obj_list))

@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_plots.R
 \name{sim_plots}
 \alias{sim_plots}
-\title{Title}
+\title{Plot simulated observations against real observations}
 \usage{
 sim_plots(
   true_model,
@@ -15,10 +15,26 @@ sim_plots(
 )
 }
 \arguments{
-\item{height}{}
+\item{true_model}{\code{panelPomp} object to get true observations from.}
+
+\item{sim_model}{\code{panelPomp} object to simulate observations from.}
+
+\item{n_sims}{Number of simulations to generate.}
+
+\item{print_plots}{Boolean specifying whether plots should be printed.}
+
+\item{save_dir}{String specifying where plots should be saved. No plots are
+saved if \code{NULL}.}
+
+\item{width}{Width of plots.}
+
+\item{height}{Height of plots.}
+}
+\value{
+Returns \code{NULL}.
 }
 \description{
-Title
+Plot simulated observations against real observations
 }
 \examples{
 mod = AK_model()

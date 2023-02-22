@@ -1,17 +1,7 @@
-prep_10_cities_data = function(
-    measles_filepath,
-    demog_filepath,
-    start_params_filepath
-  ){
-  measles = read_csv("input/ten_cities_measles/measles.csv",
-                     show_col_types = FALSE) %>%
-    as.data.frame()
-  demog = read_csv("input/ten_cities_measles/birth_pop.csv",
-                   show_col_types = FALSE) %>%
-    as.data.frame()
-  start_params = read_csv("input/ten_cities_measles/start_params.csv",
-                          show_col_types = FALSE) %>%
-    as.data.frame()
+prep_10_cities_data = function(){
+  measles = utils::read.csv("input/ten_cities_measles/measles.csv")
+  demog = utils::read.csv("input/ten_cities_measles/birth_pop.csv")
+  start_params = read.csv("input/ten_cities_measles/start_params.csv")
 
   # measles[(8358-3):(8358+3),]
   # A tibble: 7 × 3

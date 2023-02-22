@@ -10,7 +10,7 @@ tidy_pfilter_dfs(x)
 \item{x}{Object of class \code{EL_list}.}
 }
 \value{
-Tibble of \code{x} data in tidy format.
+Data frame composed from information in \code{x} data in tidy format.
 }
 \description{
 Create tidy data frame from saved \code{eval_logLik()} output.

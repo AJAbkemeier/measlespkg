@@ -1,20 +1,14 @@
-#' panelPOMP model with log-log relationship between gamma and standardized
-#' 1950 population
+#' He10 POMP model for UK measles, but alpha has been moved to exponentiate S
 #'
-#' @return List of objects required for `make_measlesPomp()`.
+#' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
 #' @examples
-#' new_pparams = AK_pparams
-#' new_pparams$shared = c(new_pparams$shared, gamma1 = -0.6369, gamma0 = 4.6121)
-#' make_measlesPomp(twentycities, new_pparams, model_mechanics_002())
-model_mechanics_002 = function(){
+#' make_measlesPomp(twentycities, AK_pparams, model_mechanics_006())
+model_mechanics_006 = function(){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
-
-    // Population-varying parameters
-    double gamma = exp(gamma1*std_log_pop_1950 + gamma0);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -36,7 +30,7 @@ model_mechanics_002 = function(){
     beta = R0*seas*(1.0-exp(-(gamma+mu)*dt))/dt;
 
     // expected force of infection
-    foi = beta*pow(I+iota,alpha)/pop;
+    foi = pow(S/(S_0*pop_1950),alpha)*beta*(I+iota)/pop;
 
     // white noise (extrademographic stochasticity)
     dw = rgammawn(sigmaSE,dt);
@@ -103,15 +97,15 @@ model_mechanics_002 = function(){
     C = 0;
   ")
 
-  pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "psi", "sigma", "iota"),
-    logit = c("cohort","amplitude", "rho"),
-    barycentric = c("S_0","E_0","I_0","R_0")
+  pt <- pomp:: parameter_trans(
+    log = c("sigma", "gamma", "sigmaSE", "psi", "R0", "mu", "alpha", "iota"),
+    logit = c("cohort", "amplitude", "rho"),
+    barycentric = c("S_0", "E_0", "I_0", "R_0")
   )
 
-  paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "psi",
-                 "iota", "sigma")
+  paramnames = c("R0","mu","sigma","gamma","alpha","iota",
+                 "rho","sigmaSE","psi","cohort","amplitude",
+                 "S_0","E_0","I_0","R_0")
 
   list(
     rproc = rproc,

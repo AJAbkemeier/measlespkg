@@ -1,5 +1,4 @@
-#' panelPOMP model with log-log relationship between gamma and standardized
-#' 1950 population
+#' panelPOMP model with log-log relationship between gamma and current population
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
@@ -7,14 +6,14 @@
 #' @examples
 #' new_pparams = AK_pparams
 #' new_pparams$shared = c(new_pparams$shared, gamma1 = -0.6369, gamma0 = 4.6121)
-#' make_measlesPomp(twentycities, new_pparams, model_mechanics_002())
-model_mechanics_002 = function(){
+#' make_measlesPomp(twentycities, new_pparams, model_mechanics_003())
+model_mechanics_003 = function(){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
     // Population-varying parameters
-    double gamma = exp(gamma1*std_log_pop_1950 + gamma0);
+    double gamma = exp(gamma1*log(pop) + gamma0);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)

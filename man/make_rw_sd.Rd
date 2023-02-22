@@ -17,6 +17,6 @@ Returns rw_sd object.
 Turn named numeric vector into rw_sd
 }
 \examples{
-rw_sd_vec = c(alpha = 0.02, gamma = 0.01, E_0 = 0.003)
+rw_sd_vec = c(alpha = 0.02, gamma = 0.01, E_0 = 0.003, I_0 = 0.006)
 make_rw_sd(rw_sd_vec)
 }

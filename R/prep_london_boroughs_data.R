@@ -3,10 +3,10 @@ prep_london_boroughs_data = function(
     demog_filepath,
     start_params_filepath
   ){
-  london_measles = read.csv(measles_filepath) %>%
-    select(borough, date, measles) %>%
-    rename(town = borough, cases = measles) %>%
-    mutate(date = as.Date(date)) %>%
+  london_measles = utils::read.csv(measles_filepath) %>%
+    dplyr::select(.data$borough, .data$date, .data$measles) %>%
+    dplyr::rename(town = .data$borough, cases = .data$measles) %>%
+    dplyr::mutate(date = as.Date(.data$date)) %>%
     as.data.frame()
   # london_measles[(16097-3):(16097+3),]
   # town       date cases
@@ -19,12 +19,15 @@ prep_london_boroughs_data = function(
   # 16100 Islington 1955-04-03   163
   london_measles[16097,"cases"] = NA
 
-  london_demog = read.csv(demog_filepath) %>%
-    rename(town = borough, pop = population) %>%
-    select(town, year, pop, births) %>%
+  london_demog = utils::read.csv(demog_filepath) %>%
+    dplyr::rename(town = .data$borough, pop = .data$population) %>%
+    dplyr::select(.data$town, .data$year, .data$pop, .data$births) %>%
     as.data.frame()
-  london_start_params = read.csv(start_params_filepath)
+  london_start_params = utils::read.csv(start_params_filepath)
 
-  list(measles = london_measles, demog = london_demog,
-       mles = london_start_params)
+  list(
+    measles = london_measles,
+    demog = london_demog,
+    mles = london_start_params
+  )
 }

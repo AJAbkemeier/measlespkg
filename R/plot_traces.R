@@ -1,42 +1,52 @@
-#' Title
+#' Plot traces from `mif2` objects
 #'
-#' @param mif2_alt_list
-#' @param plot_shared
-#' @param plot_specific
-#' @param print_plots
-#' @param save_dir
-#' @param width
-#' @param height
+#' @param mif2_list List of `mif2` objects.
+#' @param plot_shared String specifying which shared value traces should be
+#' plotted. This includes log-likelihoods and shared parameters. Set to `".ALL"`
+#' to plot all shared value traces.
+#' @param plot_specific String specifying which unit-specific value traces
+#' should be plotted. This includes unit log-likelihoods and specific
+#' parameters. Set to `".ALL"` to plot all unit-specific value traces.
+#' @param print_plots Boolean specifying whether plots should be printed.
+#' @param save_dir String specifying where plots should be saved. No plots are
+#' saved if `NULL`.
+#' @param width Width of plots.
+#' @param height Height of plots.
 #'
-#' @return
+#' @return Returns `NULL`
 #' @export
 #'
-#' @examples
-plot_traces = function(mif2_alt_list, plot_shared = ".ALL",
-plot_specific = ".ALL", print_plots = TRUE, save_dir = NULL, width = 16,
-height = 10){
-  stitch_traces = function(mif2_alt_list){
-    nalts = length(mif2_alt_list)
-    nreps = length(mif2_alt_list[[1]])
-    nalt_iter = mif2_alt_list[[1]][[1]]@Nmif
+plot_traces = function(
+    mif2_list,
+    plot_shared = ".ALL",
+    plot_specific = ".ALL",
+    print_plots = TRUE,
+    save_dir = NULL,
+    width = 16,
+    height = 10
+){
+  stitch_traces = function(mif2_list){
+    nalts = length(mif2_list)
+    nreps = length(mif2_list[[1]])
+    nalt_iter = mif2_list[[1]][[1]]@Nmif
     traces_list = vector("list", nreps)
     for(i in seq_along(traces_list)){
       traces_list_i = lapply(1:nalts, function(x)
-        traces(mif2_alt_list[[x]][[i]])
+        pomp::traces(mif2_list[[x]][[i]])
       )
       for(j in seq_along(traces_list_i)){
         if(j > 1){
           traces_list_i[[j]] = traces_list_i[[j]][2:(nalt_iter+1),]
         }
       }
-      traces_list[[i]] = do.call(rbind, traces_list_i)
+      traces_list[[i]] = dplyr::bind_rows(traces_list_i)
     }
     traces_list
   }
-  nalts = length(mif2_alt_list)
-  nreps = length(mif2_alt_list[[1]])
-  niter = mif2_alt_list[[1]][[1]]@Nmif*nalts
-  traces_list = stitch_traces(mif2_alt_list)
+  nalts = length(mif2_list)
+  nreps = length(mif2_list[[1]])
+  niter = mif2_list[[1]][[1]]@Nmif*nalts
+  traces_list = stitch_traces(mif2_list)
 
   trace_names = colnames(traces_list[[1]])
   specific_trace_indices = grep("\\[", trace_names)
@@ -52,50 +62,65 @@ height = 10){
   # Plot shared traces
   if(!is.null(plot_shared)){
     for(plot_col in plot_sh){
-      long_data = as_tibble(
+      long_data = dplyr::as_tibble(
         sapply(1:nreps, function(x) traces_list[[x]][,plot_col])
       ) %>%
-        mutate(iter = 0:niter) %>%
-        pivot_longer(cols = 1:nreps)
+        dplyr::mutate(iter = 0:niter) %>%
+        tidyr::pivot_longer(cols = 1:nreps)
 
-      traces_ggplot = ggplot(
-          long_data, aes(x = iter, y = value, color = name)
+      traces_ggplot = ggplot2::ggplot(
+          long_data,
+          ggplot2::aes(x = .data$iter, y = .data$value, color = .data$name)
         ) +
-        geom_line() +
-        ylab(plot_col) +
-        guides(color = "none")
+        ggplot2::geom_line() +
+        ggplot2::ylab(plot_col) +
+        ggplot2::guides(color = "none")
       if(print_plots) print(traces_ggplot)
       if(!is.null(save_dir)){
-        ggsave(filename = paste0("trace_plot_", plot_col, ".png"),
-               plot = traces_ggplot, path = save_dir,
-               width = width, height = height)
+        ggplot2::ggsave(
+          filename = paste0("trace_plot_", plot_col, ".png"),
+          plot = traces_ggplot,
+          path = save_dir,
+          width = width,
+          height = height
+        )
       }
     }
   }
   # Plot specific traces
   if(!is.null(plot_specific)){
     for(plot_param in plot_sp){
-      plot_units = names(mif2_alt_list[[1]][[1]])
+      plot_units = names(mif2_list[[1]][[1]])
       plot_cols = paste0(plot_param,"[",plot_units,"]")
       long_data = lapply(1:nreps, function(x){
-        as_tibble(traces_list[[x]]) %>%
-          select(plot_cols) %>%
-          mutate(repl = x) %>%
-          mutate(iter = 0:niter)
+        dplyr::as_tibble(traces_list[[x]]) %>%
+          dplyr::select(plot_cols) %>%
+          dplyr::mutate(repl = x) %>%
+          dplyr::mutate(iter = 0:niter)
       }) %>%
-        bind_rows() %>%
-        pivot_longer(cols = plot_cols)
+        dplyr::bind_rows() %>%
+        tidyr::pivot_longer(cols = plot_cols)
 
-      traces_ggplot = ggplot(long_data, aes(x = iter, y = value,
-                                            color = paste0(name,repl))) +
-        geom_line(size = 0.5, alpha = 0.25) +
-        guides(color = "none") +
-        facet_wrap(vars(name), scales = "free")
+      traces_ggplot = ggplot2::ggplot(
+        long_data,
+        ggplot2::aes(
+          x = .data$iter,
+          y = .data$value,
+          color = paste0(.data$name, .data$repl)
+        )
+      ) +
+        ggplot2::geom_line(size = 0.5, alpha = 0.25) +
+        ggplot2::guides(color = "none") +
+        ggplot2::facet_wrap(ggplot2::vars(.data$name), scales = "free")
       if(print_plots) print(traces_ggplot)
       if(!is.null(save_dir)){
-        ggsave(filename = paste0("trace_plot_",plot_param,".png"),
-               plot = traces_ggplot, path = save_dir,
-               width = width, height = height)
+        ggplot2::ggsave(
+          filename = paste0("trace_plot_", plot_param,".png"),
+          plot = traces_ggplot,
+          path = save_dir,
+          width = width,
+          height = height
+        )
       }
     }
   }

@@ -1,14 +1,21 @@
-#' panelPOMP model with log-log relationship between gamma and standardized
-#' 1950 population
+#' panelPOMP model with log-log relationship for between gamma and
+#' the standardized 1950 population, as well as between psi and the
+#' standardized 1950 population
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
 #' @examples
 #' new_pparams = AK_pparams
-#' new_pparams$shared = c(new_pparams$shared, gamma1 = -0.6369, gamma0 = 4.6121)
-#' make_measlesPomp(twentycities, new_pparams, model_mechanics_002())
-model_mechanics_002 = function(){
+#' new_pparams$shared = c(
+#'   new_pparams$shared,
+#'   gamma1 = -0.6369,
+#'   gamma0 = 4.6121,
+#'   psi1 = -0.69722,
+#'   psi0 = -1.10167
+#' )
+#' make_measlesPomp(twentycities, new_pparams, model_mechanics_005())
+model_mechanics_005 = function( ){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
@@ -65,6 +72,7 @@ model_mechanics_002 = function(){
   ")
 
   dmeas <- pomp::Csnippet("
+    double psi = exp(psi1*std_log_pop_1950 + psi0);
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
@@ -82,6 +90,7 @@ model_mechanics_002 = function(){
   ")
 
   rmeas <- pomp::Csnippet("
+    double psi = exp(psi1*std_log_pop_1950 + psi0);
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
@@ -104,14 +113,14 @@ model_mechanics_002 = function(){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "psi", "sigma", "iota"),
+    log = c("sigmaSE","R0", "mu", "alpha", "iota", "sigma"),
     logit = c("cohort","amplitude", "rho"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
 
   paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "psi",
-                 "iota", "sigma")
+                 "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "iota",
+                 "psi1", "psi0", "sigma")
 
   list(
     rproc = rproc,

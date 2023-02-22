@@ -1,20 +1,28 @@
-#' panelPOMP model with log-log relationship between gamma and standardized
-#' 1950 population
+#' panelPOMP model with log-log relationship for between gamma and
+#' the standardized 1950 population, as well as between iota and the
+#' standardized 1950 population
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
 #' @examples
 #' new_pparams = AK_pparams
-#' new_pparams$shared = c(new_pparams$shared, gamma1 = -0.6369, gamma0 = 4.6121)
-#' make_measlesPomp(twentycities, new_pparams, model_mechanics_002())
-model_mechanics_002 = function(){
+#' new_pparams$shared = c(
+#'   new_pparams$shared,
+#'   gamma1 = -0.6369,
+#'   gamma0 = 4.6121,
+#'   iota1 = 1.4172,
+#'   iota0 = -1.9611
+#' )
+#' make_measlesPomp(twentycities, new_pparams, model_mechanics_004())
+model_mechanics_004 = function(){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
     // Population-varying parameters
     double gamma = exp(gamma1*std_log_pop_1950 + gamma0);
+    double iota = exp(iota1*std_log_pop_1950 + iota0);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -104,14 +112,14 @@ model_mechanics_002 = function(){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "psi", "sigma", "iota"),
-    logit = c("cohort","amplitude", "rho"),
-    barycentric = c("S_0","E_0","I_0","R_0")
+    log = c("sigmaSE", "R0", "mu", "alpha", "psi", "sigma"),
+    logit = c("cohort", "amplitude", "rho"),
+    barycentric = c("S_0", "E_0", "I_0", "R_0")
   )
 
   paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
                  "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "psi",
-                 "iota", "sigma")
+                 "iota1", "iota0", "sigma")
 
   list(
     rproc = rproc,

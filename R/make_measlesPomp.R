@@ -1,12 +1,16 @@
-#' Skeleton for measles_ppomp functions
+#' Make a panelPomp model using measles data
 #'
-#' @param data
-#' @param starting_pparams
-#' @param model
-#' @param AK_interp
-#' @param sim_obs_list
+#' @param data List in the format of `twentycities`.
+#' @param starting_pparams Parameters in the format of `pparams()` output.
+#' @param model List of objects in the format of the output for the
+#' `model_mechanics_XXX()` functions.
+#' @param interp_method Method used to interpolate population and births.
+#' Possible options are `"shifted_splines"` and `"linear`.
+#' @param custom_obs_list List of observations where each element supplies
+#' observations for a different city. Useful when using simulated observations.
+#' Set to `NULL` to use real observations.
 #'
-#' @return
+#' @return A panelPomp object using the data and model supplied.
 #' @export
 #'
 #' @examples
@@ -15,8 +19,8 @@ make_measlesPomp = function(
     data,
     starting_pparams,
     model,
-    AK_interp = TRUE,
-    sim_obs_list = NULL
+    interp_method = c("shifted_splines", "linear"),
+    custom_obs_list = NULL
 ){
   rproc = model$rproc
   dmeas = model$dmeas
@@ -45,7 +49,7 @@ make_measlesPomp = function(
       ) %>%
       dplyr::filter(.data$time > 1950 & .data$time < 1964) %>%
       dplyr::select(.data$time, .data$cases)
-    if(!is.null(sim_obs_list)) dat_list[[i]]$cases = sim_obs_list[[i]]
+    if(!is.null(custom_obs_list)) dat_list[[i]]$cases = custom_obs_list[[i]]
 
     demog_list[[i]] = demog %>%
       dplyr::filter(.data$unit == units[[i]]) %>%
@@ -56,27 +60,30 @@ make_measlesPomp = function(
   for(i in seq_along(units)){
     dmgi = demog_list[[i]]
     times = seq(from = min(dmgi$year), to = max(dmgi$year), by = 1/12)
-    if(AK_interp){
-      pop_interp = stats::predict(
-        stats::smooth.spline(x = dmgi$year, y = dmgi$pop),
-        x = times
-      )$y
-      births_interp = stats::predict(
-        stats::smooth.spline(x = dmgi$year + 0.5, y = dmgi$births),
-        x = times - 4
-      )$y
-    } else {
-      pop_interp = stats::approx(
-        x = dmgi$year,
-        y = dmgi$pop,
-        xout = times
-      )$y
-      births_interp = stats::approx(
-        x = dmgi$year,
-        y = dmgi$births,
-        xout = times - 4
-      )$y
-    }
+    switch(interp_method[[1]],
+      shifted_splines = {
+        pop_interp = stats::predict(
+          stats::smooth.spline(x = dmgi$year, y = dmgi$pop),
+          x = times
+        )$y
+        births_interp = stats::predict(
+          stats::smooth.spline(x = dmgi$year + 0.5, y = dmgi$births),
+          x = times - 4
+        )$y
+      },
+      linear = {
+        pop_interp = stats::approx(
+          x = dmgi$year,
+          y = dmgi$pop,
+          xout = times
+        )$y
+        births_interp = stats::approx(
+          x = dmgi$year,
+          y = dmgi$births,
+          xout = times - 4
+        )$y
+      }
+    )
     covar_list[[i]] = dmgi %>%
     dplyr::summarize(
         time = times,

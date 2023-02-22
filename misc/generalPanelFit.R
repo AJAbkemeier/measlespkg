@@ -1,14 +1,12 @@
 Sys.time()
 ######### load-packages ###############################
-# Resolve function name conflict
-# select <- dplyr::select
+
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),
 #                  function(x) source(paste0("./R/functions/", x))))
 
 ######## Get arguments from command line #############
-cmd_args_list = get_cmd_args()
-print(get_cmd_args())
+(out_dir = as.numeric(Sys.getenv("out_dir", unset = NA)))
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
@@ -23,11 +21,11 @@ NREPS_MIF    = switch(RUN_LEVEL, 4,  ncores)
 NP_EVAL      = switch(RUN_LEVEL, 10, 10000)
 NREPS_EVAL   = switch(RUN_LEVEL, 3,  ncores)
 
-# TOP_N_FITS selects top fits from likelihood evalation file specified in
+# TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 BLOCK_MIF2 = TRUE
-AK_INTERP = TRUE
+INTERP_METHOD = "shifted_splines"
 # SIM_MODEL specifies whether simulated data from a given model should be used.
 SIM_MODEL = NULL
 COOLING_FRAC = 0.5
@@ -36,8 +34,6 @@ COOLING_FRAC = 0.5
 EVAL_POINTS = NULL
 EVAL_PARAM = NULL
 ### Seeds ###
-# Set seeds other than MAIN_SEED equal to NULL in order to base RNG entirely on
-# MAIN_SEED.
 MAIN_SEED = 169566665
 
 (array_job_id = as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", unset = NA)))
@@ -52,12 +48,12 @@ if(!is.na(array_job_id)){
 # the portion of code which chooses starting parameters from a box.
 PREVIOUS_FIT_PATH = NULL
 
-# Use RS0 to set random walk standard deviations for parameters.
+# Use INITIAL_RW_SD to set random walk standard deviations for parameters.
 # NOTE: current mif2_alt function might not be able to use different sd for
 # different ivp.
 DEFAULT_SD = 0.02
 IVP_DEFAULT_SD = DEFAULT_SD*3
-RS0 = c(
+INITIAL_RW_SD = c(
   S_0 = IVP_DEFAULT_SD,
   E_0 = IVP_DEFAULT_SD,
   I_0 = IVP_DEFAULT_SD,
@@ -75,11 +71,11 @@ RS0 = c(
   mu = 0
 )
 if(!is.null(EVAL_PARAM))
-  RS0[[EVAL_PARAM]] = 0
+  INITIAL_RW_SD[[EVAL_PARAM]] = 0
 
 # Specify names of output files
 MIF2_FILE = "mif2_out.rds"
-LL_FILE = "EL_out.rda"
+LL_FILE = "EL_out.rds"
 
 ### Diagnostic parameters ###
 # For plots and final loglik calc, use combination of parameters which yields
@@ -93,7 +89,7 @@ set.seed(MAIN_SEED)
 write_path = switch(
   RUN_LEVEL,
   "./output/DUMMY/",
-  cmd_args_list$path_arg
+  out_dir
 )
 dir.create(write_path)
 write_mif2_to = paste0(write_path, MIF2_FILE)
@@ -114,11 +110,11 @@ if(!is.null(SIM_MODEL)){
 }
 
 ################## Construct panelPomp object ##########################
-measles_ppomp_mod = make_measlesPomp(
-  twentycities,
+measlesPomp_mod = make_measlesPomp(
+  clean_twentycities(),
   starting_pparams = AK_pparams,
   model_mechanics_001(),
-  AK_interp = AK_INTERP
+  interp_method = INTERP_METHOD
 )
 
 if(!is.null(EVAL_POINTS)){
@@ -133,11 +129,6 @@ shared_box_specs = tibble::tribble(
   #gamma1",    -0.63695, 0.05,
   #"gamma0",    4.61215,    0.5,
   "mu",        0.02,        0
-)
-
-shared_box_specs = tibble::tribble(
-  ~param, ~lower,     ~upper,
-  "mu",        0.02,     0.02
 )
 
 # Specify box to sample initial specific parameters from
@@ -160,6 +151,11 @@ specific_radii = tibble::tribble(
 )
 if(!is.null(EVAL_PARAM))
   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
+
+shared_bounds = tibble::tribble(
+  ~param, ~lower,     ~upper,
+  "mu",        0.02,     0.02
+)
 
 specific_bounds = tibble::tribble(
   ~param,       ~lower,        ~upper,
@@ -184,34 +180,13 @@ if(!is.null(EVAL_PARAM)){
   specific_bounds[eval_param_rows, "upper"] = EVAL_POINTS[[array_job_id]]
 }
 
-if(USE_SPECIFIC_BOUNDS){
-  centers = (specific_bounds$lower + specific_bounds$upper)/2
-  names(centers) = specific_bounds$param
-  specific_centers = construct_specific_pparams(
-    pparams_df = pparams(measles_ppomp_mod)[[2]],
-    coef_choices = centers
-  )
-  specific_radii = specific_bounds %>%
-    transmute(param = param, radius = (upper - lower)/2)
-} else {
-  specific_centers = pparams(measles_ppomp_mod)$specific
-}
-
-specific_box_specs = construct_specific_box_specs(
-  specific_pparams_df = specific_centers,
-  radii_tbl = specific_radii
-)
-
 # Sample initial parameters and place into lists
-param_guess_list = sample_initial_pparams(
-  shared_box_specs = shared_box_specs,
-  specific_box_specs = specific_box_specs,
-  n_draws = NREPS_MIF,
-  pos_params = c("R0", "mu", "sigmaSE", "psi", "iota", "sigma", "alpha"),
-  unit_interval_params = c("S_0", "E_0", "I_0", "R_0", "cohort", "rho",
-                           "amplitude")
+initial_pparams_list = sample_initial_pparams_ul(
+  shared_box_specs = shared_bounds,
+  specific_box_specs = specific_bounds,
+  units = names(measlesPomp_mod),
+  n_draws = NREPS_MIF
 )
-
 
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
@@ -224,63 +199,64 @@ if(!is.null(PREVIOUS_FIT_PATH)){
 }
 
 ##################### mif2 ##################################
-registerDoParallel(cores = ncores)
-registerDoRNG(MIF2_START_SEED)
-tic()
-mif2_alt_list = mif2_alt(
-  measles_ppomp_mod = measles_ppomp_mod,
-  param_guess_list = param_guess_list,
-  rs0 = RS0,
-  run_level = RUN_LEVEL,
-  nmif = NMIF,
-  n_alt = N_ALT,
-  nreps_mif2 = NREPS_MIF,
-  np_mif2 = NP_MIF,
-  cooling_frac = COOLING_FRAC,
-  block = BLOCK_MIF2,
-  shared_first = SHARED_FIRST,
-  seed = MIF2_BAKE_SEED,
-  write_mif2_to = write_mif2_to
-)
-mif2_out = mif2_alt_list[[length(mif2_alt_list)]]
-toc()
+doParallel::registerDoParallel(cores = ncores)
+doRNG::registerDoRNG()
+tictoc::tic()
+mif2_out = pomp::bake(file = write_mif2_to, {
+  foreach::foreach(i = 1:NREPS_MIF, .packages = "panelPomp", .combine = c) %dopar% {
+    panelPomp::mif2(
+      measlesPomp_mod,
+      Np = NP_MIF,
+      cooling.fraction.50 = COOLING_FRAC,
+      rw.sd = make_rw_sd(INITIAL_RW_SD),
+      cooling.type = "geometric",
+      Nmif = NMIF,
+      shared.start = initial_pparams_list[[i]]$shared,
+      specific.start = initial_pparams_list[[i]]$specific,
+      block = BLOCK_MIF2
+    )
+  }
+})
+tictoc::toc()
 
 ## ----pfilter-----------------------------------------------
 # Note that King log likelihood is −40345.7
 # He10 log likelihood from paper SI is -40348.1
-EL_out = eval_logLik(
-  model_obj_list = mif2_out,
-  ncores = ncores,
-  np_pf = NP_EVAL,
-  nreps = NREPS_EVAL,
-  seed = PFILTER_EVAL_SEED,
-  divisor = 8164
-)
-save(EL_out, file = write_LL_to)
+tictoc::tic()
+EL_out = pomp::bake(file = write_LL_to, {
+  eval_logLik(
+    model_obj_list = mif2_out,
+    ncores = ncores,
+    np_pf = NP_EVAL,
+    nreps = NREPS_EVAL,
+    seed = PFILTER_EVAL_SEED,
+    divisor = 8164
+  )
+})
+tictoc::toc()
 
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
-  top_params = combine_best_ull(pf_logLik_frame, pf_unitlogLik_frame,
-                                pf_unitSE_frame)[-(1:2)]
-  eval_model = measles_ppomp_mod
+  top_params = combine_top_fits(EL_out)$fits[-(1:2)]
+  eval_model = measlesPomp_mod
   coef(eval_model) = top_params
-  EL_out_best = eval_logLik(
-    model_obj_list = list(eval_model),
-    ncores = ncores,
-    write_to = paste0(write_path, "best_eval.rda"),
-    np_pf = NP_EVAL,
-    nreps = ncores*8,
-    seed = BEST_EVAL_SEED,
-    divisor = 8164
+  EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
+    eval_logLik(
+      model_obj_list = list(eval_model),
+      ncores = ncores,
+      np_pf = NP_EVAL,
+      nreps = ncores*8,
+      seed = NULL,
+      divisor = 8164
+    )
   )
-  save(EL_out_best, file = paste0(write_path, "pfilter_obj_best_eval.rda"))
 }
 
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_params(EL_out)$fits %>%
-    dplyr::select(-logLik, -se)
+  top_params = grab_top_fits(EL_out)$fits %>%
+    dplyr::select(-logLik, -se) %>%
     unlist()
 }
 

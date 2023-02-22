@@ -21,6 +21,6 @@ AK_model = function(){
     twentycities,
     starting_pparams = pparams,
     model = model_mechanics_001(),
-    AK_interp = TRUE,
+    interp_method = "shifted_splines",
   )
 }

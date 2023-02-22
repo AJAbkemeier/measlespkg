@@ -2,7 +2,7 @@
 #'
 #' @param x Object of class `EL_list`.
 #'
-#' @return Tibble of `x` data in tidy format.
+#' @return Data frame composed from information in `x` data in tidy format.
 #' @export
 #'
 #' @examples
@@ -22,8 +22,7 @@ tidy_pfilter_dfs = function(x){
       t() %>%
       as.data.frame() %>%
       tibble::rownames_to_column(var = "unit") %>%
-      dplyr::mutate(ull = .[[2]]) %>%
-      dplyr::select(.data$unit, .data$ull) %>%
+      dplyr::rename(ull = .data$V1) %>%
       dplyr::left_join(tidy_LL_df, by = "unit")
     tidy_df
   }) %>%
