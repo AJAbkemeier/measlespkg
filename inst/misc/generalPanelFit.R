@@ -20,7 +20,6 @@ NMIF         = switch(RUN_LEVEL, 4,  100)
 NREPS_MIF    = switch(RUN_LEVEL, 4,  ncores)
 NP_EVAL      = switch(RUN_LEVEL, 10, 10000)
 NREPS_EVAL   = switch(RUN_LEVEL, 3,  ncores)
-
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
@@ -49,8 +48,6 @@ if(!is.na(array_job_id)){
 PREVIOUS_FIT_PATH = NULL
 
 # Use INITIAL_RW_SD to set random walk standard deviations for parameters.
-# NOTE: current mif2_alt function might not be able to use different sd for
-# different ivp.
 DEFAULT_SD = 0.02
 IVP_DEFAULT_SD = DEFAULT_SD*3
 INITIAL_RW_SD = c(
@@ -67,7 +64,7 @@ INITIAL_RW_SD = c(
   iota = DEFAULT_SD,
   sigma = DEFAULT_SD,
   cohort = DEFAULT_SD,
-  alpha = 0.002,
+  alpha = DEFAULT_SD*10^(-2),
   mu = 0
 )
 if(!is.null(EVAL_PARAM))
@@ -125,9 +122,7 @@ if(!is.null(EVAL_POINTS)){
 
 # Specify box to sample initial shared parameters from
 shared_box_specs = tibble::tribble(
-  ~param, ~center, ~radius,
-  #gamma1",    -0.63695, 0.05,
-  #"gamma0",    4.61215,    0.5,
+  ~param, ~center,   ~radius,
   "mu",        0.02,        0
 )
 
@@ -153,7 +148,7 @@ if(!is.null(EVAL_PARAM))
   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
 
 shared_bounds = tibble::tribble(
-  ~param, ~lower,     ~upper,
+  ~param,    ~lower,   ~upper,
   "mu",        0.02,     0.02
 )
 
@@ -203,7 +198,11 @@ doParallel::registerDoParallel(cores = ncores)
 doRNG::registerDoRNG()
 tictoc::tic()
 mif2_out = pomp::bake(file = write_mif2_to, {
-  foreach::foreach(i = 1:NREPS_MIF, .packages = "panelPomp", .combine = c) %dopar% {
+  foreach::foreach(
+    i = 1:NREPS_MIF,
+    .packages = "panelPomp",
+    .combine = c
+  ) %dopar% {
     panelPomp::mif2(
       measlesPomp_mod,
       Np = NP_MIF,
@@ -229,7 +228,7 @@ EL_out = pomp::bake(file = write_LL_to, {
     ncores = ncores,
     np_pf = NP_EVAL,
     nreps = NREPS_EVAL,
-    seed = PFILTER_EVAL_SEED,
+    seed = NULL,
     divisor = 8164
   )
 })
@@ -237,6 +236,7 @@ tictoc::toc()
 
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
+  tictoc::tic()
   top_params = combine_top_fits(EL_out)$fits[-(1:2)]
   eval_model = measlesPomp_mod
   coef(eval_model) = top_params
@@ -250,6 +250,7 @@ if(USE_BEST_COMBO){
       divisor = 8164
     )
   )
+  tictoc::toc()
 }
 
 
@@ -262,7 +263,7 @@ if(USE_BEST_COMBO == FALSE){
 
 if(PLOT_TRACES){
   plot_traces(
-    mif2_alt_list,
+    list(mif2_out),
     plot_shared = "loglik",
     plot_specific = ".ALL",
     print_plots = FALSE,
@@ -272,7 +273,7 @@ if(PLOT_TRACES){
 
 if(PLOT_SIMS){
   coef(measles_ppomp_mod) = top_params
-  He10_model = measles_ppomp_mod
+  He10_model = measlesPomp_mod
   set.seed(PLOT_SIMS_SEED)
   sim_plots(
     true_model = He10_model,

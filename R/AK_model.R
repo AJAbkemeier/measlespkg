@@ -11,14 +11,14 @@
 #' @examples
 #' AK_model()
 AK_model = function(){
-  shared = c(mu = AK_mles$mu[[1]])
-  specific = AK_mles %>%
-    dplyr::select(-.data$loglik, -.data$loglik.sd, -.data$mu, -.data$delay) %>%
-    tibble::column_to_rownames(var = "town") %>%
+  shared = c(mu = measlespkg::AK_mles$mu[[1]])
+  specific = measlespkg::AK_mles |>
+    dplyr::select(-.data$loglik, -.data$loglik.sd, -.data$mu, -.data$delay) |>
+    tibble::column_to_rownames(var = "town") |>
     t()
   pparams = list(shared = shared, specific = specific)
   make_measlesPomp(
-    twentycities,
+    measlespkg::twentycities,
     starting_pparams = pparams,
     model = model_mechanics_001(),
     interp_method = "shifted_splines",

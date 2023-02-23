@@ -12,7 +12,6 @@
 #' make_rw_sd(rw_sd_vec)
 make_rw_sd = function(rw_sd_vec){
   ivp_indices = grep("_0", x = names(rw_sd_vec))
-  # TODO check that this is capable of using different sd for each ivp
   ivp_rw_sd = lapply(names(rw_sd_vec[ivp_indices]), function(x){
     eval(bquote(expression(ivp(rw_sd_vec[[.(x)]]))))
   })

@@ -1,7 +1,7 @@
 prep_10_cities_data = function(){
   measles = utils::read.csv("input/ten_cities_measles/measles.csv")
   demog = utils::read.csv("input/ten_cities_measles/birth_pop.csv")
-  start_params = read.csv("input/ten_cities_measles/start_params.csv")
+  start_params = utils::read.csv("input/ten_cities_measles/start_params.csv")
 
   # measles[(8358-3):(8358+3),]
   # A tibble: 7 × 3

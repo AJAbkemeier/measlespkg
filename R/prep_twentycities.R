@@ -6,7 +6,7 @@
 #' @examples
 #' clean_twentycities()
 clean_twentycities = function(){
-  tc = twentycities
+  tc = measlespkg::twentycities
   # data used for He et al 2010, following their decision
   # to remove 3 data points
 
