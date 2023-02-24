@@ -1,6 +1,7 @@
 Sys.time()
 ######### load-packages ###############################
 #library(measlespkg)
+#library(foreach)
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),
 #                  function(x) source(paste0("./R/functions/", x))))
@@ -20,6 +21,7 @@ NMIF         = switch(RUN_LEVEL, 4,  100)
 NREPS_MIF    = switch(RUN_LEVEL, 4,  ncores)
 NP_EVAL      = switch(RUN_LEVEL, 10, 10000)
 NREPS_EVAL   = switch(RUN_LEVEL, 3,  ncores)
+N_ROUNDS     = switch(RUN_LEVEL, 1,  4)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
@@ -193,7 +195,8 @@ if(!is.null(PREVIOUS_FIT_PATH)){
   )
 }
 
-##################### mif2 ##################################
+###### MODEL FITTING #####################################
+## ----mif2-----------------------------------------------
 doParallel::registerDoParallel(cores = ncores)
 doRNG::registerDoRNG()
 tictoc::tic()
@@ -263,7 +266,7 @@ if(USE_BEST_COMBO == FALSE){
 
 if(PLOT_TRACES){
   plot_traces(
-    list(mif2_out),
+    mif2_out,
     plot_shared = "loglik",
     plot_specific = ".ALL",
     print_plots = FALSE,
