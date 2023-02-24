@@ -25,28 +25,11 @@ plot_traces = function(
     width = 16,
     height = 10
 ){
-  stitch_traces = function(mif2_list){
-    nalts = length(mif2_list)
-    nreps = length(mif2_list[[1]])
-    nalt_iter = mif2_list[[1]][[1]]@Nmif
-    traces_list = vector("list", nreps)
-    for(i in seq_along(traces_list)){
-      traces_list_i = lapply(1:nalts, function(x)
-        pomp::traces(mif2_list[[x]][[i]])
-      )
-      for(j in seq_along(traces_list_i)){
-        if(j > 1){
-          traces_list_i[[j]] = traces_list_i[[j]][2:(nalt_iter+1),]
-        }
-      }
-      traces_list[[i]] = dplyr::bind_rows(traces_list_i)
-    }
-    traces_list
-  }
-  nalts = length(mif2_list)
-  nreps = length(mif2_list[[1]])
-  niter = mif2_list[[1]][[1]]@Nmif*nalts
-  traces_list = stitch_traces(mif2_list)
+  nreps = length(mif2_list)
+  niter = mif2_list[[1]]@Nmif
+  traces_list = lapply(1:nreps, function(i)
+    pomp::traces(mif2_list[[i]])
+  )
 
   trace_names = colnames(traces_list[[1]])
   specific_trace_indices = grep("\\[", trace_names)
@@ -90,11 +73,11 @@ plot_traces = function(
   # Plot specific traces
   if(!is.null(plot_specific)){
     for(plot_param in plot_sp){
-      plot_units = names(mif2_list[[1]][[1]])
+      plot_units = names(mif2_list[[1]])
       plot_cols = paste0(plot_param,"[",plot_units,"]")
       long_data = lapply(1:nreps, function(x){
         dplyr::as_tibble(traces_list[[x]]) %>%
-          dplyr::select(plot_cols) %>%
+          dplyr::select(dplyr::all_of(plot_cols)) %>%
           dplyr::mutate(repl = x) %>%
           dplyr::mutate(iter = 0:niter)
       }) %>%
@@ -109,7 +92,7 @@ plot_traces = function(
           color = paste0(.data$name, .data$repl)
         )
       ) +
-        ggplot2::geom_line(size = 0.5, alpha = 0.25) +
+        ggplot2::geom_line(linewidth = 0.5, alpha = 0.25) +
         ggplot2::guides(color = "none") +
         ggplot2::facet_wrap(ggplot2::vars(.data$name), scales = "free")
       if(print_plots) print(traces_ggplot)

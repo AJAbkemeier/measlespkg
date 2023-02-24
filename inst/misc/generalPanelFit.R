@@ -1,6 +1,6 @@
 Sys.time()
 ######### load-packages ###############################
-
+#library(measlespkg)
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),
 #                  function(x) source(paste0("./R/functions/", x))))
@@ -240,7 +240,7 @@ if(USE_BEST_COMBO){
   top_params = combine_top_fits(EL_out)$fits[-(1:2)]
   eval_model = measlesPomp_mod
   coef(eval_model) = top_params
-  EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
+  EL_out_best = bake(file = paste0(write_path, "best_eval.rds"),
     eval_logLik(
       model_obj_list = list(eval_model),
       ncores = ncores,
@@ -272,12 +272,12 @@ if(PLOT_TRACES){
 }
 
 if(PLOT_SIMS){
-  coef(measles_ppomp_mod) = top_params
-  He10_model = measlesPomp_mod
-  set.seed(PLOT_SIMS_SEED)
+  measlesPomp_sim = measlesPomp_mod
+  coef(measlesPomp_sim) = top_params
+  AK_mod = AK_model()
   sim_plots(
-    true_model = He10_model,
-    sim_model = measles_ppomp_mod,
+    true_model = AK_mod,
+    sim_model = measlesPomp_sim,
     print_plots = FALSE,
     save_dir = paste0(write_path, "sim_plots/")
   )
