@@ -187,9 +187,9 @@ initial_pparams_list = sample_initial_pparams_ul(
 
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
-  load(PREVIOUS_FIT_PATH)
+  EL_in = readRDS(PREVIOUS_FIT_PATH)
   starting_pparams_list = duplicate_top_pparams(
-    EL_out,
+    EL_in,
     out_length = NREPS_MIF,
     top_n = TOP_N_FITS
   )
