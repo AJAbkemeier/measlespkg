@@ -1,7 +1,7 @@
 #' Turn named numeric vector into rw_sd
 #'
 #' @param rw_sd_vec Named numerical vector. Names are parameters, values are
-#` desired random walk standard deviations. Names of initial value paramers
+#' desired random walk standard deviations. Names of initial value parameters
 #' should end in _0.
 #'
 #' @return Returns rw_sd object.

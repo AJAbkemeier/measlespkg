@@ -8,6 +8,7 @@ make_rw_sd(rw_sd_vec)
 }
 \arguments{
 \item{rw_sd_vec}{Named numerical vector. Names are parameters, values are
+desired random walk standard deviations. Names of initial value parameters
 should end in _0.}
 }
 \value{

@@ -5,7 +5,7 @@
 \title{Plot traces from \code{mif2} objects}
 \usage{
 plot_traces(
-  mif2_obj,
+  mif2_list,
   plot_shared = ".ALL",
   plot_specific = ".ALL",
   print_plots = TRUE,
@@ -15,7 +15,7 @@ plot_traces(
 )
 }
 \arguments{
-\item{mif2_obj}{\code{mif2} object.}
+\item{mif2_list}{List of \code{mif2} objects.}
 
 \item{plot_shared}{String specifying which shared value traces should be
 plotted. This includes log-likelihoods and shared parameters. Set to \code{".ALL"}
@@ -39,37 +39,4 @@ Returns \code{NULL}
 }
 \description{
 Plot traces from \code{mif2} objects
-}
-\examples{
-AK_mod = AK_model()
-DEFAULT_SD = 0.02
-IVP_DEFAULT_SD = DEFAULT_SD*3
-INITIAL_RW_SD = c(
-  S_0 = IVP_DEFAULT_SD,
-  E_0 = IVP_DEFAULT_SD,
-  I_0 = IVP_DEFAULT_SD,
-  R_0 = IVP_DEFAULT_SD,
-  R0 = DEFAULT_SD,
-  sigmaSE = DEFAULT_SD,
-  amplitude = DEFAULT_SD,
-  rho = DEFAULT_SD,
-  gamma = DEFAULT_SD,
-  psi = DEFAULT_SD,
-  iota = DEFAULT_SD,
-  sigma = DEFAULT_SD,
-  cohort = DEFAULT_SD,
-  alpha = DEFAULT_SD*10^(-2),
-  mu = 0
-)
-mif2_out = panelPomp::mif2(
-  AK_mod,
-  Np = 1,
-  cooling.fraction.50 = 0.5,
-  rw.sd = make_rw_sd(INITIAL_RW_SD),
-  cooling.type = "geometric",
-  Nmif = 3,
-  shared.start = pparams(AK_mod)$shared,
-  specific.start = pparams(AK_mod)$specific
-)
-plot_traces(mif2_out)
 }
