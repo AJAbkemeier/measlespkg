@@ -2,7 +2,7 @@
 % Please edit documentation in R/tidy_pfilter_dfs.R
 \name{tidy_pfilter_dfs}
 \alias{tidy_pfilter_dfs}
-\title{Create tidy data frame from saved \code{eval_logLik()} output.}
+\title{Create tidy data frame from \code{eval_logLik()} output.}
 \usage{
 tidy_pfilter_dfs(x)
 }
@@ -13,7 +13,7 @@ tidy_pfilter_dfs(x)
 Data frame composed from information in \code{x} data in tidy format.
 }
 \description{
-Create tidy data frame from saved \code{eval_logLik()} output.
+Create tidy data frame from \code{eval_logLik()} output.
 }
 \examples{
 model_list = list(AK_model())

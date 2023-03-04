@@ -185,7 +185,7 @@ if(!is.null(PREVIOUS_FIT_PATH)){
 
 ################## Construct panelPomp object ##########################
 measlesPomp_mod = make_measlesPomp(
-  clean_twentycities(),
+  clean_twentycities() |> choose_units(UNITS),
   starting_pparams = initial_pparams_list[[1]],
   model_mechanics_001(),
   interp_method = INTERP_METHOD
