@@ -40,7 +40,7 @@ plot_traces = function(
   if(!is.null(plot_specific))
     if(!setequal(plot_specific, ".ALL")) plot_sp = plot_specific
 
-  if(!is.null(save_dir)) dir.create(save_dir)
+  if(!is.null(save_dir) & !dir.exists(save_dir)) dir.create(save_dir)
 
   # Plot shared traces
   if(!is.null(plot_shared)){

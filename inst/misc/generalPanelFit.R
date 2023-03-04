@@ -1,7 +1,8 @@
 Sys.time()
+devtools::session_info()
 ######### load-packages ###############################
-#library(measlespkg)
-#library(foreach)
+library(measlespkg)
+library(foreach)
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),
 #                  function(x) source(paste0("./R/functions/", x))))
@@ -11,20 +12,20 @@ Sys.time()
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
-if(is.na(ncores)) ncores = parallel::detectCores()/2
+if(is.na(ncores)) ncores = parallel::detectCores()/4
 print(ncores)
 
 # Set fitting and filter parameters
 RUN_LEVEL = 1
-NP_MIF       = switch(RUN_LEVEL, 10, 5000)
+NP_MIF       = switch(RUN_LEVEL, 4, 5000)
 NMIF         = switch(RUN_LEVEL, 4,  100)
-NREPS_MIF    = switch(RUN_LEVEL, 4,  ncores)
-NP_EVAL      = switch(RUN_LEVEL, 10, 10000)
-NREPS_EVAL   = switch(RUN_LEVEL, 3,  ncores)
-N_ROUNDS     = switch(RUN_LEVEL, 1,  4)
+NREPS_MIF    = switch(RUN_LEVEL, ncores,  ncores)
+NP_EVAL      = switch(RUN_LEVEL, 4, 10000)
+NREPS_EVAL   = switch(RUN_LEVEL, ncores,  ncores)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
+UNITS = unique(twentycities$measles$unit)
 BLOCK_MIF2 = TRUE
 INTERP_METHOD = "shifted_splines"
 # SIM_MODEL specifies whether simulated data from a given model should be used.
@@ -73,8 +74,7 @@ if(!is.null(EVAL_PARAM))
   INITIAL_RW_SD[[EVAL_PARAM]] = 0
 
 # Specify names of output files
-MIF2_FILE = "mif2_out.rds"
-LL_FILE = "EL_out.rds"
+RESULTS_FILE = "fit_results_out.rds"
 
 ### Diagnostic parameters ###
 # For plots and final loglik calc, use combination of parameters which yields
@@ -90,9 +90,8 @@ write_path = switch(
   "./output/DUMMY/",
   out_dir
 )
-dir.create(write_path)
-write_mif2_to = paste0(write_path, MIF2_FILE)
-write_LL_to = paste0(write_path, LL_FILE)
+if(!dir.exists(write_path)) dir.create(write_path)
+write_results_to = paste0(write_path, RESULTS_FILE)
 
 # Use observations from simulation?
 if(!is.null(SIM_MODEL)){
@@ -108,19 +107,7 @@ if(!is.null(SIM_MODEL)){
   sim_obs_list = NULL
 }
 
-################## Construct panelPomp object ##########################
-measlesPomp_mod = make_measlesPomp(
-  clean_twentycities(),
-  starting_pparams = AK_pparams,
-  model_mechanics_001(),
-  interp_method = INTERP_METHOD
-)
-
-if(!is.null(EVAL_POINTS)){
-  coef_names = paste0(EVAL_PARAM, "[", UNITS, "]")
-  coef(measles_ppomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
-}
-########################################################################
+###### Starting parameters #############################
 
 # Specify box to sample initial shared parameters from
 shared_box_specs = tibble::tribble(
@@ -181,71 +168,105 @@ if(!is.null(EVAL_PARAM)){
 initial_pparams_list = sample_initial_pparams_ul(
   shared_box_specs = shared_bounds,
   specific_box_specs = specific_bounds,
-  units = names(measlesPomp_mod),
+  units = UNITS,
   n_draws = NREPS_MIF
 )
 
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
   EL_in = readRDS(PREVIOUS_FIT_PATH)
-  starting_pparams_list = duplicate_top_pparams(
+  initial_pparams_list = duplicate_top_pparams(
     EL_in,
     out_length = NREPS_MIF,
-    top_n = TOP_N_FITS
+    top_n = TOP_N_FITS,
+    combine = TRUE
   )
 }
 
-###### MODEL FITTING #####################################
-## ----mif2-----------------------------------------------
-doParallel::registerDoParallel(cores = ncores)
-doRNG::registerDoRNG()
-tictoc::tic()
-mif2_out = pomp::bake(file = write_mif2_to, {
-  foreach::foreach(
-    i = 1:NREPS_MIF,
-    .packages = "panelPomp",
-    .combine = c
-  ) %dopar% {
-    panelPomp::mif2(
-      measlesPomp_mod,
-      Np = NP_MIF,
-      cooling.fraction.50 = COOLING_FRAC,
-      rw.sd = make_rw_sd(INITIAL_RW_SD),
-      cooling.type = "geometric",
-      Nmif = NMIF,
-      shared.start = initial_pparams_list[[i]]$shared,
-      specific.start = initial_pparams_list[[i]]$specific,
-      block = BLOCK_MIF2
-    )
-  }
-})
-tictoc::toc()
+################## Construct panelPomp object ##########################
+measlesPomp_mod = make_measlesPomp(
+  clean_twentycities(),
+  starting_pparams = initial_pparams_list[[1]],
+  model_mechanics_001(),
+  interp_method = INTERP_METHOD
+)
 
-## ----pfilter-----------------------------------------------
-# Note that King log likelihood is −40345.7
-# He10 log likelihood from paper SI is -40348.1
-tictoc::tic()
-EL_out = pomp::bake(file = write_LL_to, {
-  eval_logLik(
-    model_obj_list = mif2_out,
-    ncores = ncores,
-    np_pf = NP_EVAL,
-    nreps = NREPS_EVAL,
-    seed = NULL,
-    divisor = 8164
-  )
-})
-tictoc::toc()
+if(!is.null(EVAL_POINTS)){
+  coef_names = paste0(EVAL_PARAM, "[", UNITS, "]")
+  coef(measles_ppomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
+}
+###### MODEL FITTING #####################################
+round_out = run_round(
+  measlesPomp_mod,
+  initial_pparams_list = initial_pparams_list,
+  rw_sd = make_rw_sd(INITIAL_RW_SD),
+  cooling_frac = COOLING_FRAC,
+  nmif = NMIF,
+  np_mif2 = NP_MIF,
+  np_eval = NP_EVAL,
+  nreps_eval = NREPS_EVAL,
+  block = BLOCK_MIF2,
+  ncores = ncores,
+  write_results_to = write_results_to,
+  print_times = TRUE
+)
+
+cooling = calc_geo_cooling(
+  COOLING_FRAC,
+  n = 1,
+  m = 100*1 + 1,
+  N = length(time(measlesPomp_mod[[1]]))
+)
+round_out = run_round(
+  round_out,
+  top_n_fits = TOP_N_FITS,
+  combine = TRUE,
+  rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
+  cooling_frac = COOLING_FRAC,
+  nmif = NMIF,
+  np_mif2 = NP_MIF,
+  np_eval = NP_EVAL,
+  nreps_eval = NREPS_EVAL,
+  block = BLOCK_MIF2,
+  ncores = ncores,
+  write_results_to = write_results_to,
+  print_times = TRUE
+)
+
+cooling = calc_geo_cooling(
+  COOLING_FRAC,
+  n = 1,
+  m = 100*2 + 1,
+  N = length(time(measlesPomp_mod[[1]]))
+)
+round_out = run_round(
+  round_out,
+  top_n_fits = TOP_N_FITS,
+  combine = TRUE,
+  rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
+  cooling_frac = COOLING_FRAC,
+  nmif = NMIF,
+  np_mif2 = NP_MIF,
+  np_eval = NP_EVAL,
+  nreps_eval = NREPS_EVAL,
+  block = BLOCK_MIF2,
+  ncores = ncores,
+  write_results_to = write_results_to,
+  print_times = TRUE
+)
+
+EL_final = round_out$EL_out[[length(round_out$EL_out)]]
+print(dplyr::arrange(EL_final$fits[1:2,], dplyr::desc(logLik)))
 
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
   tictoc::tic()
-  top_params = combine_top_fits(EL_out)$fits[-(1:2)]
+  top_params = combine_top_fits(EL_final)$fits[-(1:2)]
   eval_model = measlesPomp_mod
   coef(eval_model) = top_params
   EL_out_best = bake(file = paste0(write_path, "best_eval.rds"),
     eval_logLik(
-      model_obj_list = list(eval_model),
+    model_obj_list = list(eval_model),
       ncores = ncores,
       np_pf = NP_EVAL,
       nreps = ncores*8,
@@ -259,14 +280,14 @@ if(USE_BEST_COMBO){
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_fits(EL_out)$fits %>%
+  top_params = grab_top_fits(EL_final)$fits %>%
     dplyr::select(-logLik, -se) %>%
     unlist()
 }
 
 if(PLOT_TRACES){
   plot_traces(
-    mif2_out,
+    round_out$mif2_out,
     plot_shared = "loglik",
     plot_specific = ".ALL",
     print_plots = FALSE,
@@ -285,5 +306,6 @@ if(PLOT_SIMS){
     save_dir = paste0(write_path, "sim_plots/")
   )
 }
+
 
 

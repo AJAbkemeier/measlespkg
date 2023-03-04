@@ -4,6 +4,8 @@
 #' @param out_length Number of parameter sets to output. `top_n` should divide
 #' `out_length`
 #' @param top_n Number of top fits to duplicate.
+#' @param combine Boolean specifying whether best specific fits should be
+#' combined.
 #'
 #' @return List of parameters in the form of `pparams()`.
 #' @export
@@ -20,7 +22,8 @@
 duplicate_top_pparams = function(
     x,
     out_length,
-    top_n = 1
+    top_n = 1,
+    combine = FALSE
   ){
   if(out_length %% top_n != 0){
     stop(
@@ -28,7 +31,7 @@ duplicate_top_pparams = function(
       call. = FALSE
     )
   }
-  if(ncol(x$ull) == 1){
+  if(ncol(x$ull) == 1 | combine == FALSE){
     grabbed_params = grab_top_fits(x, top_n = top_n)$fits %>%
       dplyr::select(-.data$logLik, -.data$se)
   } else {

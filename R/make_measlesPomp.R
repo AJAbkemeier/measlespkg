@@ -130,6 +130,6 @@ make_measlesPomp = function(
   panelPomp::panelPomp(
     pomp_list,
     shared = starting_pparams$shared,
-    specific = starting_pparams$specific
+    specific = as.matrix(starting_pparams$specific)
   )
 }
