@@ -8,7 +8,7 @@ library(foreach)
 #                  function(x) source(paste0("./R/functions/", x))))
 
 ######## Get arguments from command line #############
-(out_dir = as.numeric(Sys.getenv("out_dir", unset = NA)))
+(out_dir = as.character(Sys.getenv("out_dir", unset = NA)))
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
@@ -25,6 +25,8 @@ NREPS_EVAL   = switch(RUN_LEVEL, ncores,  ncores)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
+DATA = clean_twentycities()
+MODEL = model_mechanics_001()
 UNITS = unique(twentycities$measles$unit)
 BLOCK_MIF2 = TRUE
 INTERP_METHOD = "shifted_splines"
@@ -174,7 +176,8 @@ initial_pparams_list = sample_initial_pparams_ul(
 
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
-  EL_in = readRDS(PREVIOUS_FIT_PATH)
+  fit_results_in = readRDS(PREVIOUS_FIT_PATH)
+  EL_in = fit_results_in$EL_out[[length(fit_results_in$EL_out)]]
   initial_pparams_list = duplicate_top_pparams(
     EL_in,
     out_length = NREPS_MIF,
@@ -185,9 +188,9 @@ if(!is.null(PREVIOUS_FIT_PATH)){
 
 ################## Construct panelPomp object ##########################
 measlesPomp_mod = make_measlesPomp(
-  clean_twentycities() |> choose_units(UNITS),
+  DATA |> choose_units(UNITS),
   starting_pparams = initial_pparams_list[[1]],
-  model_mechanics_001(),
+  model = MODEL,
   interp_method = INTERP_METHOD
 )
 
@@ -256,7 +259,7 @@ round_out = run_round(
 )
 
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]
-print(dplyr::arrange(EL_final$fits[1:2,], dplyr::desc(logLik)))
+print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
 
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
@@ -276,7 +279,7 @@ if(USE_BEST_COMBO){
   )
   tictoc::toc()
 }
-
+EL_out_best$fits[,1:2]
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
