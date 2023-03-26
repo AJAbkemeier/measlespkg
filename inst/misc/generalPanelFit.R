@@ -266,7 +266,7 @@ if(USE_BEST_COMBO){
   tictoc::tic()
   top_params = combine_top_fits(EL_final)$fits[-(1:2)]
   eval_model = measlesPomp_mod
-  pomp::coef(eval_model) = top_params
+  panelPomp::coef(eval_model) = top_params
   EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
     eval_logLik(
     model_obj_list = list(eval_model),
