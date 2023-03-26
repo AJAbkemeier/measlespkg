@@ -1,7 +1,7 @@
 validate_EL_list = function(x){
-  if(!all(c("fits", "ull", "se") %in% names(x))){
+  if(!all(c("fits", "ull", "se", "np_pf", "nreps") %in% names(x))){
     stop(
-      "`x` must have names 'fits', 'ull', and 'se'",
+      "`x` must have names 'fits', 'ull', 'se', 'np_pf', and 'nreps'",
       call. = FALSE
     )
   }
@@ -10,9 +10,14 @@ validate_EL_list = function(x){
       "'fits', 'ull', and 'se' must be of class data.frame"
     )
   }
+  if(!all(is.numeric(x$np_pf), is.numeric(x$nreps))){
+    stop(
+      "'np_pf' and 'nreps' must be of class numeric"
+    )
+  }
   if(!all(c("logLik", "se") %in% colnames(x$fits))){
     stop(
-      "`fits` must have 'logLik' and 'se' columns",
+      "'fits' must have 'logLik' and 'se' columns",
       call. = FALSE
     )
   }

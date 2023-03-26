@@ -75,7 +75,9 @@ eval_logLik = function(
   pf_frames_list = new_EL_list(
     fits = pf_logLik_frame,
     ull = pf_unitlogLik_frame,
-    se = pf_unitSE_frame
+    se = pf_unitSE_frame,
+    np_pf = np_pf,
+    nreps = nreps
   )
   if(return_pfilter_obj)
     pf_frames_list = c(pf_frames_list, pfilter_obj = pfilter_obj)
