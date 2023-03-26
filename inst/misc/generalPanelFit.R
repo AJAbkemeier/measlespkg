@@ -214,49 +214,49 @@ round_out = run_round(
   print_times = TRUE
 )
 
-cooling = calc_geo_cooling(
-  COOLING_FRAC,
-  n = 1,
-  m = 100*1 + 1,
-  N = length(time(measlesPomp_mod[[1]]))
-)
-round_out = run_round(
-  round_out,
-  top_n_fits = TOP_N_FITS,
-  combine = TRUE,
-  rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
-  cooling_frac = COOLING_FRAC,
-  nmif = NMIF,
-  np_mif2 = NP_MIF,
-  np_eval = NP_EVAL,
-  nreps_eval = NREPS_EVAL,
-  block = BLOCK_MIF2,
-  ncores = ncores,
-  write_results_to = write_results_to,
-  print_times = TRUE
-)
-
-cooling = calc_geo_cooling(
-  COOLING_FRAC,
-  n = 1,
-  m = 100*2 + 1,
-  N = length(time(measlesPomp_mod[[1]]))
-)
-round_out = run_round(
-  round_out,
-  top_n_fits = TOP_N_FITS,
-  combine = TRUE,
-  rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
-  cooling_frac = COOLING_FRAC,
-  nmif = NMIF,
-  np_mif2 = NP_MIF,
-  np_eval = NP_EVAL,
-  nreps_eval = NREPS_EVAL,
-  block = BLOCK_MIF2,
-  ncores = ncores,
-  write_results_to = write_results_to,
-  print_times = TRUE
-)
+# cooling = calc_geo_cooling(
+#   COOLING_FRAC,
+#   n = 1,
+#   m = 100*1 + 1,
+#   N = length(time(measlesPomp_mod[[1]]))
+# )
+# round_out = run_round(
+#   round_out,
+#   top_n_fits = TOP_N_FITS,
+#   combine = TRUE,
+#   rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
+#   cooling_frac = COOLING_FRAC,
+#   nmif = NMIF,
+#   np_mif2 = NP_MIF,
+#   np_eval = NP_EVAL,
+#   nreps_eval = NREPS_EVAL,
+#   block = BLOCK_MIF2,
+#   ncores = ncores,
+#   write_results_to = write_results_to,
+#   print_times = TRUE
+# )
+#
+# cooling = calc_geo_cooling(
+#   COOLING_FRAC,
+#   n = 1,
+#   m = 100*2 + 1,
+#   N = length(time(measlesPomp_mod[[1]]))
+# )
+# round_out = run_round(
+#   round_out,
+#   top_n_fits = TOP_N_FITS,
+#   combine = TRUE,
+#   rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
+#   cooling_frac = COOLING_FRAC,
+#   nmif = NMIF,
+#   np_mif2 = NP_MIF,
+#   np_eval = NP_EVAL,
+#   nreps_eval = NREPS_EVAL,
+#   block = BLOCK_MIF2,
+#   ncores = ncores,
+#   write_results_to = write_results_to,
+#   print_times = TRUE
+# )
 
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]
 print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
@@ -266,8 +266,8 @@ if(USE_BEST_COMBO){
   tictoc::tic()
   top_params = combine_top_fits(EL_final)$fits[-(1:2)]
   eval_model = measlesPomp_mod
-  coef(eval_model) = top_params
-  EL_out_best = bake(file = paste0(write_path, "best_eval.rds"),
+  pomp::coef(eval_model) = top_params
+  EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
     eval_logLik(
     model_obj_list = list(eval_model),
       ncores = ncores,
