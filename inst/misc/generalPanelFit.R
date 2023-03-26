@@ -9,6 +9,7 @@ library(foreach)
 
 ######## Get arguments from command line #############
 (out_dir = as.character(Sys.getenv("out_dir", unset = NA)))
+(array_job_id = as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", unset = NA)))
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
@@ -19,9 +20,10 @@ print(ncores)
 RUN_LEVEL = 1
 NP_MIF       = switch(RUN_LEVEL, 4, 5000)
 NMIF         = switch(RUN_LEVEL, 4,  100)
-NREPS_MIF    = switch(RUN_LEVEL, ncores,  ncores)
+NREPS_MIF    = switch(RUN_LEVEL, ncores, ncores)
 NP_EVAL      = switch(RUN_LEVEL, 4, 10000)
-NREPS_EVAL   = switch(RUN_LEVEL, ncores,  ncores)
+NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores)
+NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
@@ -37,16 +39,14 @@ COOLING_FRAC = 0.5
 # search. Set both equal to NULL to do regular search.
 EVAL_POINTS = NULL
 EVAL_PARAM = NULL
-### Seeds ###
+
 MAIN_SEED = 169566665
-
-(array_job_id = as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", unset = NA)))
-
 # Add to MAIN_SEED if running array job
 if(!is.na(array_job_id)){
   MAIN_SEED = MAIN_SEED + array_job_id
   print(MAIN_SEED)
 }
+
 # Set PREVIOUS_FIT_PATH to NULL to choose starting parameters from a box
 # instead of from a previous fit. Setting this equal to a path will nullify
 # the portion of code which chooses starting parameters from a box.
@@ -196,7 +196,7 @@ measlesPomp_mod = make_measlesPomp(
 
 if(!is.null(EVAL_POINTS)){
   coef_names = paste0(EVAL_PARAM, "[", UNITS, "]")
-  coef(measles_ppomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
+  coef(measlesPomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
 }
 ###### MODEL FITTING #####################################
 round_out = run_round(
@@ -272,14 +272,14 @@ if(USE_BEST_COMBO){
     model_obj_list = list(eval_model),
       ncores = ncores,
       np_pf = NP_EVAL,
-      nreps = ncores*8,
+      nreps = NREPS_EVAL2,
       seed = NULL,
       divisor = 8164
     )
   )
   tictoc::toc()
 }
-EL_out_best$fits[,1:2]
+as.data.frame(EL_out_best$fits[,1:2])
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){

@@ -26,7 +26,7 @@ run_round.fit_results = function(
     combine = FALSE,
     ...
 ){
-  i = NULL # prevents check() note
+  i = NULL # prevents devtools::check() note
   starting_pparams_list = duplicate_top_pparams(
     x$EL_out[[length(x$EL_out)]],
     out_length = length(x$mif2_out),
@@ -43,7 +43,7 @@ run_round.fit_results = function(
       .combine = c
     ) %dopar% {
       panelPomp::mif2(
-        x$mif2_out[[1]],
+        x$mif2_out[[i]],
         Np = np_mif2,
         cooling.fraction.50 = cooling_frac,
         rw.sd = rw_sd,
@@ -66,18 +66,21 @@ run_round.fit_results = function(
     )
     if(print_times) print(Sys.time() - start_t)
     # for(j in seq_along(mif2_out)){
-    #   for(k in seq_along(mif2_out[[j]])){
+    #   mif2_out[[j]] = lapply(seq_along(mif2_out[[j]]), function(k) {
     #     mif2_old = x$mif2_out[[j]][[k]]
+    #     mif2_new = mif2_out[[j]][[k]]
     #     ndone = mif2_old@Nmif
     #     mif2_old@traces[ndone + 1, "loglik"] =
-    #       mif2_out[[j]][[k]]@traces[1L, "loglik"]
-    #     mif2_out[[j]][[k]]@traces = rbind(
+    #       mif2_new@traces[1L, "loglik"]
+    #     mif2_new@traces = rbind(
     #       mif2_old@traces,
-    #       mif2_out[[j]][[k]]@traces[-1L, colnames(mif2_old@traces)]
+    #       mif2_new@traces[-1L, colnames(mif2_old@traces)]
     #     )
-    #     names(dimnames(mif2_out[[j]][[k]]@traces)) = c("iteration", "variable")
-    #     mif2_out[[j]][[k]]@Nmif = as.integer(ndone + nmif)
-    #   }
+    #     names(dimnames(mif2_new@traces)) = c("iteration", "variable")
+    #     mif2_new@Nmif = as.integer(ndone + nmif)
+    #     mif2_new
+    #   }) |>
+    #     panelPomp()
     # }
     new_fit_results(mif2_out = mif2_out, EL_out = c(x$EL_out, list(EL_out)))
   })
