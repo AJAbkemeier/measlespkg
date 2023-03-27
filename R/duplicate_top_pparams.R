@@ -1,8 +1,7 @@
 #' Duplicate top fits from `EL_list`
 #'
 #' @param x Object of class `EL_list`.
-#' @param out_length Number of parameter sets to output. `top_n` should divide
-#' `out_length`
+#' @param out_length Number of parameter sets to output.
 #' @param top_n Number of top fits to duplicate.
 #' @param combine Boolean specifying whether best specific fits should be
 #' combined.
@@ -40,7 +39,7 @@ duplicate_top_pparams = function(
   }
   top_params = dplyr::slice(
     grabbed_params,
-    rep(1:nrow(grabbed_params), each = out_length/top_n)
+    rep_len(1:nrow(grabbed_params), length.out = out_length)
   )
   lapply(1:nrow(top_params), function(z){
     coef_to_pparams(top_params[z,])

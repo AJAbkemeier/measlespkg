@@ -283,8 +283,8 @@ as.data.frame(EL_out_best$fits[,1:2])
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_fits(EL_final)$fits %>%
-    dplyr::select(-logLik, -se) %>%
+  top_params = grab_top_fits(EL_final)$fits |>
+    dplyr::select(-logLik, -se) |>
     unlist()
 }
 
