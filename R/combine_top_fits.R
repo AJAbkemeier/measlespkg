@@ -67,6 +67,8 @@ combine_top_fits = function(
   new_EL_list(
     fits = fits,
     ull = ull,
-    se = se
+    se = se,
+    np_pf = x$np_pf,
+    nreps = x$nreps
   )
 }

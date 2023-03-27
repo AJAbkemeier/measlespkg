@@ -27,6 +27,8 @@ grab_top_fits = function(
   new_EL_list(
     fits = x$fits[ranking,][1:top_n,],
     ull = x$ull[ranking,][1:top_n,],
-    se = x$se[ranking,][1:top_n,]
+    se = x$se[ranking,][1:top_n,],
+    np_pf = x$np_pf,
+    nreps = x$nreps
   )
 }
