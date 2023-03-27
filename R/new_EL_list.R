@@ -15,7 +15,7 @@ new_EL_list = function(
     ull = dplyr::as_tibble(ull),
     se = dplyr::as_tibble(se),
     np_pf = np_pf,
-    nreps = nreps,
+    nreps = nreps
   )
   structure(out, class = "EL_list")
 }

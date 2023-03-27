@@ -10,3 +10,5 @@
   to skip to results?)
 - Continue to think of ways to make the package easy to use and understand
 - Write code to use spatPomp
+- Update duplicate_top_pparams to work with values of top_n that do not divide
+  out_length
