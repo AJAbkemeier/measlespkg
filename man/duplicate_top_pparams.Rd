@@ -9,8 +9,7 @@ duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE)
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
 
-\item{out_length}{Number of parameter sets to output. \code{top_n} should divide
-\code{out_length}}
+\item{out_length}{Number of parameter sets to output.}
 
 \item{top_n}{Number of top fits to duplicate.}
 
