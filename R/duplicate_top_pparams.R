@@ -23,7 +23,7 @@ duplicate_top_pparams = function(
     out_length,
     top_n = 1,
     combine = FALSE
-  ){
+){
   if(out_length %% top_n != 0){
     stop(
       "top_n should divide out_length",
