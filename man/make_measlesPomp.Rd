@@ -9,7 +9,8 @@ make_measlesPomp(
   starting_pparams,
   model,
   interp_method = c("shifted_splines", "linear"),
-  custom_obs_list = NULL
+  custom_obs_list = NULL,
+  dt = 1/365.25
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ Possible options are \code{"shifted_splines"} and \verb{"linear}.}
 \item{custom_obs_list}{List of observations where each element supplies
 observations for a different city. Useful when using simulated observations.
 Set to \code{NULL} to use real observations.}
+
+\item{dt}{Size of the time step.}
 }
 \value{
 A panelPomp object using the data and model supplied.

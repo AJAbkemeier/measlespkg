@@ -9,6 +9,7 @@
 #' @param custom_obs_list List of observations where each element supplies
 #' observations for a different city. Useful when using simulated observations.
 #' Set to `NULL` to use real observations.
+#' @param dt Size of the time step.
 #'
 #' @return A panelPomp object using the data and model supplied.
 #' @export
@@ -20,7 +21,8 @@ make_measlesPomp = function(
     starting_pparams,
     model,
     interp_method = c("shifted_splines", "linear"),
-    custom_obs_list = NULL
+    custom_obs_list = NULL,
+    dt = 1/365.25
 ){
   rproc = model$rproc
   dmeas = model$dmeas
@@ -113,7 +115,7 @@ make_measlesPomp = function(
       pomp::pomp(
         t0 = with(dat_list[[i]], 2*time[1] - time[2]),
         time = "time",
-        rprocess = pomp::euler(rproc, delta.t = 1/365.25),
+        rprocess = pomp::euler(rproc, delta.t = dt),
         rinit = rinit,
         dmeasure = dmeas,
         rmeasure = rmeas,

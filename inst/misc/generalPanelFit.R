@@ -29,6 +29,7 @@ NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = clean_twentycities()
 MODEL = model_mechanics_001()
+DT = 1/365.25
 UNITS = unique(twentycities$measles$unit)
 BLOCK_MIF2 = TRUE
 INTERP_METHOD = "shifted_splines"
@@ -54,7 +55,7 @@ PREVIOUS_FIT_PATH = NULL
 
 # Use INITIAL_RW_SD to set random walk standard deviations for parameters.
 DEFAULT_SD = 0.02
-IVP_DEFAULT_SD = DEFAULT_SD*3
+IVP_DEFAULT_SD = DEFAULT_SD*12
 INITIAL_RW_SD = c(
   S_0 = IVP_DEFAULT_SD,
   E_0 = IVP_DEFAULT_SD,
@@ -62,13 +63,13 @@ INITIAL_RW_SD = c(
   R_0 = IVP_DEFAULT_SD,
   R0 = DEFAULT_SD,
   sigmaSE = DEFAULT_SD,
-  amplitude = DEFAULT_SD,
-  rho = DEFAULT_SD,
-  gamma = DEFAULT_SD,
-  psi = DEFAULT_SD,
+  amplitude = DEFAULT_SD*0.5,
+  rho = DEFAULT_SD*0.5,
+  gamma = DEFAULT_SD*0.5,
+  psi = DEFAULT_SD*0.25,
   iota = DEFAULT_SD,
   sigma = DEFAULT_SD,
-  cohort = DEFAULT_SD,
+  cohort = DEFAULT_SD*0.5,
   alpha = DEFAULT_SD*10^(-2),
   mu = 0
 )
@@ -191,12 +192,13 @@ measlesPomp_mod = make_measlesPomp(
   DATA |> choose_units(UNITS),
   starting_pparams = initial_pparams_list[[1]],
   model = MODEL,
-  interp_method = INTERP_METHOD
+  interp_method = INTERP_METHOD,
+  dt = DT
 )
 
 if(!is.null(EVAL_POINTS)){
   coef_names = paste0(EVAL_PARAM, "[", UNITS, "]")
-  coef(measlesPomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
+  panelPomp::coef(measlesPomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
 }
 ###### MODEL FITTING #####################################
 round_out = run_round(
@@ -278,8 +280,8 @@ if(USE_BEST_COMBO){
     )
   )
   tictoc::toc()
+  as.data.frame(EL_out_best$fits[,1:2])
 }
-as.data.frame(EL_out_best$fits[,1:2])
 
 ################ diagnostics ###############################################
 if(USE_BEST_COMBO == FALSE){
