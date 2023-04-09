@@ -11,13 +11,17 @@
 #' @export
 #'
 gather_results = function(file_names, parent_dir = "."){
-  out_paths = sapply(file_names, function(x){
-    list.files(
-      path = parent_dir,
-      pattern = paste0("*", x),
-      recursive = TRUE
+  out_paths = c()
+  for(fn in file_names){
+    out_paths = c(
+      out_paths,
+      list.files(
+        path = parent_dir,
+        pattern = paste0("*", fn),
+        recursive = TRUE
+      )
     )
-  })
+  }
   out_paths = paste0(parent_dir,"/",out_paths)
   lapply(out_paths, function(x){
     loaded_obj = readRDS(x)
