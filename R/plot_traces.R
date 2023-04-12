@@ -12,6 +12,8 @@
 #' saved if `NULL`.
 #' @param width Width of plots.
 #' @param height Height of plots.
+#' @param log_y Boolean specifying whether y-axis should be scaled by log base
+#' 10.
 #'
 #' @return Returns `NULL`
 #' @export
@@ -23,7 +25,8 @@ plot_traces = function(
     print_plots = TRUE,
     save_dir = NULL,
     width = 16,
-    height = 10
+    height = 10,
+    log_y = FALSE
 ){
   nreps = length(mif2_list)
   niter = mif2_list[[1]]@Nmif
@@ -40,8 +43,10 @@ plot_traces = function(
   if(!is.null(plot_specific))
     if(!setequal(plot_specific, ".ALL")) plot_sp = plot_specific
 
-  if(!is.null(save_dir) & !dir.exists(save_dir)) dir.create(save_dir)
-
+  if(!is.null(save_dir)){
+    if(!dir.exists(save_dir))
+      dir.create(save_dir)
+  }
   # Plot shared traces
   if(!is.null(plot_shared)){
     for(plot_col in plot_sh){
@@ -58,6 +63,8 @@ plot_traces = function(
         ggplot2::geom_line() +
         ggplot2::ylab(plot_col) +
         ggplot2::guides(color = "none")
+      if(log_y)
+        traces_ggplot = traces_ggplot + ggplot2::scale_y_log10()
       if(print_plots) print(traces_ggplot)
       if(!is.null(save_dir)){
         ggplot2::ggsave(
@@ -95,6 +102,8 @@ plot_traces = function(
         ggplot2::geom_line(linewidth = 0.5, alpha = 0.25) +
         ggplot2::guides(color = "none") +
         ggplot2::facet_wrap(ggplot2::vars(.data$name), scales = "free")
+      if(log_y)
+        traces_ggplot = traces_ggplot + ggplot2::scale_y_log10()
       if(print_plots) print(traces_ggplot)
       if(!is.null(save_dir)){
         ggplot2::ggsave(

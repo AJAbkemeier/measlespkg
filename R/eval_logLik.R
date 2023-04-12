@@ -8,7 +8,7 @@
 #' @param divisor seed mod divisor*i is used to obtain seed for ith repetition.
 #' If NULL, does not set new seed.
 #' @param return_pfilter_obj Should the returned list include a pfilter object?
-#' repetition. If NULL, pfilter object is not saved.
+#' repetition.
 #'
 #' @return Object of type `EL_list`, a list of data frames containing
 #' log likelihood and se estimates.

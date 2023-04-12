@@ -90,7 +90,7 @@ set.seed(MAIN_SEED)
 # Create directory for output if it does not exist
 write_path = switch(
   RUN_LEVEL,
-  "./output/DUMMY/",
+  "./output2/DUMMY/",
   out_dir
 )
 if(!dir.exists(write_path)) dir.create(write_path)

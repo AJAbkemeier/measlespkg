@@ -11,7 +11,8 @@ plot_traces(
   print_plots = TRUE,
   save_dir = NULL,
   width = 16,
-  height = 10
+  height = 10,
+  log_y = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ saved if \code{NULL}.}
 \item{width}{Width of plots.}
 
 \item{height}{Height of plots.}
+
+\item{log_y}{Boolean specifying whether y-axis should be scaled by log base
+10.}
 }
 \value{
 Returns \code{NULL}

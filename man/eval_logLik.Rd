@@ -29,7 +29,7 @@ eval_logLik(
 If NULL, does not set new seed.}
 
 \item{return_pfilter_obj}{Should the returned list include a pfilter object?
-repetition. If NULL, pfilter object is not saved.}
+repetition.}
 }
 \value{
 Object of type \code{EL_list}, a list of data frames containing
