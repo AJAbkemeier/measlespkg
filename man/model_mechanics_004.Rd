@@ -16,14 +16,3 @@ panelPOMP model with log-log relationship for between gamma and
 the standardized 1950 population, as well as between iota and the
 standardized 1950 population
 }
-\examples{
-new_pparams = AK_pparams
-new_pparams$shared = c(
-  new_pparams$shared,
-  gamma1 = -0.6369,
-  gamma0 = 4.6121,
-  iota1 = 1.4172,
-  iota0 = -1.9611
-)
-make_measlesPomp(twentycities, new_pparams, model_mechanics_004())
-}

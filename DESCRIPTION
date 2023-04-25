@@ -1,6 +1,6 @@
 Package: measlespkg
 Title: Fit POMP Models to Measles Data
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Aaron", "Abkemeier", , "aaronabk@umich.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
@@ -19,6 +19,7 @@ Imports:
     panelPomp,
     pomp,
     rlang,
+    spatPomp,
     stats,
     tibble,
     tidyr

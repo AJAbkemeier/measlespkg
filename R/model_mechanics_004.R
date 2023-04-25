@@ -5,16 +5,6 @@
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-#' @examples
-#' new_pparams = AK_pparams
-#' new_pparams$shared = c(
-#'   new_pparams$shared,
-#'   gamma1 = -0.6369,
-#'   gamma0 = 4.6121,
-#'   iota1 = 1.4172,
-#'   iota0 = -1.9611
-#' )
-#' make_measlesPomp(twentycities, new_pparams, model_mechanics_004())
 model_mechanics_004 = function(){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;

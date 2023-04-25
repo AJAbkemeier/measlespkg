@@ -11,6 +11,7 @@ Less imporant:
 - Continue to think of ways to make the package easy to use and understand
 - Figure out how to stop Csnippet code from getting flattened after installation
  - Alternatively, figure out how to display contents of model_mechanics better
+- Update smooth interp method to use demog data outside of the 1950-1964 range
 
 Optional:
 - Standardize how output directory is structured

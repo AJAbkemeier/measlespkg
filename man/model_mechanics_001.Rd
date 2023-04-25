@@ -12,6 +12,3 @@ List of objects required for \code{make_measlesPomp}.
 \description{
 He10 POMP model for UK measles
 }
-\examples{
-make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
-}

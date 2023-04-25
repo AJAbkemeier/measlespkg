@@ -3,8 +3,6 @@
 #' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
-#' @examples
-#' make_measlesPomp(twentycities, AK_pparams, model_mechanics_006())
 model_mechanics_006 = function(){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;

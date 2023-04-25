@@ -12,8 +12,3 @@ List of objects required for \code{make_measlesPomp()}.
 \description{
 panelPOMP model with log-log relationship between gamma and current population
 }
-\examples{
-new_pparams = AK_pparams
-new_pparams$shared = c(new_pparams$shared, gamma1 = -0.6369, gamma0 = 4.6121)
-make_measlesPomp(twentycities, new_pparams, model_mechanics_003())
-}

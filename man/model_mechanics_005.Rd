@@ -16,14 +16,3 @@ panelPOMP model with log-log relationship for between gamma and
 the standardized 1950 population, as well as between psi and the
 standardized 1950 population
 }
-\examples{
-new_pparams = AK_pparams
-new_pparams$shared = c(
-  new_pparams$shared,
-  gamma1 = -0.6369,
-  gamma0 = 4.6121,
-  psi1 = -0.69722,
-  psi0 = -1.10167
-)
-make_measlesPomp(twentycities, new_pparams, model_mechanics_005())
-}
