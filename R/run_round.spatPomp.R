@@ -3,6 +3,11 @@
 #' @param x `spatPomp` object.
 #' @param initial_pparams_list List of initial parameters in the format of
 #' `pparams()`.
+#' @param sharedParNames Estimated parameters that are shared between units.
+#' @param unitParParNames Estimated parameters that are unit-specific.
+#' @param block_size The number of spatial units per block.
+#' @param spat_regression Fraction of each extended shared parameter regressed
+#' toward the unit mean. Not required when all parameters are unit-specific.
 #' @inheritParams run_round
 #'
 #' @return Object of class `fit_results` containing a list of `ibpfd_spatPomp`
@@ -17,11 +22,13 @@ run_round.spatPomp = function(
     cooling_frac,
     rw_sd,
     nmif,
-    block = FALSE,
+    block = TRUE,
     np_eval,
     nreps_eval,
     print_times = FALSE,
     initial_pparams_list,
+    block_size = 1,
+    spat_regression = 0.1,
     ...
 ){
   i = NULL # prevents check() note
@@ -44,8 +51,8 @@ run_round.spatPomp = function(
         sharedParNames = "g",
         unitParNames =
           setdiff(rownames(initial_pparams_list[[i]]$specific), "muD"),
-        block_size = 1,
-        spat_regression = 0.1
+        block_size = block_size,
+        spat_regression = spat_regression
       )
     }
     if(print_times) print(Sys.time() - start_t)
@@ -55,6 +62,7 @@ run_round.spatPomp = function(
       ncores = ncores,
       np_pf = np_eval,
       nreps = nreps_eval,
+      block_size = block_size,
       seed = NULL,
       divisor = NULL
     )

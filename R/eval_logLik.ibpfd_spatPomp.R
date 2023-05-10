@@ -1,6 +1,7 @@
 #' Evaluate log likelihood of spatPomp model using the block particle filter
 #'
 #' @param model_obj_list List of model objects to evaluate log likelihood of.
+#' @param block_size The number of spatial units per block.
 #' @param ncores Number of cores to use for parallel computing.
 #' @param np_pf Number of particles to use.
 #' @param nreps Number of block particle filter repetitions.
@@ -15,6 +16,7 @@
 #'
 eval_logLik.ibpfd_spatPomp = function(
     model_obj_list,
+    block_size = 1,
     ncores,
     np_pf,
     nreps,
@@ -41,7 +43,7 @@ eval_logLik.ibpfd_spatPomp = function(
       pfilter_obj = spatPomp::bpfilter(
         model_obj_list[[i]],
         Np = np_pf,
-        block_size = 1
+        block_size = block_size
       )
       spatPomp::logLik(pfilter_obj)
     } -> logLik_vec

@@ -11,7 +11,7 @@ eval_logLik(
   nreps,
   seed = NULL,
   divisor = NULL,
-  return_pfilter_obj = FALSE
+  return_n_pfilter_objs = 0
 )
 }
 \arguments{
@@ -28,8 +28,7 @@ eval_logLik(
 \item{divisor}{seed mod divisor*i is used to obtain seed for ith repetition.
 If NULL, does not set new seed.}
 
-\item{return_pfilter_obj}{Should the returned list include a pfilter object?
-repetition.}
+\item{return_n_pfilter_objs}{Number of pfilter objects to return.}
 }
 \value{
 Object of type \code{EL_list}, a list of data frames containing

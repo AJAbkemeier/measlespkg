@@ -4,11 +4,12 @@ library(tibble)
 load("R/sysdata.rda")
 urr = urban_rural_raw
 
+dates = as.Date("1944-01-07") + 7*(0:(nrow(urr$measles_urban) - 1))
+
 measles = cbind(urr$measles_rural, urr$measles_urban) %>%
   rownames_to_column(var = "date") %>%
-  mutate(date = as.numeric(date) + 1900) %>%
+  mutate(date = dates) %>%
   pivot_longer(-date, names_to = "unit", values_to = "cases") %>%
-  mutate(date =  as.Date(lubridate::date_decimal(date))) %>%
   select(unit, everything()) %>%
   arrange(unit)
 

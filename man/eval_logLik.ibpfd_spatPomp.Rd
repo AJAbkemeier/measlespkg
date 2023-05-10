@@ -6,6 +6,7 @@
 \usage{
 eval_logLik.ibpfd_spatPomp(
   model_obj_list,
+  block_size = 1,
   ncores,
   np_pf,
   nreps,
@@ -16,6 +17,8 @@ eval_logLik.ibpfd_spatPomp(
 }
 \arguments{
 \item{model_obj_list}{List of model objects to evaluate log likelihood of.}
+
+\item{block_size}{The number of spatial units per block.}
 
 \item{ncores}{Number of cores to use for parallel computing.}
 

@@ -12,11 +12,13 @@
   cooling_frac,
   rw_sd,
   nmif,
-  block = FALSE,
+  block = TRUE,
   np_eval,
   nreps_eval,
   print_times = FALSE,
   initial_pparams_list,
+  block_size = 1,
+  spat_regression = 0.1,
   ...
 )
 }
@@ -48,7 +50,16 @@ specific parameters.}
 \item{initial_pparams_list}{List of initial parameters in the format of
 \code{pparams()}.}
 
+\item{block_size}{The number of spatial units per block.}
+
+\item{spat_regression}{Fraction of each extended shared parameter regressed
+toward the unit mean. Not required when all parameters are unit-specific.}
+
 \item{...}{Additional arguments for other methods.}
+
+\item{sharedParNames}{Estimated parameters that are shared between units.}
+
+\item{unitParParNames}{Estimated parameters that are unit-specific.}
 }
 \value{
 Object of class \code{fit_results} containing a list of \code{ibpfd_spatPomp}

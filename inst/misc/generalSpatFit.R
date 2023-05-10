@@ -1,8 +1,8 @@
 Sys.time()
 devtools::session_info()
 ######### load-packages ###############################
-#devtools::load_all()
-library(measlespkg)
+devtools::load_all()
+#library(measlespkg)
 library(foreach)
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),
@@ -31,8 +31,13 @@ TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = twentycities
 UNITS = unique(twentycities$measles$unit)
 MODEL = model_mechanics_007(length(UNITS))
+SHARED = "g"
+SPECIFIC = c("S_0", "E_0", "I_0", "R0", "sigmaSE", "amplitude", "rho", "gamma",
+             "psi", "iota", "sigma", "cohort", "alpha", "muD")
 DT = 1/365.25
-BLOCK_MIF2 = TRUE
+BLOCK_SIZE = 1
+SPAT_REGR = 0.1
+
 INTERP_METHOD = "shifted_splines"
 # SIM_MODEL specifies whether simulated data from a given model should be used.
 SIM_MODEL = NULL
@@ -200,16 +205,9 @@ measlesPomp_mod = make_spatMeaslesPomp(
 
 U = length(UNITS)
 expanded_rw_sd = unlist(lapply(names(INITIAL_RW_SD), function(x){
-  if(x %in% MODEL$spp_names){
     z = rep(INITIAL_RW_SD[[x]], U)
     names(z) = paste0(x,1:U)
-  } else {
-    z = INITIAL_RW_SD[[x]]
-    z = rep(INITIAL_RW_SD[[x]], U)
-    names(z) = paste0(x,1:U)
-    #names(z) = paste0(x,1)
-  }
-  z
+    z
 }))
 
 if(!is.null(EVAL_POINTS)){
@@ -226,10 +224,13 @@ round_out = run_round(
   np_mif2 = NP_MIF,
   np_eval = NP_EVAL,
   nreps_eval = NREPS_EVAL,
-  block = BLOCK_MIF2,
   ncores = ncores,
   write_results_to = write_results_to,
-  print_times = TRUE
+  print_times = TRUE,
+  block_size = BLOCK_SIZE,
+  spat_regression = SPAT_REGR,
+  sharedParNames = SHARED,
+  unitParNames = SPECIFIC
 )
 
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]

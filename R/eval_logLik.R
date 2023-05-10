@@ -7,8 +7,8 @@
 #' @param seed Seed for particle filter. If NULL, does not set new seed.
 #' @param divisor seed mod divisor*i is used to obtain seed for ith repetition.
 #' If NULL, does not set new seed.
-#' @param return_pfilter_obj Should the returned list include a pfilter object?
-#' repetition.
+#' @param return_n_pfilter_objs Number of pfilter objects to return.
+#'
 #'
 #' @return Object of type `EL_list`, a list of data frames containing
 #' log likelihood and se estimates.
@@ -24,7 +24,7 @@ eval_logLik = function(
     nreps,
     seed = NULL,
     divisor = NULL,
-    return_pfilter_obj = FALSE
+    return_n_pfilter_objs = 0
 ){
   pf_logLik_frame = data.frame(
     logLik = rep(0, length(model_obj_list)),
@@ -43,11 +43,13 @@ eval_logLik = function(
     foreach::foreach(
       j = 1:nreps,
       .packages = "panelPomp",
-      .combine = rbind
+      .combine = c
     ) %dopar% {
-      pfilter_obj = panelPomp::pfilter(model_obj_list[[i]], Np = np_pf)
-      panelPomp::unitlogLik(pfilter_obj)
-    } -> pf_unitlogLik_matrix
+      panelPomp::pfilter(model_obj_list[[i]], Np = np_pf)
+    } -> pf_list
+    if(nreps == 1) pf_list = list(pf_list)
+    pf_unitlogLik_matrix = lapply(pf_list, panelPomp::unitlogLik) |>
+      dplyr::bind_rows()
     pf_logLik_frame[i, 1:2] = panelPomp::panel_logmeanexp(
       pf_unitlogLik_matrix,
       MARGIN = 2,
@@ -79,7 +81,7 @@ eval_logLik = function(
     np_pf = np_pf,
     nreps = nreps
   )
-  if(return_pfilter_obj)
-    pf_frames_list = c(pf_frames_list, pfilter_obj = pfilter_obj)
+  if(return_n_pfilter_objs > 0)
+    pf_frames_list$pfilter_list = pf_list[1:return_n_pfilter_objs]
   pf_frames_list
 }

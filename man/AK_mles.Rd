@@ -28,6 +28,7 @@ transition from S to E during school versus during vacations}
 time}
 \item{cohort}{Controls proportion of the year's susceptible individuals
 who are added on the 251st day of the year}
+\item{psi}{Measurement overdispersion parameter}
 \item{S_0}{Proportion of individuals at time 0 who are susceptible}
 \item{E_0}{Proportion of individuals at time 0 who are exposed}
 \item{I_0}{Proportion of individuals at time 0 who are infectious}
