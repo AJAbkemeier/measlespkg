@@ -1,7 +1,6 @@
 More important:
 - Fix round_round.fit_results so it updates traces correctly
  - Need to figure out how to modify panelPomp traces
-- Write code to use spatPomp
 - Edit eval_logLik to make the return the pfilter object for a *good* fit
   instead of the last one
 - Edit eval_logLik to return an array of many conditional log likelihoods
@@ -11,7 +10,6 @@ Less imporant:
 - Continue to think of ways to make the package easy to use and understand
 - Figure out how to stop Csnippet code from getting flattened after installation
  - Alternatively, figure out how to display contents of model_mechanics better
-- Update smooth interp method to use demog data outside of the 1950-1964 range
 
 Optional:
 - Standardize how output directory is structured
