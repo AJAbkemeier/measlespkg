@@ -89,7 +89,7 @@ model_mechanics_007 = function(U){
         if (C < 0) {lik += log(tol);} else {
           if (cases[u] > tol) {
             lik += log(pnorm(cases[u] + 0.5, m, sqrt(v) + tol, 1, 0) -
-              pnorm(cases[u] - 0.5, m, sqrt(v)+tol, 1, 0) + tol);
+              pnorm(cases[u] - 0.5, m, sqrt(v) + tol, 1, 0) + tol);
           } else {
               lik += log(pnorm(cases[u] + 0.5, m, sqrt(v) + tol, 1, 0) + tol);
           }
@@ -107,12 +107,14 @@ model_mechanics_007 = function(U){
       double v = m*(1.0 - rho[u*rho_unit] + psi[u*psi_unit]*psi[u*psi_unit]*m);
       double tol = 1e-300;
       // C < 0 can happen in bootstrap methods such as bootgirf
-      if (C < 0) {lik = 0;} else {
-        if (cases > tol) {
-          lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) -
-            pnorm(cases - 0.5, m, sqrt(v) + tol, 1, 0) + tol;
-        } else {
-          lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) + tol;
+      if (ISNA(cases)) {lik = 1;} else {
+        if (C < 0) {lik = 0;} else {
+          if (cases > tol) {
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) -
+              pnorm(cases - 0.5, m, sqrt(v) + tol, 1, 0) + tol;
+          } else {
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) + tol;
+          }
         }
       }
       if(give_log) lik = log(lik);
@@ -159,7 +161,7 @@ model_mechanics_007 = function(U){
 
   spp_names = c("R0","sigma","gamma","alpha","iota", "rho",
                 "sigmaSE","psi","cohort","amplitude",
-                "S_0","E_0","I_0", "muD", "g")
+                "S_0","E_0","I_0")
   shp_names = c("muD", "g")
   ivp_names = c("S_0", "E_0", "I_0")
   paramnames = union(spp_names, shp_names)
