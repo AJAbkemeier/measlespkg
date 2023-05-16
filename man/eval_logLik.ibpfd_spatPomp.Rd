@@ -35,7 +35,9 @@ If NULL, does not set new seed.}
 object from the last repetition?}
 }
 \value{
-A list containing the results of the likelihood evaluation.
+A list containing the results of the likelihood evaluation. The \code{ull}
+and \code{se} data frames are not estimates of the actual \code{ull} and unit \code{se},
+as the units are not independent.
 }
 \description{
 Evaluate log likelihood of spatPomp model using the block particle filter
