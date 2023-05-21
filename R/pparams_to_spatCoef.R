@@ -1,4 +1,4 @@
-#' Title
+#' Convert list of `pparams` into `coef.spatPomp` format
 #'
 #' @param pparams List of parameters in format of `pparams`.
 #'

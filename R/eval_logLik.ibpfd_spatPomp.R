@@ -64,7 +64,6 @@ eval_logLik.ibpfd_spatPomp = function(
       ull
     }) |>
       dplyr::bind_rows()
-    print(pf_unitlogLik_matrix)
     unit_calcs = apply(
       pf_unitlogLik_matrix,
       MARGIN = 2,

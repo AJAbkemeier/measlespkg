@@ -2,7 +2,7 @@
 % Please edit documentation in R/pparams_to_spatCoef.R
 \name{pparams_to_spatCoef}
 \alias{pparams_to_spatCoef}
-\title{Title}
+\title{Convert list of \code{pparams} into \code{coef.spatPomp} format}
 \usage{
 pparams_to_spatCoef(pparams)
 }
@@ -13,5 +13,5 @@ pparams_to_spatCoef(pparams)
 Named vector of parameters in format used by \code{coef.spatPomp}.
 }
 \description{
-Title
+Convert list of \code{pparams} into \code{coef.spatPomp} format
 }

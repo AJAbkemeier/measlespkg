@@ -5,6 +5,9 @@
 #' @param top_n Number of top fits to duplicate.
 #' @param combine Boolean specifying whether best specific fits should be
 #' combined.
+#' @param units Character vector of unit names, which is necessary when
+#' duplicating the parameters of a `spatPomp` object. If the parameters belong
+#' to a `panelPomp` object, leave as `NULL`.
 #'
 #' @return List of parameters in the form of `pparams()`.
 #' @export
@@ -22,7 +25,8 @@ duplicate_top_pparams = function(
     x,
     out_length,
     top_n = 1,
-    combine = FALSE
+    combine = FALSE,
+    units = NULL
 ){
   if(out_length %% top_n != 0){
     stop(
@@ -42,6 +46,9 @@ duplicate_top_pparams = function(
     rep_len(1:nrow(grabbed_params), length.out = out_length)
   )
   lapply(1:nrow(top_params), function(z){
-    coef_to_pparams(top_params[z,])
+    if(is.null(units))
+      coef_to_pparams(top_params[z,])
+    else
+      spatCoef_to_pparams(top_params[z,], units)
   })
 }

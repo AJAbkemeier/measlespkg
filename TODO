@@ -4,6 +4,7 @@ More important:
 - Edit eval_logLik to make the return the pfilter object for a *good* fit
   instead of the last one
 - Edit eval_logLik to return an array of many conditional log likelihoods
+- Fix how spatPomp specific/shared parameters are handled
 
 Less imporant:
 

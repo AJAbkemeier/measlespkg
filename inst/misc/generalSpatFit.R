@@ -58,6 +58,7 @@ if(!is.na(array_job_id)){
 # instead of from a previous fit. Setting this equal to a path will nullify
 # the portion of code which chooses starting parameters from a box.
 PREVIOUS_FIT_PATH = NULL
+COMBINE_TOP_SPECIFIC = FALSE
 
 # Use INITIAL_RW_SD to set random walk standard deviations for parameters.
 DEFAULT_SD = 0.02
@@ -191,7 +192,8 @@ if(!is.null(PREVIOUS_FIT_PATH)){
     EL_in,
     out_length = NREPS_MIF,
     top_n = TOP_N_FITS,
-    combine = TRUE
+    combine = COMBINE_TOP_SPECIFIC,
+    units = UNITS
   )
 }
 

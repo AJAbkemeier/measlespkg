@@ -4,7 +4,7 @@
 \alias{duplicate_top_pparams}
 \title{Duplicate top fits from \code{EL_list}}
 \usage{
-duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE)
+duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE, units = NULL)
 }
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
@@ -15,6 +15,10 @@ duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE)
 
 \item{combine}{Boolean specifying whether best specific fits should be
 combined.}
+
+\item{units}{Character vector of unit names, which is necessary when
+duplicating the parameters of a \code{spatPomp} object. If the parameters belong
+to a \code{panelPomp} object, leave as \code{NULL}.}
 }
 \value{
 List of parameters in the form of \code{pparams()}.
