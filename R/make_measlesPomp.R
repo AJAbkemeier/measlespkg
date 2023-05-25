@@ -6,6 +6,8 @@
 #' `model_mechanics_XXX()` functions.
 #' @param interp_method Method used to interpolate population and births.
 #' Possible options are `"shifted_splines"` and `"linear`.
+#' @param first_year Integer for the first full year of data desired.
+#' @param last_year Integer for the last full year of data desired.
 #' @param custom_obs_list List of observations where each element supplies
 #' observations for a different city. Useful when using simulated observations.
 #' Set to `NULL` to use real observations.
@@ -21,6 +23,8 @@ make_measlesPomp = function(
     starting_pparams,
     model,
     interp_method = c("shifted_splines", "linear"),
+    first_year = 1950,
+    last_year = 1963,
     custom_obs_list = NULL,
     dt = 1/365.25
 ){
@@ -43,12 +47,16 @@ make_measlesPomp = function(
     dat_list[[i]] = measles |>
       dplyr::mutate(year = as.integer(format(date,"%Y"))) |>
       dplyr::filter(
-        .data$unit == units[[i]] & .data$year >= 1950 & .data$year < 1964
+        .data$unit == units[[i]] & .data$year >= first_year &
+          .data$year < (last_year + 1)
       ) |>
       dplyr::mutate(
-        time = julian(.data$date, origin = as.Date("1950-01-01"))/365.25 + 1950
+        time = julian(
+          .data$date,
+          origin = as.Date(paste0(first_year, "-01-01"))
+        )/365.25 + first_year
       ) |>
-      dplyr::filter(.data$time > 1950 & .data$time < 1964) |>
+      dplyr::filter(.data$time > first_year & .data$time < (last_year + 1)) |>
       dplyr::select(.data$time, .data$cases)
     if(!is.null(custom_obs_list)) dat_list[[i]]$cases = custom_obs_list[[i]]
 
@@ -93,7 +101,9 @@ make_measlesPomp = function(
     )
     covar_list[[i]] = covar_list[[i]] |>
     dplyr::mutate(
-      pop_1950 = dplyr::filter(covar_list[[i]],covar_list[[i]]$time == 1950)$pop
+      pop_1950 = dplyr::filter(
+        covar_list[[i]], covar_list[[i]]$time == 1950
+      )$pop
     )
   }
   for(i in seq_along(units)){
