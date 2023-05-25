@@ -12,10 +12,15 @@
 #' make_rw_sd(rw_sd_vec)
 make_rw_sd = function(rw_sd_vec){
   ivp_indices = grep("_0", x = names(rw_sd_vec))
-  ivp_rw_sd = lapply(names(rw_sd_vec[ivp_indices]), function(x){
-    eval(bquote(expression(ivp(rw_sd_vec[[.(x)]]))))
-  })
-  names(ivp_rw_sd) = names(rw_sd_vec[ivp_indices])
-  reg_rw_sd = as.list(rw_sd_vec[-ivp_indices])
+  if(length(ivp_indices) > 0){
+    ivp_rw_sd = lapply(names(rw_sd_vec[ivp_indices]), function(x){
+      eval(bquote(expression(ivp(rw_sd_vec[[.(x)]]))))
+    })
+    names(ivp_rw_sd) = names(rw_sd_vec[ivp_indices])
+    reg_rw_sd = as.list(rw_sd_vec[-ivp_indices])
+  } else {
+    ivp_rw_sd = NULL
+    reg_rw_sd = as.list(rw_sd_vec)
+  }
   do.call(pomp::rw_sd, c(reg_rw_sd, ivp_rw_sd))
 }
