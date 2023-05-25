@@ -103,7 +103,8 @@ make_measlesPomp = function(
     covar_list[[i]] = covar_list[[i]] |>
       dplyr::mutate(
         std_log_pop_1950 = (log(.data$pop_1950) - mean(log_pop_1950))/
-          stats::sd(log_pop_1950)
+          stats::sd(log_pop_1950),
+        unit_num = i
       )
   }
 
