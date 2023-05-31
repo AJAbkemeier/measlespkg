@@ -25,7 +25,8 @@ gather_results = function(file_names, parent_dir = "."){
   out_paths = paste0(parent_dir,"/",out_paths)
   lapply(out_paths, function(x){
     loaded_obj = readRDS(x)
-    if(is(loaded_obj) == "fit_results"){
+    classes = is(loaded_obj)
+    if("fit_results" %in% classes){
       ELL = loaded_obj$EL_out[[1]]
       MIF2O = loaded_obj$mif2_out[[1]]
       Nmif = MIF2O@Nmif
@@ -35,7 +36,7 @@ gather_results = function(file_names, parent_dir = "."){
       np_eval = ELL$np_pf
       nreps_eval = ELL$nreps
     }
-    if(is(loaded_obj) == "EL_list"){
+    if("EL_list" %in% classes){
       ELL = loaded_obj
       Nmif = NA
       cf = NA

@@ -9,6 +9,8 @@ make_measlesPomp(
   starting_pparams,
   model,
   interp_method = c("shifted_splines", "linear"),
+  first_year = 1950,
+  last_year = 1963,
   custom_obs_list = NULL,
   dt = 1/365.25
 )
@@ -23,6 +25,10 @@ make_measlesPomp(
 
 \item{interp_method}{Method used to interpolate population and births.
 Possible options are \code{"shifted_splines"} and \verb{"linear}.}
+
+\item{first_year}{Integer for the first full year of data desired.}
+
+\item{last_year}{Integer for the last full year of data desired.}
 
 \item{custom_obs_list}{List of observations where each element supplies
 observations for a different city. Useful when using simulated observations.

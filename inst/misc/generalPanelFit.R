@@ -79,12 +79,9 @@ if(!is.null(EVAL_PARAM))
 # Specify names of output files
 RESULTS_FILE = "fit_results_out.rds"
 
-### Diagnostic parameters ###
-# For plots and final loglik calc, use combination of parameters which yields
-# best sum of unit loglik?
+# For final loglik calc, use combination of unit-specific parameters which
+# yields the best sum of unit loglik?
 USE_BEST_COMBO = TRUE
-PLOT_TRACES = TRUE
-PLOT_SIMS = FALSE
 ################## SETUP ###########################################
 set.seed(MAIN_SEED)
 # Create directory for output if it does not exist
@@ -98,10 +95,7 @@ write_results_to = paste0(write_path, RESULTS_FILE)
 
 # Use observations from simulation?
 if(!is.null(SIM_MODEL)){
-  sim = simulate(
-    SIM_MODEL,
-    seed = SIM_MODEL_SEED
-  )
+  sim = simulate(SIM_MODEL, seed = SIM_MODEL_SEED)
   sim_obs_list = lapply(seq_along(sim), function(x){
     pomp::obs(sim[[x]]) |>
       as.numeric()
@@ -113,31 +107,31 @@ if(!is.null(SIM_MODEL)){
 ###### Starting parameters #############################
 
 # Specify box to sample initial shared parameters from
-shared_box_specs = tibble::tribble(
-  ~param, ~center,   ~radius,
-  "mu",        0.02,        0
-)
-
-# Specify box to sample initial specific parameters from
-specific_radii = tibble::tribble(
-  ~param, ~radius,
-  "R0",        6,
-  "rho",       0.05,
-  "sigmaSE",   6,
-  "amplitude", 0.08,
-  "S_0",       0.01,
-  "E_0",       0.0001,
-  "I_0",       0.001,
-  "R_0",       0.01,
-  "sigma",     10,
-  "iota",      0.5,
-  "psi",       0.4,
-  "alpha",     0.02,
-  "cohort",    0.1,
-  "gamma",     30
-)
-if(!is.null(EVAL_PARAM))
-  specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
+# shared_box_specs = tibble::tribble(
+#   ~param, ~center,   ~radius,
+#   "mu",        0.02,        0
+# )
+#
+# # Specify box to sample initial specific parameters from
+# specific_radii = tibble::tribble(
+#   ~param, ~radius,
+#   "R0",        6,
+#   "rho",       0.05,
+#   "sigmaSE",   6,
+#   "amplitude", 0.08,
+#   "S_0",       0.01,
+#   "E_0",       0.0001,
+#   "I_0",       0.001,
+#   "R_0",       0.01,
+#   "sigma",     10,
+#   "iota",      0.5,
+#   "psi",       0.4,
+#   "alpha",     0.02,
+#   "cohort",    0.1,
+#   "gamma",     30
+# )
+# if(!is.null(EVAL_PARAM))
+#   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
 
 shared_bounds = tibble::tribble(
   ~param,    ~lower,   ~upper,
@@ -162,7 +156,7 @@ specific_bounds = tibble::tribble(
   "gamma",          25,           320
 )
 if(!is.null(EVAL_PARAM)){
-  eval_param_rows = specific_radii[["param"]] == EVAL_PARAM
+  eval_param_rows = specific_bounds[["param"]] == EVAL_PARAM
   specific_bounds[eval_param_rows, "lower"] = EVAL_POINTS[[array_job_id]]
   specific_bounds[eval_param_rows, "upper"] = EVAL_POINTS[[array_job_id]]
 }
@@ -216,50 +210,6 @@ round_out = run_round(
   print_times = TRUE
 )
 
-# cooling = calc_geo_cooling(
-#   COOLING_FRAC,
-#   n = 1,
-#   m = 100*1 + 1,
-#   N = length(time(measlesPomp_mod[[1]]))
-# )
-# round_out = run_round(
-#   round_out,
-#   top_n_fits = TOP_N_FITS,
-#   combine = TRUE,
-#   rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
-#   cooling_frac = COOLING_FRAC,
-#   nmif = NMIF,
-#   np_mif2 = NP_MIF,
-#   np_eval = NP_EVAL,
-#   nreps_eval = NREPS_EVAL,
-#   block = BLOCK_MIF2,
-#   ncores = ncores,
-#   write_results_to = write_results_to,
-#   print_times = TRUE
-# )
-#
-# cooling = calc_geo_cooling(
-#   COOLING_FRAC,
-#   n = 1,
-#   m = 100*2 + 1,
-#   N = length(time(measlesPomp_mod[[1]]))
-# )
-# round_out = run_round(
-#   round_out,
-#   top_n_fits = TOP_N_FITS,
-#   combine = TRUE,
-#   rw_sd = make_rw_sd(INITIAL_RW_SD*cooling),
-#   cooling_frac = COOLING_FRAC,
-#   nmif = NMIF,
-#   np_mif2 = NP_MIF,
-#   np_eval = NP_EVAL,
-#   nreps_eval = NREPS_EVAL,
-#   block = BLOCK_MIF2,
-#   ncores = ncores,
-#   write_results_to = write_results_to,
-#   print_times = TRUE
-# )
-
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]
 print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
 
@@ -282,35 +232,3 @@ if(USE_BEST_COMBO){
   tictoc::toc()
   as.data.frame(EL_out_best$fits[,1:2])
 }
-
-################ diagnostics ###############################################
-if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_fits(EL_final)$fits |>
-    dplyr::select(-logLik, -se) |>
-    unlist()
-}
-
-if(PLOT_TRACES){
-  plot_traces(
-    round_out$mif2_out,
-    plot_shared = "loglik",
-    plot_specific = ".ALL",
-    print_plots = FALSE,
-    save_dir = paste0(write_path, "trace_plots/")
-  )
-}
-
-if(PLOT_SIMS){
-  measlesPomp_sim = measlesPomp_mod
-  coef(measlesPomp_sim) = top_params
-  AK_mod = AK_model()
-  sim_plots(
-    true_model = AK_mod,
-    sim_model = measlesPomp_sim,
-    print_plots = FALSE,
-    save_dir = paste0(write_path, "sim_plots/")
-  )
-}
-
-
-
