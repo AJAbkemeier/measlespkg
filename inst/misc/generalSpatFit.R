@@ -30,10 +30,7 @@ NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = twentycities
 UNITS = unique(twentycities$measles$unit)
-MODEL = model_mechanics_007(length(UNITS))
-SHARED = "g"
-SPECIFIC = c("S_0", "E_0", "I_0", "R0", "sigmaSE", "amplitude", "rho", "gamma",
-             "psi", "iota", "sigma", "cohort", "alpha", "muD")
+MODEL = model_mechanics_007(length(UNITS), shared_names = "g")
 DT = 1/365.25
 BLOCK_SIZE = 1
 SPAT_REGR = 0.1
@@ -86,12 +83,10 @@ if(!is.null(EVAL_PARAM))
 # Specify names of output files
 RESULTS_FILE = "fit_results_out.rds"
 
-### Diagnostic parameters ###
-# For plots and final loglik calc, use combination of parameters which yields
-# best sum of unit loglik?
+# For final loglik calc, use combination of parameters which yields best sum of
+# unit loglik?
 USE_BEST_COMBO = FALSE
-PLOT_TRACES = FALSE
-PLOT_SIMS = FALSE
+
 ################## SETUP ###########################################
 set.seed(MAIN_SEED)
 # Create directory for output if it does not exist
@@ -105,10 +100,7 @@ write_results_to = paste0(write_path, RESULTS_FILE)
 
 # Use observations from simulation?
 if(!is.null(SIM_MODEL)){
-  sim = simulate(
-    SIM_MODEL,
-    seed = SIM_MODEL_SEED
-  )
+  sim = simulate(SIM_MODEL, seed = SIM_MODEL_SEED)
   sim_obs_list = lapply(seq_along(sim), function(x){
     pomp::obs(sim[[x]]) |>
       as.numeric()
@@ -171,7 +163,7 @@ specific_bounds = tibble::tribble(
   "g"  ,           350,           450
 )
 if(!is.null(EVAL_PARAM)){
-  eval_param_rows = specific_radii[["param"]] == EVAL_PARAM
+  eval_param_rows = specific_bounds[["param"]] == EVAL_PARAM
   specific_bounds[eval_param_rows, "lower"] = EVAL_POINTS[[array_job_id]]
   specific_bounds[eval_param_rows, "upper"] = EVAL_POINTS[[array_job_id]]
 }
@@ -231,8 +223,8 @@ round_out = run_round(
   print_times = TRUE,
   block_size = BLOCK_SIZE,
   spat_regression = SPAT_REGR,
-  sharedParNames = SHARED,
-  unitParNames = SPECIFIC
+  sharedParNames = MODEL$shp_names,
+  unitParNames = MODEL$spp_names
 )
 
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]
@@ -257,35 +249,3 @@ if(USE_BEST_COMBO){
   tictoc::toc()
   as.data.frame(EL_out_best$fits[,1:2])
 }
-
-################ diagnostics ###############################################
-if(USE_BEST_COMBO == FALSE){
-  top_params = grab_top_fits(EL_final)$fits |>
-    dplyr::select(-logLik, -se) |>
-    unlist()
-}
-
-if(PLOT_TRACES){
-  plot_traces(
-    round_out$mif2_out,
-    plot_shared = "loglik",
-    plot_specific = ".ALL",
-    print_plots = FALSE,
-    save_dir = paste0(write_path, "trace_plots/")
-  )
-}
-
-if(PLOT_SIMS){
-  measlesPomp_sim = measlesPomp_mod
-  coef(measlesPomp_sim) = top_params
-  AK_mod = AK_model()
-  sim_plots(
-    true_model = AK_mod,
-    sim_model = measlesPomp_sim,
-    print_plots = FALSE,
-    save_dir = paste0(write_path, "sim_plots/")
-  )
-}
-
-
-

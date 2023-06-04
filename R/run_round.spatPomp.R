@@ -3,8 +3,9 @@
 #' @param x `spatPomp` object.
 #' @param initial_pparams_list List of initial parameters in the format of
 #' `pparams()`.
-#' @param sharedParNames Estimated parameters that are shared between units.
-#' @param unitParParNames Estimated parameters that are unit-specific.
+#' @param sharedParNames Character vector of parameters that are shared between
+#' units.
+#' @param unitParNames Character vector of parameters that are unit-specific.
 #' @param block_size The number of spatial units per block.
 #' @param spat_regression Fraction of each extended shared parameter regressed
 #' toward the unit mean. Not required when all parameters are unit-specific.
@@ -16,6 +17,8 @@
 #'
 run_round.spatPomp = function(
     x,
+    sharedParNames,
+    unitParNames,
     write_results_to,
     ncores,
     np_mif2,
@@ -48,9 +51,8 @@ run_round.spatPomp = function(
         rw.sd = make_rw_sd(rw_sd),
         cooling.type = "geometric",
         Nbpf = nmif,
-        sharedParNames = "g",
-        unitParNames =
-          setdiff(rownames(initial_pparams_list[[i]]$specific), "muD"),
+        sharedParNames = sharedParNames,
+        unitParNames = unitParNames,
         block_size = block_size,
         spat_regression = spat_regression
       )

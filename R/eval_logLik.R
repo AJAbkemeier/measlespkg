@@ -67,7 +67,7 @@ eval_logLik = function(
       rownames(unit_calcs) == "loglik"
     ) |>
       as.data.frame()
-    pf_unitSE_list[[i]] = subset(unit_calcs, rownames(unit_calcs) == "se") %>%
+    pf_unitSE_list[[i]] = subset(unit_calcs, rownames(unit_calcs) == "se") |>
       as.data.frame()
   }
   pf_unitlogLik_frame = data.frame(dplyr::bind_rows(pf_unitlogLik_list))

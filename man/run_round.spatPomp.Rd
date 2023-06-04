@@ -6,6 +6,8 @@
 \usage{
 \method{run_round}{spatPomp}(
   x,
+  sharedParNames,
+  unitParNames,
   write_results_to,
   ncores,
   np_mif2,
@@ -24,6 +26,11 @@
 }
 \arguments{
 \item{x}{\code{spatPomp} object.}
+
+\item{sharedParNames}{Character vector of parameters that are shared between
+units.}
+
+\item{unitParNames}{Character vector of parameters that are unit-specific.}
 
 \item{write_results_to}{File path to save Rds file containing results to.}
 
@@ -56,10 +63,6 @@ specific parameters.}
 toward the unit mean. Not required when all parameters are unit-specific.}
 
 \item{...}{Additional arguments for other methods.}
-
-\item{sharedParNames}{Estimated parameters that are shared between units.}
-
-\item{unitParParNames}{Estimated parameters that are unit-specific.}
 }
 \value{
 Object of class \code{fit_results} containing a list of \code{ibpfd_spatPomp}

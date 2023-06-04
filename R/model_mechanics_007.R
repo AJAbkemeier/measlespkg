@@ -1,9 +1,12 @@
 #' spatPomp model for UK measles
 #'
+#' @param U Number of units to be included.
+#' @param shared_names Character vector of parameters to be treated as shared.
+#'
 #' @return List of objects required for `make_spatMeaslesPomp`.
 #' @export
 #'
-model_mechanics_007 = function(U){
+model_mechanics_007 = function(U, shared_names = "muD"){
   rproc <- spatPomp::spatPomp_Csnippet(
     unit_statenames = c('S','E','I','C'),
     unit_covarnames = c('pop','birthrate'),
@@ -159,10 +162,11 @@ model_mechanics_007 = function(U){
     "
   )
 
-  spp_names = c("R0","sigma","gamma","alpha","iota", "rho",
+  all_params = c("R0","sigma","gamma","alpha","iota", "rho",
                 "sigmaSE","psi","cohort","amplitude",
-                "S_0","E_0","I_0")
-  shp_names = c("muD", "g")
+                "S_0","E_0","I_0", "muD", "g")
+  shp_names = shared_names
+  spp_names = setdiff(all_params, shp_names)
   ivp_names = c("S_0", "E_0", "I_0")
   paramnames = union(spp_names, shp_names)
   log_names = c("sigma","gamma","sigmaSE","psi","R0", "muD", "alpha", "iota")
