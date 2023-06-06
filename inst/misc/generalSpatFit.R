@@ -237,7 +237,7 @@ if(USE_BEST_COMBO){
   eval_model = measlesPomp_mod
   panelPomp::coef(eval_model) = top_params
   EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
-    eval_logLik.ibpfd_spatPomp(
+    eval_logLik(
     model_obj_list = list(eval_model),
       ncores = ncores,
       np_pf = NP_EVAL,

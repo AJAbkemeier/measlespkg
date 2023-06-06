@@ -2,10 +2,11 @@
 % Please edit documentation in R/eval_logLik.R
 \name{eval_logLik}
 \alias{eval_logLik}
-\title{Evaluate log likelihood of model using particle filter}
+\title{Evaluate the log likelihood of a model using \code{pfilter()}}
 \usage{
 eval_logLik(
   model_obj_list,
+  block_size = 1,
   ncores,
   np_pf,
   nreps,
@@ -15,7 +16,11 @@ eval_logLik(
 )
 }
 \arguments{
-\item{model_obj_list}{List of model objects to evaluate log likelihood of.}
+\item{model_obj_list}{List of \code{panelPomp} or \code{spatPomp} objects to evaluate
+the log likelihood of.}
+
+\item{block_size}{The number of spatial units per block. Only used when
+evaluating are \code{spatPomp} models.}
 
 \item{ncores}{Number of cores to use for parallel computing.}
 
@@ -25,17 +30,21 @@ eval_logLik(
 
 \item{seed}{Seed for particle filter. If NULL, does not set new seed.}
 
-\item{divisor}{seed mod divisor*i is used to obtain seed for ith repetition.
-If NULL, does not set new seed.}
+\item{divisor}{\code{seed} mod \code{divisor*i} is used to obtain seed for ith
+repetition. If NULL, does not set new seed.}
 
-\item{return_n_pfilter_objs}{Number of pfilter objects to return.}
+\item{return_n_pfilter_objs}{Number of \code{pfilter} objects to return. Currently
+only works for \code{panelPomp} models.}
 }
 \value{
 Object of type \code{EL_list}, a list of data frames containing log
-likelihood and se estimates.
+likelihood and standard error estimates. The unit log likelihoods estimated
+for \code{spatPomp} objects are not real unit log likelihoods given that the
+units are dependent, but they may still be useful when evaluating model
+fit.
 }
 \description{
-Evaluate log likelihood of model using particle filter
+Evaluate the log likelihood of a model using \code{pfilter()}
 }
 \examples{
 model_list = list(AK_model())

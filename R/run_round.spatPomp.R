@@ -59,7 +59,7 @@ run_round.spatPomp = function(
     }
     if(print_times) print(Sys.time() - start_t)
     if(print_times) start_t = Sys.time()
-    EL_out = eval_logLik.ibpfd_spatPomp(
+    EL_out = eval_logLik(
       model_obj_list = ibpf_out,
       ncores = ncores,
       np_pf = np_eval,
