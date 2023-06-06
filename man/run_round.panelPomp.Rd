@@ -51,8 +51,8 @@ specific parameters.}
 \item{...}{Additional arguments for other methods.}
 }
 \value{
-Object of class \code{fit_results} containing a list of \code{mif2} objects
-and a list of \code{EL_list} objects.
+Object of class \code{fit_results} containing a list of \code{mif2} objects and
+a list of \code{EL_list} objects.
 }
 \description{
 Perform one round of model fitting

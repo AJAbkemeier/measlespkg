@@ -3,7 +3,7 @@
 #' @param spatCoef `coef.spatPomp` object
 #' @param units Character vector of unit names
 #'
-#' @return Parameters in the format of `pparams`.
+#' @return Parameters in the format of [panelPomp::pparams].
 #' @export
 #'
 spatCoef_to_pparams = function(spatCoef, units){

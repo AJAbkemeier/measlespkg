@@ -31,8 +31,8 @@ Possible options are \code{"shifted_splines"} and \verb{"linear}.}
 \item{last_year}{Integer for the last full year of data desired.}
 
 \item{custom_obs_list}{List of observations where each element supplies
-observations for a different city. Useful when using simulated observations.
-Set to \code{NULL} to use real observations.}
+observations for a different city. Useful when using simulated
+observations. Set to \code{NULL} to use real observations.}
 
 \item{dt}{Size of the time step.}
 }

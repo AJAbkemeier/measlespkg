@@ -1,12 +1,12 @@
 #' Convert coef-style object to pparams-style object.
 #'
 #' @param coef Vector in the style of `coef(panelPomp_obj)`. That is, a numeric
-#' vector with names styled as "`shared_parameter`" or
-#' "`specific_parameter[unit]`".
+#'   vector with names styled as "`shared_parameter`" or
+#'   "`specific_parameter[unit]`".
 #'
 #' @return A list of length 2 in the style of `pparams(panelPomp_obj)`. That is,
-#' a numeric vector with shared parameter names, and a matrix with specific
-#' parameters as row names and units as column names.
+#'   a numeric vector with shared parameter names, and a matrix with specific
+#'   parameters as row names and units as column names.
 #' @export
 #'
 #' @examples

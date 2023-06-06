@@ -12,7 +12,7 @@ spatCoef_to_pparams(spatCoef, units)
 \item{units}{Character vector of unit names}
 }
 \value{
-Parameters in the format of \code{pparams}.
+Parameters in the format of \link[panelPomp:pparams]{panelPomp::pparams}.
 }
 \description{
 Convert \code{coef.spatPomp} to \code{pparams} format

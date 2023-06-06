@@ -7,13 +7,13 @@
 #' @param nreps Number of block particle filter repetitions.
 #' @param seed Seed for particle filter. If NULL, does not set new seed.
 #' @param divisor seed mod divisor*i is used to obtain seed for ith repetition.
-#' If NULL, does not set new seed.
+#'   If NULL, does not set new seed.
 #' @param return_pfilter_obj Should the returned list include the bpfilter
-#' object from the last repetition?
+#'   object from the last repetition?
 #'
 #' @return A list containing the results of the likelihood evaluation. The `ull`
-#' and `se` data frames are not estimates of the actual `ull` and unit `se`,
-#' as the units are not independent.
+#'   and `se` data frames are not estimates of the actual `ull` and unit `se`,
+#'   as the units are not independent.
 #' @export
 #'
 eval_logLik.ibpfd_spatPomp = function(

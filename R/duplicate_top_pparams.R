@@ -4,12 +4,12 @@
 #' @param out_length Number of parameter sets to output.
 #' @param top_n Number of top fits to duplicate.
 #' @param combine Boolean specifying whether best specific fits should be
-#' combined.
+#'   combined.
 #' @param units Character vector of unit names, which is necessary when
-#' duplicating the parameters of a `spatPomp` object. If the parameters belong
-#' to a `panelPomp` object, leave as `NULL`.
+#'   duplicating the parameters of a `spatPomp` object. If the parameters belong
+#'   to a `panelPomp` object, leave as `NULL`.
 #'
-#' @return List of parameters in the form of `pparams()`.
+#' @return List of parameters in the form of [panelPomp::pparams()].
 #' @export
 #'
 #' @examples

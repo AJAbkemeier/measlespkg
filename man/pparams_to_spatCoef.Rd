@@ -7,7 +7,7 @@
 pparams_to_spatCoef(pparams)
 }
 \arguments{
-\item{pparams}{List of parameters in format of \code{pparams}.}
+\item{pparams}{List of parameters in format of \code{\link[panelPomp:pparams]{panelPomp::pparams()}}.}
 }
 \value{
 Named vector of parameters in format used by \code{coef.spatPomp}.

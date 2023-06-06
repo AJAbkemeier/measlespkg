@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_rw_sd.R
 \name{make_rw_sd}
 \alias{make_rw_sd}
-\title{Turn named numeric vector into rw_sd}
+\title{Turn named numeric vector into \code{rw_sd}}
 \usage{
 make_rw_sd(rw_sd_vec)
 }
@@ -12,10 +12,10 @@ desired random walk standard deviations. Names of initial value parameters
 should end in _0.}
 }
 \value{
-Returns rw_sd object.
+Returns \code{rw_sd} object.
 }
 \description{
-Turn named numeric vector into rw_sd
+Turn named numeric vector into \code{rw_sd}
 }
 \examples{
 rw_sd_vec = c(alpha = 0.02, gamma = 0.01, E_0 = 0.003, I_0 = 0.006)

@@ -20,8 +20,8 @@ run_round(
 )
 }
 \arguments{
-\item{x}{An object used to select a method. Should either be
-\code{panelPomp} object or an object of class \code{fit_results}.}
+\item{x}{An object used to select a method. Should either be \code{panelPomp}
+object or an object of class \code{fit_results}.}
 
 \item{write_results_to}{File path to save Rds file containing results to.}
 
@@ -48,8 +48,8 @@ specific parameters.}
 \item{...}{Additional arguments for other methods.}
 }
 \value{
-Object of class \code{fit_results} containing a list of \code{mif2} objects
-and a list of \code{EL_list} objects.
+Object of class \code{fit_results} containing a list of \code{mif2} objects and
+a list of \code{EL_list} objects.
 }
 \description{
 Perform one round of model fitting

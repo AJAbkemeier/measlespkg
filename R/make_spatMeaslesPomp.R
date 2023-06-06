@@ -1,13 +1,13 @@
-#' Make a spatPomp model using measles data
+#' Make a `spatPomp` model using measles data
 #'
 #' @param data List in the format of `twentycities`.
 #' @param model List of objects in the format of the output for the
-#' `model_mechanics_XXX()` functions.
+#'   `model_mechanics_XXX()` functions.
 #' @param interp_method Method used to interpolate population and births.
-#' Possible options are `"shifted_splines"` and `"linear`.
+#'   Possible options are `"shifted_splines"` and `"linear"`.
 #' @param dt Size of the time step.
 #'
-#' @return A panelPomp object using the data and model supplied.
+#' @return A `spatPomp` object using the data and model supplied.
 #' @export
 #'
 make_spatMeaslesPomp = function(

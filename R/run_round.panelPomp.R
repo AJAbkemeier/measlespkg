@@ -2,11 +2,11 @@
 #'
 #' @param x `panelPomp` object.
 #' @param initial_pparams_list List of initial parameters in the format of
-#' `pparams()`.
+#'   `pparams()`.
 #' @inheritParams run_round
 #'
-#' @return Object of class `fit_results` containing a list of `mif2` objects
-#' and a list of `EL_list` objects.
+#' @return Object of class `fit_results` containing a list of `mif2` objects and
+#'   a list of `EL_list` objects.
 #' @export
 #'
 run_round.panelPomp = function(

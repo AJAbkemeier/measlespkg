@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_spatMeaslesPomp.R
 \name{make_spatMeaslesPomp}
 \alias{make_spatMeaslesPomp}
-\title{Make a spatPomp model using measles data}
+\title{Make a \code{spatPomp} model using measles data}
 \usage{
 make_spatMeaslesPomp(
   data,
@@ -18,13 +18,13 @@ make_spatMeaslesPomp(
 \code{model_mechanics_XXX()} functions.}
 
 \item{interp_method}{Method used to interpolate population and births.
-Possible options are \code{"shifted_splines"} and \verb{"linear}.}
+Possible options are \code{"shifted_splines"} and \code{"linear"}.}
 
 \item{dt}{Size of the time step.}
 }
 \value{
-A panelPomp object using the data and model supplied.
+A \code{spatPomp} object using the data and model supplied.
 }
 \description{
-Make a spatPomp model using measles data
+Make a \code{spatPomp} model using measles data
 }

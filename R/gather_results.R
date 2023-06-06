@@ -2,12 +2,12 @@
 #'
 #' @param file_names Character vector of names of rds files to load.
 #' @param parent_dir Path to the directory that we want to search the
-#' subdirectories of.
+#'   subdirectories of.
 #'
 #' @return `data.frame` where each row contains information for a unit from a
-#' `mif2` replication. Columns include information such as the path to the rds
-#' file, the number of particles used for `mif2` and likelihood evaluation, and
-#' the parameters that the likelihood was evaluated at.
+#'   `mif2` replication. Columns include information such as the path to the rds
+#'   file, the number of particles used for `mif2` and likelihood evaluation,
+#'   and the parameters that the likelihood was evaluated at.
 #' @export
 #'
 gather_results = function(file_names, parent_dir = "."){

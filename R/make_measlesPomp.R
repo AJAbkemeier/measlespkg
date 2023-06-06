@@ -3,14 +3,14 @@
 #' @param data List in the format of `twentycities`.
 #' @param starting_pparams Parameters in the format of `pparams()` output.
 #' @param model List of objects in the format of the output for the
-#' `model_mechanics_XXX()` functions.
+#'   `model_mechanics_XXX()` functions.
 #' @param interp_method Method used to interpolate population and births.
-#' Possible options are `"shifted_splines"` and `"linear`.
+#'   Possible options are `"shifted_splines"` and `"linear`.
 #' @param first_year Integer for the first full year of data desired.
 #' @param last_year Integer for the last full year of data desired.
 #' @param custom_obs_list List of observations where each element supplies
-#' observations for a different city. Useful when using simulated observations.
-#' Set to `NULL` to use real observations.
+#'   observations for a different city. Useful when using simulated
+#'   observations. Set to `NULL` to use real observations.
 #' @param dt Size of the time step.
 #'
 #' @return A panelPomp object using the data and model supplied.

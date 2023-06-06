@@ -31,8 +31,8 @@ If NULL, does not set new seed.}
 \item{return_n_pfilter_objs}{Number of pfilter objects to return.}
 }
 \value{
-Object of type \code{EL_list}, a list of data frames containing
-log likelihood and se estimates.
+Object of type \code{EL_list}, a list of data frames containing log
+likelihood and se estimates.
 }
 \description{
 Evaluate log likelihood of model using particle filter

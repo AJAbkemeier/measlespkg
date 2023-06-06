@@ -15,8 +15,8 @@ subdirectories of.}
 \value{
 \code{data.frame} where each row contains information for a unit from a
 \code{mif2} replication. Columns include information such as the path to the rds
-file, the number of particles used for \code{mif2} and likelihood evaluation, and
-the parameters that the likelihood was evaluated at.
+file, the number of particles used for \code{mif2} and likelihood evaluation,
+and the parameters that the likelihood was evaluated at.
 }
 \description{
 Gather information on fit results from subdirectories and tidy them
