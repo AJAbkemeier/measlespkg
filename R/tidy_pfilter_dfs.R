@@ -35,12 +35,12 @@ tidy_pfilter_dfs = function(x){
       t() |>
       as.data.frame() |>
       tibble::rownames_to_column(var = "unit") |>
-      dplyr::rename(ull = .data$V1)
+      dplyr::rename(ull = 2)
     tidy_se_df = subset(x$se, subset = rownames(x$se) == z) |>
       t() |>
       as.data.frame() |>
       tibble::rownames_to_column(var = "unit") |>
-      dplyr::rename(se = .data$V1)
+      dplyr::rename(se = 2)
     tidy_df = dplyr::left_join(tidy_ull_df, tidy_LL_df, by = "unit") |>
       dplyr::left_join(tidy_se_df, by = "unit") |>
       dplyr::select(
