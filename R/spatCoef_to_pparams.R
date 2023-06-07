@@ -1,6 +1,6 @@
 #' Convert `coef.spatPomp` to `pparams` format
 #'
-#' @param spatCoef `coef.spatPomp` object.
+#' @param spatCoef Named numeric vector in format of `coef.spatPomp` object.
 #' @param units Character vector of unit names.
 #'
 #' @return Parameters in the format of [panelPomp::pparams].

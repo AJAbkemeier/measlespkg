@@ -10,16 +10,27 @@
 #' EL_out = eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
 #' tidy_pfilter_dfs(EL_out)
 tidy_pfilter_dfs = function(x){
+  stopifnot(class(x) == "EL_list")
+  # Handle case where fits are from spatPomp model
+  if(any(grepl("\\[", colnames(x$fits)))){
+    conversion_function = coef_to_pparams
+  } else {
+    units = colnames(x$ull)
+    conversion_function = function(x) spatCoef_to_pparams(x, units)
+  }
   lapply(1:nrow(x$fits), function(z){
-    tidy_LL_df = coef_to_pparams(x$fits[z,-c(1,2)])$specific |>
+    z_pparams = conversion_function(x$fits[z,-c(1,2)])
+    tidy_LL_df = z_pparams$specific |>
       t() |>
       as.data.frame() |>
       tibble::rownames_to_column(var = "unit") |>
       dplyr::mutate(rep = z)
-    tidy_LL_df = coef_to_pparams(x$fits[z,-c(1,2)])$shared |>
-      tibble::enframe() |>
-      tidyr::pivot_wider() |>
-      dplyr::bind_cols(tidy_LL_df)
+    if(length(z_pparams$shared) > 0){
+      tidy_LL_df = z_pparams$shared |>
+        tibble::enframe() |>
+        tidyr::pivot_wider() |>
+        dplyr::bind_cols(tidy_LL_df)
+    }
     tidy_ull_df = subset(x$ull, subset = rownames(x$ull) == z) |>
       t() |>
       as.data.frame() |>
