@@ -1,6 +1,6 @@
 #' Convert list of `pparams` into `coef.spatPomp` format
 #'
-#' @param pparams List of parameters in format of [panelPomp::pparams()].
+#' @param pparams List of parameters in format of [panelPomp::pparams].
 #'
 #' @return Named vector of parameters in format used by `coef.spatPomp`.
 #' @export

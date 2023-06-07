@@ -1,7 +1,7 @@
 Sys.time()
 devtools::session_info()
 ######### load-packages ###############################
-library(measlespkg)
+#library(measlespkg)
 library(foreach)
 ######## Source functions ############################
 # invisible(sapply(list.files(path = "./R/functions", pattern = "*.R"),

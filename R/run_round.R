@@ -54,7 +54,6 @@ run_round = function(
     spat_unitParNames = NULL,
     spat_regression = 0.2
 ){
-  i = NULL # prevents check() note
   doParallel::registerDoParallel(cores = ncores)
   RNGkind("L'Ecuyer-CMRG")
   doRNG::registerDoRNG()
@@ -112,6 +111,7 @@ run_round_helper.panelPomp = function(
     panel_block,
     ...
 ){
+  i = NULL # prevents check() note
   mif2_out = foreach::foreach(
     i = 1:length(initial_pparams_list),
     .packages = "panelPomp"
@@ -144,6 +144,7 @@ run_round_helper.spatPomp = function(
     spat_regression,
     ...
 ){
+  i = NULL # prevents check() note
   ibpf_out = foreach::foreach(
     i = 1:length(initial_pparams_list),
     .packages = "spatPomp"

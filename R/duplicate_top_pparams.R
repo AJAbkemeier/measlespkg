@@ -35,10 +35,10 @@ duplicate_top_pparams = function(
     )
   }
   if(ncol(x$ull) == 1 | combine == FALSE){
-    grabbed_params = grab_top_fits(x, top_n = top_n)$fits %>%
+    grabbed_params = grab_top_fits(x, top_n = top_n)$fits |>
       dplyr::select(-.data$logLik, -.data$se)
   } else {
-    grabbed_params = combine_top_fits(x, top_n = top_n)$fits %>%
+    grabbed_params = combine_top_fits(x, top_n = top_n)$fits |>
       dplyr::select(-.data$logLik, -.data$se)
   }
   top_params = dplyr::slice(
