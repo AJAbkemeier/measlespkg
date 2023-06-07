@@ -212,19 +212,19 @@ if(!is.null(EVAL_POINTS)){
 round_out = run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
-  rw_sd = expanded_rw_sd,
+  rw_sd_obj = make_rw_sd(expanded_rw_sd),
   cooling_frac = COOLING_FRAC,
-  nmif = NMIF,
-  np_mif2 = NP_MIF,
+  N_fitr = NMIF,
+  np_fitr = NP_MIF,
   np_eval = NP_EVAL,
   nreps_eval = NREPS_EVAL,
   ncores = ncores,
   write_results_to = write_results_to,
   print_times = TRUE,
-  block_size = BLOCK_SIZE,
+  spat_block_size = BLOCK_SIZE,
   spat_regression = SPAT_REGR,
-  sharedParNames = MODEL$shp_names,
-  unitParNames = MODEL$spp_names
+  spat_sharedParNames = MODEL$shp_names,
+  spat_unitParNames = MODEL$spp_names
 )
 
 EL_final = round_out$EL_out[[length(round_out$EL_out)]]

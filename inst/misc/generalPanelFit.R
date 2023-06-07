@@ -198,13 +198,13 @@ if(!is.null(EVAL_POINTS)){
 round_out = run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
-  rw_sd = make_rw_sd(INITIAL_RW_SD),
+  rw_sd_obj = make_rw_sd(INITIAL_RW_SD),
   cooling_frac = COOLING_FRAC,
-  nmif = NMIF,
-  np_mif2 = NP_MIF,
+  N_fitr = NMIF,
+  np_fitr = NP_MIF,
   np_eval = NP_EVAL,
   nreps_eval = NREPS_EVAL,
-  block = BLOCK_MIF2,
+  panel_block = BLOCK_MIF2,
   ncores = ncores,
   write_results_to = write_results_to,
   print_times = TRUE

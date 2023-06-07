@@ -4,7 +4,7 @@
 \alias{run_round.panelPomp}
 \title{Perform one round of model fitting}
 \usage{
-\method{run_round}{panelPomp}(
+run_round.panelPomp(
   x,
   write_results_to,
   ncores,
@@ -27,28 +27,17 @@
 
 \item{ncores}{Number of cores to use.}
 
-\item{np_mif2}{Number of particles to use when running \code{mif2()}.}
-
-\item{cooling_frac}{Cooling fraction to use when running \code{mif2()}.}
-
-\item{rw_sd}{Random walk standard deviation to use when running \code{mif2()}.}
-
-\item{nmif}{Number of iterations to use when running \code{mif2()}.}
-
-\item{block}{Boolean specifying whether to perform block resampling of
-specific parameters.}
+\item{cooling_frac}{Cooling fraction to use when running fitting algorithm.}
 
 \item{np_eval}{Number of particles to use when running \code{eval_logLik()}.}
 
 \item{nreps_eval}{Number of replications to use when running \code{eval_logLik()}.}
 
-\item{print_times}{Boolean for whether times to run \code{mif2()} and
+\item{print_times}{Boolean for whether times to run the fitting algorithm and
 \code{eval_logLik()} should be printed.}
 
 \item{initial_pparams_list}{List of initial parameters in the format of
 \code{pparams()}.}
-
-\item{...}{Additional arguments for other methods.}
 }
 \value{
 Object of class \code{fit_results} containing a list of \code{mif2} objects and

@@ -6,51 +6,73 @@
 \usage{
 run_round(
   x,
+  initial_pparams_list,
   write_results_to,
   ncores,
-  np_mif2,
+  np_fitr,
   cooling_frac,
-  rw_sd,
-  nmif,
-  block = FALSE,
+  rw_sd_obj,
+  N_fitr,
+  panel_block = FALSE,
   np_eval,
   nreps_eval,
   print_times = FALSE,
-  ...
+  spat_block_size = 1,
+  spat_sharedParNames = NULL,
+  spat_unitParNames = NULL,
+  spat_regression = 0.2
 )
 }
 \arguments{
-\item{x}{An object used to select a method. Should either be \code{panelPomp}
-object or an object of class \code{fit_results}.}
+\item{x}{A \code{panelPomp} or \code{spatPomp} object.}
+
+\item{initial_pparams_list}{List of initial parameters in the format of
+\code{\link[panelPomp:pparams]{panelPomp::pparams()}}. Each entry in the list specifies the initial
+parameters for one replication of the fitting algorithm.}
 
 \item{write_results_to}{File path to save Rds file containing results to.}
 
 \item{ncores}{Number of cores to use.}
 
-\item{np_mif2}{Number of particles to use when running \code{mif2()}.}
+\item{np_fitr}{Number of particles to use when running the fitting algorithm.}
 
-\item{cooling_frac}{Cooling fraction to use when running \code{mif2()}.}
+\item{cooling_frac}{Cooling fraction to use when running fitting algorithm.}
 
-\item{rw_sd}{Random walk standard deviation to use when running \code{mif2()}.}
+\item{rw_sd_obj}{Object of class \code{rw_sd} specifying random walk standard
+deviations to use when running the fitting algorithm.}
 
-\item{nmif}{Number of iterations to use when running \code{mif2()}.}
+\item{N_fitr}{Number of iterations to use when running the fitting algorithm.}
 
-\item{block}{Boolean specifying whether to perform block resampling of
-specific parameters.}
+\item{panel_block}{Boolean specifying whether to perform block resampling of
+specific parameters for a \code{panelPomp} model. Only used when \code{x} is a
+\code{panelPomp} object.}
 
 \item{np_eval}{Number of particles to use when running \code{eval_logLik()}.}
 
 \item{nreps_eval}{Number of replications to use when running \code{eval_logLik()}.}
 
-\item{print_times}{Boolean for whether times to run \code{mif2()} and
+\item{print_times}{Boolean for whether times to run the fitting algorithm and
 \code{eval_logLik()} should be printed.}
 
-\item{...}{Additional arguments for other methods.}
+\item{spat_block_size}{Block size used when fitting and evaluating \code{spatPomp}
+models. Only used when \code{x} is a \code{spatPomp} object.}
+
+\item{spat_sharedParNames}{Character vector of parameters to be treated as
+shared by \code{ibpf()}. Only used when \code{x} is a \code{spatPomp} object.}
+
+\item{spat_unitParNames}{Character vector of parameters to be treated as
+unit-specific by \code{ibpf()}. Only used when \code{x} is a \code{spatPomp} object.}
+
+\item{spat_regression}{Numeric specifying the mean-regressing coefficient to
+use when fitting shared parameters in a \code{spatPomp} model. Only used when
+\code{x} is a \code{spatPomp} object.}
 }
 \value{
-Object of class \code{fit_results} containing a list of \code{mif2} objects and
-a list of \code{EL_list} objects.
+Object of class \code{fit_results} containing a list of \code{mif2d.ppomp} or
+\code{ibpfd_spatPomp} objects and a list of \code{EL_list} objects.
 }
 \description{
-Perform one round of model fitting
+Depending on the model used, \code{run_round} will use either \link[panelPomp:mif2]{panelPomp::mif2} or
+\link[spatPomp:ibpf]{spatPomp::ibpf} to fit it, then use \code{eval_logLik()} to estimate the log
+likelihood of the fit. The results are saved using \link[pomp:bake]{pomp::bake}.
 }
