@@ -1,10 +1,14 @@
-#' Make an "`eval_logLik()`" list, which contains the results of `eval_logLik()`
+#' Make a list containing the results of `eval_logLik()`
 #'
 #' @name EL_list
 #' @param fits Data frame of fit results. Columns should be named `logLik`,
 #'   `se`, followed by the parameter names.
 #' @param ull Data frame of unit log likelihoods. Column names are unit names.
 #' @param se Data frame of unit standard errors. Column names are unit names.
+#' @param cll List of matrices containing estimated conditional log likelihoods
+#'   for each unit.
+#' @param cll List of matrices containing standard errors for estimated
+#'   conditional log likelihoods for each unit.
 #' @param np_pf Number of particles used by `eval_logLik()`.
 #' @param nreps Number of replications used by `eval_logLik()`.
 #'
@@ -16,18 +20,24 @@ new_EL_list = function(
     fits,
     ull,
     se,
+    cll,
+    cll_se,
     np_pf,
     nreps
 ){
   stopifnot(is.data.frame(fits))
   stopifnot(is.data.frame(ull))
   stopifnot(is.data.frame(se))
+  stopifnot(is.list(cll))
+  stopifnot(is.list(cll_se))
   stopifnot(is.numeric(np_pf))
   stopifnot(is.numeric(nreps))
   out = list(
     fits = dplyr::as_tibble(fits),
     ull = dplyr::as_tibble(ull),
     se = dplyr::as_tibble(se),
+    cll = cll,
+    cll_se = cll_se,
     np_pf = np_pf,
     nreps = nreps
   )
@@ -66,9 +76,11 @@ EL_list = function(
   fits,
   ull,
   se,
+  cll,
+  cll_se,
   np_pf,
   nreps
 ){
-  x = new_EL_list(fits, ull, se, np_pf, nreps)
+  x = new_EL_list(fits, ull, se, cll, cll_se, np_pf, nreps)
   validate_EL_list(x)
 }

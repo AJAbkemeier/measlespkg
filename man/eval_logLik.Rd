@@ -20,7 +20,9 @@ eval_logLik(
 the log likelihood of.}
 
 \item{block_size}{The number of spatial units per block. Only used when
-evaluating are \code{spatPomp} models.}
+evaluating are \code{spatPomp} models. (NOTE: function will break for any block
+size other than 1; this will be fixed when choosing other block sizes seems
+worthwhile.)}
 
 \item{ncores}{Number of cores to use for parallel computing.}
 

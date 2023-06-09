@@ -7,6 +7,7 @@ More important:
 
 Less imporant:
 
+- Update eval_logLik.R to work with block sizes other than 1.
 - Continue to think of ways to make the package easy to use and understand
 - Figure out how to stop Csnippet code from getting flattened after installation
  - Alternatively, figure out how to display contents of model_mechanics better
