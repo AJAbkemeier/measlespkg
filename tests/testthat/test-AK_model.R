@@ -4,7 +4,7 @@ test_that("parameters are correct", {
 })
 
 test_that("data frames are correct", {
-  answer = readRDS(test_path("key", "AK_dfs.rds"))
+  answer = readRDS(test_path("fixtures", "AK_dfs.rds"))
   AK_dfs = lapply(AK_mod@unit.objects, as.data.frame)
   expect_equal(AK_dfs, answer)
 })

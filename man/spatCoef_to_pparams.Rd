@@ -7,7 +7,7 @@
 spatCoef_to_pparams(spatCoef, units)
 }
 \arguments{
-\item{spatCoef}{\code{coef.spatPomp} object.}
+\item{spatCoef}{Named numeric vector in format of \code{coef.spatPomp} object.}
 
 \item{units}{Character vector of unit names.}
 }

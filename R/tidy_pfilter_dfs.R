@@ -19,7 +19,7 @@ tidy_pfilter_dfs = function(x){
     conversion_function = function(x) spatCoef_to_pparams(x, units)
   }
   lapply(1:nrow(x$fits), function(z){
-    z_pparams = conversion_function(x$fits[z,-c(1,2)])
+    z_pparams = conversion_function(x$fits[z,-c(1, 2)])
     tidy_LL_df = z_pparams$specific |>
       t() |>
       as.data.frame() |>
@@ -43,8 +43,10 @@ tidy_pfilter_dfs = function(x){
       dplyr::rename(se = 2)
     tidy_df = dplyr::left_join(tidy_ull_df, tidy_LL_df, by = "unit") |>
       dplyr::left_join(tidy_se_df, by = "unit") |>
+      dplyr::mutate(total_ll = x$fits$logLik[[z]], total_se = x$fits$se[[z]]) |>
       dplyr::select(
-        .data$rep, .data$unit, .data$ull, .data$se, dplyr::everything()
+        .data$rep, .data$total_ll, .data$total_se, .data$unit, .data$ull,
+        .data$se, dplyr::everything()
       )
     tidy_df
   }) |>
