@@ -13,11 +13,13 @@ print(ncores)
 RUN_LEVEL = 2
 NP_PF      = switch(RUN_LEVEL, 50, 10000,  10000)
 NREPS_EVAL = switch(RUN_LEVEL,  4,     1, ncores)
+N_EVALS    = switch(RUN_LEVEL,  1,     1,      6)
 # new; fit_results
 MODEL_OBJ_FROM = "new"
 # new; fit_results; ELL
 PARAMS_FROM = "fit_results"
-LOAD_FIT_FROM = "output2/mod_01/group_04/search_01/round_01/fit_results_out.rds"
+LOAD_FIT_FROM =
+  "output2/mod_01/group_04/search_01/round_01/fit_results_out.rds"
 LOAD_PARAMS_FROM =
   "output2/mod_01/group_04/search_01/round_01/fit_results_out.rds"
 WRITE_ELL_DIR = "output2/mod_01/group_04/search_01/eval_01/"
@@ -42,19 +44,20 @@ if(PARAMS_FROM == "new"){
 } else if(PARAMS_FROM == "fit_results"){
   fitr = readRDS(LOAD_PARAMS_FROM)
   fits = fitr[[2]][[1]]$fits
-  best_fit = unlist(fits[order(fits$logLik),][1, -(1:2)])
+  best_fit = unlist(fits[order(fits$logLik, decreasing = TRUE),][1, -(1:2)])
   pomp::coef(model_obj) = best_fit
 } else if(PARAMS_FROM == "ELL"){
   fitr = readRDS(LOAD_PARAMS_FROM)
   fits = fitr$fits
-  best_fit = unlist(fits[order(fits$logLik),][1, -(1:2)])
+  best_fit = unlist(fits[order(fits$logLik, decreasing = TRUE),][1, -(1:2)])
   pomp::coef(model_obj) = best_fit
 }
 
+model_obj_list = lapply(1:N_EVALS, function(x) model_obj)
 ## ----pfilter-----------------------------------------------
 ELL_out = pomp::bake(file = paste0(WRITE_ELL_DIR, WRITE_FILE), {
   eval_logLik(
-    model_obj_list = list(model_obj),
+    model_obj_list = model_obj_list,
     ncores = NREPS_EVAL,
     np_pf = NP_PF,
     nreps = NREPS_EVAL,

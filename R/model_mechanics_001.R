@@ -58,15 +58,15 @@ model_mechanics_001 = function(){
 
   dmeas <- pomp::Csnippet("
     double m = rho*C;
-    double v = m*(1.0-rho+psi*psi*m);
+    double v = m*(1.0 - rho + psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
     if(ISNA(cases)) {lik = 1;} else {
         if (C < 0) {lik = 0;} else {
           if (cases > tol) {
-            lik = pnorm(cases+0.5,m,sqrt(v)+tol,1,0)-
-              pnorm(cases-0.5,m,sqrt(v)+tol,1,0)+tol;
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0)-
+              pnorm(cases - 0.5 , m, sqrt(v) + tol, 1, 0) + tol;
           } else {
-            lik = pnorm(cases+0.5,m,sqrt(v)+tol,1,0)+tol;
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) + tol;
           }
         }
       }
