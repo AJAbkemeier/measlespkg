@@ -25,49 +25,59 @@ combine_top_fits = function(
 ){
   unit_names = colnames(x$ull)
   best_shared = coef_to_pparams(
-    dplyr::select(x$fits[1,], -.data$logLik, -.data$se)
+    dplyr::select(
+      x$fits[order(EL_final$fits$logLik, decreasing = TRUE),][1,],
+      -"logLik", -"se"
+    )
   )[[1]]
   shared_names = names(best_shared)
   is_unique = sapply(shared_names, function(z)
     length(unique(x$fits[[z]])) == 1
   )
   if(!all(is_unique)){
-    warning("Fits do not all have same shared parameters. Grabbing shared parameters from top row.")
+    warning("Fits do not all have the same shared parameters. Grabbing shared parameters from the best overall fit.")
   }
   fits_cols = vector(length = length(unit_names), mode = "list")
   ull_cols = fits_cols
   se_cols = fits_cols
+  cll = fits_cols
+  names(cll) = unit_names
+  cll_se = fits_cols
+  names(cll_se) = unit_names
   for(z in seq_along(unit_names)){
     un = unit_names[[z]]
     score = x$ull[[un]] - se_penalty*x$se[[un]]
     ranking = order(score, decreasing = TRUE)[1:top_n]
-    fits_cols[[z]] = x$fits[ranking,] %>%
+    fits_cols[[z]] = x$fits[ranking,] |>
       dplyr::select(dplyr::contains(un))
     ull_cols[[z]] = x$ull[ranking, un]
     names(ull_cols)[[z]] = un
     se_cols[[z]] = x$se[ranking, un]
     names(se_cols)[[z]] = un
+    cll[[unit_names[[z]]]] = x$cll[[unit_names[[z]]]][ranking, , drop = FALSE]
+    cll_se[[unit_names[[z]]]] =
+      x$cll_se[[unit_names[[z]]]][ranking, , drop = FALSE]
   }
   fits = dplyr::bind_cols(fits_cols)
   ull = dplyr::bind_cols(ull_cols)
   se = dplyr::bind_cols(se_cols)
   for(shared_name in names(best_shared)){
-    fits = fits %>%
-      dplyr::mutate(SHARED = best_shared[[shared_name]])
-    colnames(fits)[[ncol(fits)]] = shared_name
+    fits[[shared_name]] = best_shared[[shared_name]]
   }
-  fits = fits %>%
+  fits = fits |>
     dplyr::mutate(
       logLik = rowSums(ull),
       se = sapply(1:nrow(se), function(z)
         sqrt(sum(se[z,]^2))
       )
-    ) %>%
-    dplyr::select(.data$logLik, .data$se, dplyr::everything())
+    ) |>
+    dplyr::select("logLik", "se", dplyr::everything())
   new_EL_list(
     fits = fits,
     ull = ull,
     se = se,
+    cll = cll,
+    cll_se = cll_se,
     np_pf = x$np_pf,
     nreps = x$nreps
   )
