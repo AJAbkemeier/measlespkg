@@ -3,7 +3,10 @@
 #' @param x Object of class `EL_list`.
 #' @param top_n Number of rows to grab.
 #' @param se_penalty Penalizes log likelihood in ranking based on
-#' `se*se_penalty`.
+#'   `se*se_penalty`.
+#' @param is_spat Indicates whether parameters in `x` are for a spatPOMP model.
+#'   Function will fail to return desired results if wrong.
+#'
 #'
 #' @return Object of class `EL_list`.
 #' @export
@@ -21,14 +24,17 @@
 combine_top_fits = function(
     x,
     top_n = 1,
-    se_penalty = 0
+    se_penalty = 0,
+    is_spat = FALSE
 ){
   unit_names = colnames(x$ull)
-  best_shared = coef_to_pparams(
+  coef_conversion_func = ifelse(is_spat, spatCoef_to_pparams, coef_to_pparams)
+  best_shared = coef_conversion_func(
     dplyr::select(
-      x$fits[order(EL_final$fits$logLik, decreasing = TRUE),][1,],
+      x$fits[order(x$fits$logLik, decreasing = TRUE),][1,],
       -"logLik", -"se"
-    )
+    ),
+    units = unit_names
   )[[1]]
   shared_names = names(best_shared)
   is_unique = sapply(shared_names, function(z)
@@ -48,8 +54,13 @@ combine_top_fits = function(
     un = unit_names[[z]]
     score = x$ull[[un]] - se_penalty*x$se[[un]]
     ranking = order(score, decreasing = TRUE)[1:top_n]
-    fits_cols[[z]] = x$fits[ranking,] |>
-      dplyr::select(dplyr::contains(un))
+    if(is_spat){
+      # TODO Locate parameters in safer way.
+      fits_cols[[z]] = x$fits[ranking,] |>
+        dplyr::select(grep(paste0("[^1-9]",z,"$"), colnames(x$fits)))
+    } else {
+      fits_cols[[z]] = x$fits[ranking,] |> dplyr::select(dplyr::contains(un))
+    }
     ull_cols[[z]] = x$ull[ranking, un]
     names(ull_cols)[[z]] = un
     se_cols[[z]] = x$se[ranking, un]

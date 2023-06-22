@@ -16,10 +16,17 @@
 #' @examples
 #' coef_out = panelPomp::coef(AK_model())
 #' coef_to_pparams(coef_out)
-coef_to_pparams = function(coef){
-  coef_tibble = tibble::tibble(sp = names(coef), value = as.numeric(coef)) |>
-    tidyr::separate(.data$sp, into = c("param", "unit"), sep = "\\[",
-                    fill = "right") |>
+coef_to_pparams = function(coef, ...){
+  coef_tibble = tibble::tibble(
+    full_param_name = names(coef),
+    value = as.numeric(coef)
+  ) |>
+    tidyr::separate(
+      .data$full_param_name,
+      into = c("param", "unit"),
+      sep = "\\[",
+      fill = "right"
+    ) |>
     dplyr::mutate(unit = gsub(pattern = "\\]", "", x = .data$unit))
   shared_tibble = dplyr::filter(coef_tibble, is.na(.data$unit))
   specific_tibble = dplyr::filter(coef_tibble, !is.na(.data$unit))
