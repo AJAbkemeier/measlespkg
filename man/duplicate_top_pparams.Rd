@@ -4,7 +4,14 @@
 \alias{duplicate_top_pparams}
 \title{Duplicate top fits from \code{EL_list}}
 \usage{
-duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE, units = NULL)
+duplicate_top_pparams(
+  x,
+  out_length,
+  top_n = 1,
+  combine = FALSE,
+  units = NULL,
+  is_spat = FALSE
+)
 }
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
@@ -19,6 +26,9 @@ combined.}
 \item{units}{Character vector of unit names, which is necessary when
 duplicating the parameters of a \code{spatPomp} object. If the parameters belong
 to a \code{panelPomp} object, leave as \code{NULL}.}
+
+\item{is_spat}{Indicates whether parameters in \code{x} are for a spatPOMP model.
+Function will fail to return desired results if wrong.}
 }
 \value{
 List of parameters in the form of \code{\link[panelPomp:pparams]{panelPomp::pparams()}}.

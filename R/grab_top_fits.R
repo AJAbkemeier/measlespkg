@@ -28,8 +28,8 @@ grab_top_fits = function(
     fits = x$fits[ranking,][1:top_n,],
     ull = x$ull[ranking,][1:top_n,],
     se = x$se[ranking,][1:top_n,],
-    cll = x$cll[ranking,][1:top_n,],
-    cll_se = x$cll_se[ranking,][1:top_n,],
+    cll = x$cll |> lapply(function(y) y[ranking,][1:top_n,]),
+    cll_se = x$cll_se |> lapply(function(y) y[ranking,][1:top_n,]),
     np_pf = x$np_pf,
     nreps = x$nreps
   )

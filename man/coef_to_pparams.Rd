@@ -4,7 +4,7 @@
 \alias{coef_to_pparams}
 \title{Convert coef-style object to pparams-style object.}
 \usage{
-coef_to_pparams(coef)
+coef_to_pparams(coef, ...)
 }
 \arguments{
 \item{coef}{Vector in the style of \code{coef(panelPomp_obj)}. That is, a numeric
@@ -17,7 +17,9 @@ a numeric vector with shared parameter names, and a matrix with specific
 parameters as row names and units as column names.
 }
 \description{
-Convert coef-style object to pparams-style object.
+Vector entries with name in the style of \code{param[unit]} are assumed to be
+unit-specific whereas those with name in the style of \code{param} are assumed to
+be shared.
 }
 \examples{
 coef_out = panelPomp::coef(AK_model())

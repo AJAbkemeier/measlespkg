@@ -4,7 +4,7 @@
 \alias{combine_top_fits}
 \title{Combine parameter estimates with best unit log likelihoods}
 \usage{
-combine_top_fits(x, top_n = 1, se_penalty = 0)
+combine_top_fits(x, top_n = 1, se_penalty = 0, is_spat = FALSE)
 }
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
@@ -13,6 +13,9 @@ combine_top_fits(x, top_n = 1, se_penalty = 0)
 
 \item{se_penalty}{Penalizes log likelihood in ranking based on
 \code{se*se_penalty}.}
+
+\item{is_spat}{Indicates whether parameters in \code{x} are for a spatPOMP model.
+Function will fail to return desired results if wrong.}
 }
 \value{
 Object of class \code{EL_list}.

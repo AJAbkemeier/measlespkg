@@ -29,6 +29,8 @@ NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = clean_twentycities()
 MODEL = model_mechanics_001()
+# Set equal to true if using spatPomp model
+IS_SPAT = FALSE
 # Time step
 DT = 1/365.25
 # Units to select from data
@@ -187,7 +189,8 @@ if(!is.null(PREVIOUS_FIT_PATH)){
     EL_in,
     out_length = NREPS_MIF,
     top_n = TOP_N_FITS,
-    combine = COMBINE_TOP_SPECIFIC
+    combine = COMBINE_TOP_SPECIFIC,
+    is_spat = IS_SPAT
   )
 }
 
@@ -240,7 +243,7 @@ print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
   tictoc::tic()
-  top_params = combine_top_fits(EL_final)$fits[-(1:2)]
+  top_params = combine_top_fits(EL_final, is_spat = IS_SPAT)$fits[-(1:2)]
   eval_model = measlesPomp_mod
   panelPomp::coef(eval_model) = top_params
   EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
