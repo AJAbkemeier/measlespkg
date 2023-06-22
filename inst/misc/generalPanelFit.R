@@ -29,13 +29,20 @@ NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = clean_twentycities()
 MODEL = model_mechanics_001()
+# Time step
 DT = 1/365.25
+# Units to select from data
 UNITS = unique(twentycities$measles$unit)
 BLOCK_MIF2 = TRUE
 INTERP_METHOD = "shifted_splines"
 # SIM_MODEL specifies whether simulated data from a given model should be used.
 SIM_MODEL = NULL
+# Cooling fraction for rw_sd.
 COOLING_FRAC = 0.5
+# Block size for spatPomp models
+SPAT_BLOCK_SIZE = 1
+# Regression parameter for spatPomp shared parameters
+SPAT_REGR = 0.1
 # EVAL_POINTS sets points to evaluate EVAL_PARAM at when performing profile
 # search. Set both equal to NULL to do regular search.
 EVAL_POINTS = NULL
@@ -52,6 +59,9 @@ if(!is.na(array_job_id)){
 # instead of from a previous fit. Setting this equal to a path will nullify
 # the portion of code which chooses starting parameters from a box.
 PREVIOUS_FIT_PATH = NULL
+# Highly recommended that this be set to TRUE if panelPomp model has no shared
+# parameters.
+COMBINE_TOP_SPECIFIC = FALSE
 
 # Use INITIAL_RW_SD to set random walk standard deviations for parameters.
 DEFAULT_SD = 0.02
@@ -133,38 +143,34 @@ if(!is.null(SIM_MODEL)){
 # if(!is.null(EVAL_PARAM))
 #   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
 
-shared_bounds = tibble::tribble(
-  ~param,    ~lower,   ~upper,
-  "mu",        0.02,     0.02
-)
-
-specific_bounds = tibble::tribble(
-  ~param,       ~lower,        ~upper,
-  "R0",             10,            60,
-  "rho",           0.1,           0.9,
-  "sigmaSE",      0.04,           0.1,
-  "amplitude",     0.1,           0.6,
-  "S_0",          0.01,          0.07,
-  "E_0",      0.000004,        0.0001,
-  "I_0",      0.000003,         0.001,
-  "R_0",           0.9,          0.99,
-  "sigma",          25,           100,
-  "iota",        0.004,             3,
-  "psi",          0.05,             3,
-  "alpha",       0.935,          1.05,
-  "cohort",        0.1,           0.7,
-  "gamma",          25,           320
+bounds_tbl = tibble::tribble(
+  ~param,       ~lower,        ~upper,       ~shared,
+  "R0",             10,            60,         FALSE,
+  "rho",           0.1,           0.9,         FALSE,
+  "sigmaSE",      0.04,           0.1,         FALSE,
+  "amplitude",     0.1,           0.6,         FALSE,
+  "S_0",          0.01,          0.07,         FALSE,
+  "E_0",      0.000004,        0.0001,         FALSE,
+  "I_0",      0.000003,         0.001,         FALSE,
+  "R_0",           0.9,          0.99,         FALSE,
+  "sigma",          25,           100,         FALSE,
+  "iota",        0.004,             3,         FALSE,
+  "psi",          0.05,             3,         FALSE,
+  "alpha",       0.935,          1.05,         FALSE,
+  "cohort",        0.1,           0.7,         FALSE,
+  "gamma",          25,           320,         FALSE,
+  "mu",           0.02,          0.02,          TRUE
 )
 if(!is.null(EVAL_PARAM)){
-  eval_param_rows = specific_bounds[["param"]] == EVAL_PARAM
-  specific_bounds[eval_param_rows, "lower"] = EVAL_POINTS[[array_job_id]]
-  specific_bounds[eval_param_rows, "upper"] = EVAL_POINTS[[array_job_id]]
+  eval_param_rows = bounds_tbl[["param"]] == EVAL_PARAM
+  bounds_tbl[eval_param_rows, "lower"] = EVAL_POINTS[[array_job_id]]
+  bounds_tbl[eval_param_rows, "upper"] = EVAL_POINTS[[array_job_id]]
 }
 
 # Sample initial parameters and place into lists
 initial_pparams_list = sample_initial_pparams_ul(
-  shared_box_specs = shared_bounds,
-  specific_box_specs = specific_bounds,
+  shared_box_specs = dplyr::filter(bounds_tbl, shared == TRUE),
+  specific_box_specs = dplyr::filter(bounds_tbl, shared == FALSE),
   units = UNITS,
   n_draws = NREPS_MIF
 )
@@ -172,26 +178,40 @@ initial_pparams_list = sample_initial_pparams_ul(
 # Get starting parameters from previous fit
 if(!is.null(PREVIOUS_FIT_PATH)){
   fit_results_in = readRDS(PREVIOUS_FIT_PATH)
-  EL_in = fit_results_in$EL_out[[length(fit_results_in$EL_out)]]
+  if(class(fit_results_in$EL_out) != "EL_list"){
+    EL_in = fit_results_in$EL_out[[length(fit_results_in$EL_out)]]
+  } else {
+    EL_in = fit_results_in$EL_out
+  }
   initial_pparams_list = duplicate_top_pparams(
     EL_in,
     out_length = NREPS_MIF,
     top_n = TOP_N_FITS,
-    combine = TRUE
+    combine = COMBINE_TOP_SPECIFIC
   )
 }
 
 ################## Construct panelPomp object ##########################
 measlesPomp_mod = make_measlesPomp(
-  DATA |> choose_units(UNITS),
+  data = DATA |> choose_units(UNITS),
   starting_pparams = initial_pparams_list[[1]],
   model = MODEL,
   interp_method = INTERP_METHOD,
   dt = DT
 )
 
+# Only used for spatPomp models
+U = length(UNITS)
+expanded_rw_sd = unlist(lapply(names(INITIAL_RW_SD), function(x){
+  z = rep(INITIAL_RW_SD[[x]], U)
+  names(z) = paste0(x,1:U)
+  z
+}))
+
 if(!is.null(EVAL_POINTS)){
-  coef_names = paste0(EVAL_PARAM, "[", UNITS, "]")
+  is_shared = bounds_tbl[bounds_tbl$param == EVAL_PARAM, "shared"] |>
+    as.logical()
+  coef_names = ifelse(is_shared, EVAL_PARAM, paste0(EVAL_PARAM,"[",UNITS,"]"))
   panelPomp::coef(measlesPomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
 }
 ###### MODEL FITTING #####################################
@@ -207,10 +227,14 @@ round_out = run_round(
   panel_block = BLOCK_MIF2,
   ncores = ncores,
   write_results_to = write_results_to,
-  print_times = TRUE
+  print_times = TRUE,
+  spat_block_size = BLOCK_SIZE,
+  spat_regression = SPAT_REGR,
+  spat_sharedParNames = MODEL$shp_names,
+  spat_unitParNames = MODEL$spp_names
 )
 
-EL_final = round_out$EL_out[[length(round_out$EL_out)]]
+EL_final = round_out$EL_out
 print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
 
 # Evaluate at parameters of best ULL combination
@@ -221,7 +245,7 @@ if(USE_BEST_COMBO){
   panelPomp::coef(eval_model) = top_params
   EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),
     eval_logLik(
-    model_obj_list = list(eval_model),
+      model_obj_list = list(eval_model),
       ncores = ncores,
       np_pf = NP_EVAL,
       nreps = NREPS_EVAL2,

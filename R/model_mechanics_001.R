@@ -63,7 +63,7 @@ model_mechanics_001 = function(){
     if(ISNA(cases)) {lik = 1;} else {
         if (C < 0) {lik = 0;} else {
           if (cases > tol) {
-            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0)-
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) -
               pnorm(cases - 0.5 , m, sqrt(v) + tol, 1, 0) + tol;
           } else {
             lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) + tol;
