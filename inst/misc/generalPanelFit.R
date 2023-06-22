@@ -28,13 +28,13 @@ NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_MIF.
 TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
 DATA = clean_twentycities()
+# Units to select from data
+UNITS = unique(twentycities$measles$unit)
 MODEL = model_mechanics_001()
 # Set equal to true if using spatPomp model
 IS_SPAT = FALSE
 # Time step
 DT = 1/365.25
-# Units to select from data
-UNITS = unique(twentycities$measles$unit)
 BLOCK_MIF2 = TRUE
 INTERP_METHOD = "shifted_splines"
 # SIM_MODEL specifies whether simulated data from a given model should be used.
@@ -147,6 +147,7 @@ if(!is.null(SIM_MODEL)){
 
 bounds_tbl = tibble::tribble(
   ~param,       ~lower,        ~upper,       ~shared,
+  #"g",              10,           500,         FALSE,
   "R0",             10,            60,         FALSE,
   "rho",           0.1,           0.9,         FALSE,
   "sigmaSE",      0.04,           0.1,         FALSE,
@@ -161,7 +162,7 @@ bounds_tbl = tibble::tribble(
   "alpha",       0.935,          1.05,         FALSE,
   "cohort",        0.1,           0.7,         FALSE,
   "gamma",          25,           320,         FALSE,
-  "mu",           0.02,          0.02,          TRUE
+  "mu",           0.02,          0.02,         FALSE
 )
 if(!is.null(EVAL_PARAM)){
   eval_param_rows = bounds_tbl[["param"]] == EVAL_PARAM
@@ -190,26 +191,32 @@ if(!is.null(PREVIOUS_FIT_PATH)){
     out_length = NREPS_MIF,
     top_n = TOP_N_FITS,
     combine = COMBINE_TOP_SPECIFIC,
-    is_spat = IS_SPAT
+    units = ifelse(rep(IS_SPAT, length(UNITS)), UNITS, NULL)
   )
 }
 
 ################## Construct panelPomp object ##########################
-measlesPomp_mod = make_measlesPomp(
+if(IS_SPAT){
+  U = length(UNITS)
+  expanded_rw_sd = unlist(lapply(names(INITIAL_RW_SD), function(x){
+    z = rep(INITIAL_RW_SD[[x]], U)
+    names(z) = paste0(x,1:U)
+    z
+  }))
+  measlesPomp_maker = make_spatMeaslesPomp
+  initial_rw_sd = expanded_rw_sd
+} else {
+  measlesPomp_maker = make_measlesPomp
+  initial_rw_sd = INITIAL_RW_SD
+}
+
+measlesPomp_mod = measlesPomp_maker(
   data = DATA |> choose_units(UNITS),
   starting_pparams = initial_pparams_list[[1]],
   model = MODEL,
   interp_method = INTERP_METHOD,
   dt = DT
 )
-
-# Only used for spatPomp models
-U = length(UNITS)
-expanded_rw_sd = unlist(lapply(names(INITIAL_RW_SD), function(x){
-  z = rep(INITIAL_RW_SD[[x]], U)
-  names(z) = paste0(x,1:U)
-  z
-}))
 
 if(!is.null(EVAL_POINTS)){
   is_shared = bounds_tbl[bounds_tbl$param == EVAL_PARAM, "shared"] |>
@@ -221,7 +228,7 @@ if(!is.null(EVAL_POINTS)){
 round_out = run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
-  rw_sd_obj = make_rw_sd(INITIAL_RW_SD),
+  rw_sd_obj = make_rw_sd(initial_rw_sd),
   cooling_frac = COOLING_FRAC,
   N_fitr = NMIF,
   np_fitr = NP_MIF,
@@ -231,7 +238,7 @@ round_out = run_round(
   ncores = ncores,
   write_results_to = write_results_to,
   print_times = TRUE,
-  spat_block_size = BLOCK_SIZE,
+  spat_block_size = SPAT_BLOCK_SIZE,
   spat_regression = SPAT_REGR,
   spat_sharedParNames = MODEL$shp_names,
   spat_unitParNames = MODEL$spp_names

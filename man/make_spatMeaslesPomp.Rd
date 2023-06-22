@@ -8,7 +8,8 @@ make_spatMeaslesPomp(
   data,
   model,
   interp_method = c("shifted_splines", "linear"),
-  dt = 1/365.25
+  dt = 1/365.25,
+  ...
 )
 }
 \arguments{

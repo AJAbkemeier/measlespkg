@@ -8,8 +8,6 @@
 #' @param units Character vector of unit names, which is necessary when
 #'   duplicating the parameters of a `spatPomp` object. If the parameters belong
 #'   to a `panelPomp` object, leave as `NULL`.
-#' @param is_spat Indicates whether parameters in `x` are for a spatPOMP model.
-#'   Function will fail to return desired results if wrong.
 #'
 #' @return List of parameters in the form of [panelPomp::pparams()].
 #' @export
@@ -28,8 +26,7 @@ duplicate_top_pparams = function(
     out_length,
     top_n = 1,
     combine = FALSE,
-    units = NULL,
-    is_spat = FALSE
+    units = NULL
 ){
   if(out_length %% top_n != 0){
     stop(
@@ -44,7 +41,7 @@ duplicate_top_pparams = function(
     grabbed_params = combine_top_fits(
       x,
       top_n = top_n,
-      is_spat = is_spat
+      is_spat = !is.null(units)
     )$fits |>
       dplyr::select(-"logLik", -"se")
   }
