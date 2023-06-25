@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_traces.R
 \name{plot_traces}
 \alias{plot_traces}
-\title{Plot traces from \code{mif2} objects}
+\title{Plot traces from fitted objects}
 \usage{
 plot_traces(
-  mif2_list,
+  fitr_list,
   plot_shared = ".ALL",
   plot_specific = ".ALL",
   print_plots = TRUE,
@@ -16,7 +16,7 @@ plot_traces(
 )
 }
 \arguments{
-\item{mif2_list}{List of \code{mif2} objects.}
+\item{fitr_list}{List of \code{mif2d.ppomp} or \code{ibpfd_spatPomp} objects.}
 
 \item{plot_shared}{String specifying which shared value traces should be
 plotted. This includes log-likelihoods and shared parameters. Set to \code{".ALL"}
@@ -39,8 +39,8 @@ saved if \code{NULL}.}
 10.}
 }
 \value{
-Returns \code{NULL}
+Returns \code{NULL}.
 }
 \description{
-Plot traces from \code{mif2} objects
+Plot traces from fitted objects
 }

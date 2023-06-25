@@ -13,7 +13,7 @@ library(foreach)
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
-if(is.na(ncores)) ncores = parallel::detectCores()/4
+if(is.na(ncores)) ncores = 2
 print(ncores)
 
 # Set fitting and filter parameters
@@ -87,6 +87,10 @@ INITIAL_RW_SD = c(
 )
 if(!is.null(EVAL_PARAM))
   INITIAL_RW_SD[[EVAL_PARAM]] = 0
+stopifnot(
+  names(INITIAL_RW_SD) %in% MODEL$paramnames &
+  MODEL$paramnames %in% names(INITIAL_RW_SD)
+)
 
 # Specify names of output files
 RESULTS_FILE = "fit_results_out.rds"

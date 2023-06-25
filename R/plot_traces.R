@@ -1,6 +1,6 @@
-#' Plot traces from `mif2` objects
+#' Plot traces from fitted objects
 #'
-#' @param mif2_list List of `mif2` objects.
+#' @param fitr_list List of `mif2d.ppomp` or `ibpfd_spatPomp` objects.
 #' @param plot_shared String specifying which shared value traces should be
 #' plotted. This includes log-likelihoods and shared parameters. Set to `".ALL"`
 #' to plot all shared value traces.
@@ -15,11 +15,11 @@
 #' @param log_y Boolean specifying whether y-axis should be scaled by log base
 #' 10.
 #'
-#' @return Returns `NULL`
+#' @return Returns `NULL`.
 #' @export
 #'
 plot_traces = function(
-    mif2_list,
+    fitr_list,
     plot_shared = ".ALL",
     plot_specific = ".ALL",
     print_plots = TRUE,
@@ -28,12 +28,33 @@ plot_traces = function(
     height = 10,
     log_y = FALSE
 ){
-  nreps = length(mif2_list)
-  niter = mif2_list[[1]]@Nmif
-  traces_list = lapply(1:nreps, function(i)
-    pomp::traces(mif2_list[[i]])
-  )
-
+  nreps = length(fitr_list)
+  #niter = fitr_list[[1]]@Nmif
+  if(class(fitr_list[[1]]) == "mif2d.ppomp"){
+    niter = fitr_list[[1]]@Nmif
+    plot_units = names(fitr_list[[1]])
+    traces_list = lapply(1:nreps, function(i)
+      pomp::traces(fitr_list[[i]])
+    )
+  } else if(class(fitr_list[[1]]) == "ibpfd_spatPomp"){
+    niter = fitr_list[[1]]@Nbpf
+    plot_units = unit_names(fitr_list[[1]])
+    traces_list = lapply(1:nreps, function(i){
+      fitr_obj = fitr_list[[i]]
+      un = spatPomp::unit_names(fitr_obj)
+      tr = fitr_obj@traces
+      new_colnames = colnames(tr)
+      for(i in seq_along(un)){
+        new_colnames = ifelse(
+          grepl(paste0("[^1-9]",i,"$"), new_colnames),
+          gsub(paste0(i,"$"), paste0("[",un[[i]],"]"), new_colnames),
+          new_colnames
+        )
+      }
+      colnames(tr) = new_colnames
+      tr
+    })
+  }
   trace_names = colnames(traces_list[[1]])
   specific_trace_indices = grep("\\[", trace_names)
   plot_sh = trace_names[-specific_trace_indices]
@@ -53,7 +74,7 @@ plot_traces = function(
       long_data = dplyr::as_tibble(
         sapply(1:nreps, function(x) traces_list[[x]][,plot_col])
       ) %>%
-        dplyr::mutate(iter = 0:niter) %>%
+        dplyr::mutate(iter = 0:niter) |>
         tidyr::pivot_longer(cols = 1:nreps)
 
       traces_ggplot = ggplot2::ggplot(
@@ -80,15 +101,14 @@ plot_traces = function(
   # Plot specific traces
   if(!is.null(plot_specific)){
     for(plot_param in plot_sp){
-      plot_units = names(mif2_list[[1]])
       plot_cols = paste0(plot_param,"[",plot_units,"]")
       long_data = lapply(1:nreps, function(x){
-        dplyr::as_tibble(traces_list[[x]]) %>%
-          dplyr::select(dplyr::all_of(plot_cols)) %>%
-          dplyr::mutate(repl = x) %>%
+        dplyr::as_tibble(traces_list[[x]]) |>
+          dplyr::select(dplyr::all_of(plot_cols)) |>
+          dplyr::mutate(repl = x) |>
           dplyr::mutate(iter = 0:niter)
-      }) %>%
-        dplyr::bind_rows() %>%
+      }) |>
+        dplyr::bind_rows() |>
         tidyr::pivot_longer(cols = plot_cols)
 
       traces_ggplot = ggplot2::ggplot(
