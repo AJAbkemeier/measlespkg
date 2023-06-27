@@ -81,8 +81,12 @@ combine_top_fits = function(
       se = sapply(1:nrow(se), function(z)
         sqrt(sum(se[z,]^2))
       )
-    ) |>
-    dplyr::select("logLik", "se", dplyr::everything())
+    )
+  fits = fits[colnames(x$fits)]
+  ull = ull[colnames(x$ull)]
+  se = se[colnames(x$se)]
+  cll = cll[names(x$cll)]
+  cll_se = cll_se[names(x$cll_se)]
   new_EL_list(
     fits = fits,
     ull = ull,
