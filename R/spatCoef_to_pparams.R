@@ -1,7 +1,8 @@
 #' Convert `coef.spatPomp` to `pparams` format
 #'
 #' @param spatCoef Named numeric vector in format of `coef.spatPomp` object.
-#' @param units Character vector of unit names.
+#' @param units Character vector of unit names in the order they are enumerated
+#'   in `spatCoef`.
 #'
 #' @return Parameters in the format of [panelPomp::pparams].
 #' @export
@@ -16,9 +17,18 @@ spatCoef_to_pparams = function(spatCoef, units){
     sapply(USE.NAMES = FALSE, function(x){
       substr(x, start = 1, stop = nchar(x) - 1)
     })
+  spatCoef_enumeration = names(spatCoef_sorted)[1:U] |>
+    gsub(param_names[[1]], "", x = _) |>
+    as.numeric() |>
+    lapply(1:length(param_names), function(x, a){
+      a + U*(x - 1)
+    }, a = _) |>
+    unlist()
+  spatCoef_sorted_final = spatCoef_sorted[order(spatCoef_enumeration)]
+  units_sorted_final = units_sorted[order(spatCoef_enumeration[1:U])]
   specific_params = lapply(1:length(param_names), function(i){
-    params = spatCoef_sorted[1:U + U*(i - 1)]
-    names(params) = units_sorted
+    params = spatCoef_sorted_final[1:U + U*(i - 1)]
+    names(params) = units_sorted_final
     params
   }) |>
     dplyr::bind_rows() |>
