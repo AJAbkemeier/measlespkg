@@ -9,7 +9,8 @@ spatCoef_to_pparams(spatCoef, units)
 \arguments{
 \item{spatCoef}{Named numeric vector in format of \code{coef.spatPomp} object.}
 
-\item{units}{Character vector of unit names.}
+\item{units}{Character vector of unit names in the order they are enumerated
+in \code{spatCoef}.}
 }
 \value{
 Parameters in the format of \link[panelPomp:pparams]{panelPomp::pparams}.

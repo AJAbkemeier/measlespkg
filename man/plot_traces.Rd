@@ -12,15 +12,16 @@ plot_traces(
   save_dir = NULL,
   width = 16,
   height = 10,
-  log_y = FALSE
+  log_y = FALSE,
+  skip_n = 0
 )
 }
 \arguments{
 \item{fitr_list}{List of \code{mif2d.ppomp} or \code{ibpfd_spatPomp} objects.}
 
 \item{plot_shared}{String specifying which shared value traces should be
-plotted. This includes log-likelihoods and shared parameters. Set to \code{".ALL"}
-to plot all shared value traces.}
+plotted. This includes log-likelihoods and shared parameters. Set to
+\code{".ALL"} to plot all shared value traces.}
 
 \item{plot_specific}{String specifying which unit-specific value traces
 should be plotted. This includes unit log-likelihoods and specific
@@ -37,6 +38,9 @@ saved if \code{NULL}.}
 
 \item{log_y}{Boolean specifying whether y-axis should be scaled by log base
 10.}
+
+\item{skip_n}{Skip plotting the first \code{skip_n} iterations. Useful when
+extreme early values make it difficult to observe later behavior.}
 }
 \value{
 Returns \code{NULL}.
