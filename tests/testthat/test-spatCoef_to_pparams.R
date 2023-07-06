@@ -1,4 +1,4 @@
-test_that("function works", {
+test_that("function produces expected output", {
   spatCoef = c(
     sapply(1:20, function(x) 1 + 0.01*x),
     sapply(1:20, function(x) 2 + 0.01*x)

@@ -16,7 +16,9 @@ Data frame composed from information in \code{x} data in tidy format.
 Create tidy data frame from \code{eval_logLik()} output.
 }
 \examples{
+\dontrun{
 model_list = list(AK_model())
 EL_out = eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
 tidy_pfilter_dfs(EL_out)
+}
 }

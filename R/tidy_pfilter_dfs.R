@@ -6,9 +6,11 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' model_list = list(AK_model())
 #' EL_out = eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
 #' tidy_pfilter_dfs(EL_out)
+#' }
 tidy_pfilter_dfs = function(x){
   stopifnot(class(x) == "EL_list")
   # Handle case where fits are from spatPomp model
