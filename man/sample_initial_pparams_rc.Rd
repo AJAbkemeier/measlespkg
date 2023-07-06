@@ -44,6 +44,7 @@ centers (based on a past fit, for example) and then sample in an interval
 around each one using radii for \code{parameter1}, \code{parameter2}, etc.
 }
 \examples{
+\dontrun{
 AK_mod = AK_model()
 shared_box_specs = tibble::tribble(
   ~param, ~center, ~radius,
@@ -74,4 +75,5 @@ sample_initial_pparams_rc(
   radii_tbl = specific_radii,
   n_draws = 3
 )
+}
 }

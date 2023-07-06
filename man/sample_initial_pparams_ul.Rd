@@ -23,6 +23,7 @@ A list of parameters sets in the \code{pparams()} format.
 Use upper and lower bounds to sample initial parameters from box
 }
 \examples{
+\dontrun{
 AK_mod = AK_model()
 shared_bounds = tibble::tribble(
 ~param, ~lower,     ~upper,
@@ -51,4 +52,5 @@ sample_initial_pparams_ul(
   units = names(AK_mod),
   n_draws = 3
 )
+}
 }

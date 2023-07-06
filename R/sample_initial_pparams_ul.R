@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_mod = AK_model()
 #' shared_bounds = tibble::tribble(
 #' ~param, ~lower,     ~upper,
@@ -38,6 +39,7 @@
 #'   units = names(AK_mod),
 #'   n_draws = 3
 #' )
+#' }
 sample_initial_pparams_ul = function(
     shared_box_specs,
     specific_box_specs,

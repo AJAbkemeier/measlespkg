@@ -13,8 +13,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' mod = AK_model()
 #' sim_plots(mod, mod, n_sims = 10)
+#' }
 sim_plots = function(
     true_model,
     sim_model,

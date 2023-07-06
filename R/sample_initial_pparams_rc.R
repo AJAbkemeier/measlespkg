@@ -23,6 +23,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_mod = AK_model()
 #' shared_box_specs = tibble::tribble(
 #'   ~param, ~center, ~radius,
@@ -53,6 +54,7 @@
 #'   radii_tbl = specific_radii,
 #'   n_draws = 3
 #' )
+#' }
 sample_initial_pparams_rc = function(
     shared_box_specs,
     specific_pparams_df,
