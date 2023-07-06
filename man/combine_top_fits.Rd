@@ -24,6 +24,7 @@ Object of class \code{EL_list}.
 Combine parameter estimates with best unit log likelihoods
 }
 \examples{
+\dontrun{
 AK_mod = AK_model()
 EL_out = eval_logLik(
   list(AK_mod, AK_mod, AK_mod),
@@ -33,4 +34,5 @@ EL_out = eval_logLik(
 )
 EL_out$fits
 combine_top_fits(EL_out, top_n = 2)
+}
 }

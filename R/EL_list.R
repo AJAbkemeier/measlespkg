@@ -7,7 +7,7 @@
 #' @param se Data frame of unit standard errors. Column names are unit names.
 #' @param cll List of matrices containing estimated conditional log likelihoods
 #'   for each unit.
-#' @param cll List of matrices containing standard errors for estimated
+#' @param cll_se List of matrices containing standard errors for estimated
 #'   conditional log likelihoods for each unit.
 #' @param np_pf Number of particles used by `eval_logLik()`.
 #' @param nreps Number of replications used by `eval_logLik()`.

@@ -12,15 +12,25 @@
 #' @param seed Seed for particle filter. If NULL, does not set new seed.
 #' @param divisor `seed` mod `divisor*i` is used to obtain seed for ith
 #'   repetition. If NULL, does not set new seed.
-#' @param return_n_pfilter_objs Number of `pfilter` objects to return. Currently
-#'   only works for `panelPomp` models.
+#' @param return_n_pfilter_objs Number of `pfilter` objects to return.
 #'
 #'
 #' @return Object of type `EL_list`, a list of data frames containing log
-#'   likelihood and standard error estimates. The unit log likelihoods estimated
-#'   for `spatPomp` objects are not real unit log likelihoods given that the
-#'   units are dependent, but they may still be useful when evaluating model
-#'   fit.
+#'   likelihood and standard error estimates.
+#'
+#'   Note that the unit log likelihoods estimated for `spatPomp` objects are not
+#'   real unit log likelihoods given that the units are dependent, but they may
+#'   still be useful when evaluating model fit.
+#'
+#'   For `panelPomp`, log likelihood estimates are obtained by using
+#'   [panelPomp::panel_logmeanexp()] over the `pfilter()` log likelihood
+#'   replications. For `spatPomp`, log likelihood estimates are obtained by
+#'   using [pomp::logmeanexp()] over the `pfilter()` log likelihood
+#'   replications. For both model types, unit log likelihood estimates are
+#'   obrained by using `logmeanexp()` over the unit log likelihood replications
+#'   for each unit, and conditional log likelihood estimates are obtained by
+#'   using `logmeanexp()` over the condtional log likelihood replications for
+#'   each unit and time point.
 #'
 #' @export
 #'
@@ -41,7 +51,8 @@ eval_logLik = function(
   pf_logLik_frame = data.frame(
     logLik = rep(0, N_models),
     se = rep(0, N_models)
-  ) %>% cbind(
+  ) |>
+  cbind(
     rbind(t(sapply(model_obj_list, panelPomp::coef)))
   )
 
@@ -56,7 +67,7 @@ eval_logLik = function(
       ncores = ncores,
       np_pf = np_pf,
       nreps = nreps,
-      seed = seed,
+      seed = if(is.null(seed)) NULL else seed*i,
       divisor = divisor,
       return_n_pfilter_objs = return_n_pfilter_objs
     )
@@ -124,7 +135,7 @@ eval_logLik_single.panelPomp = function(
     ...
 ){
   doParallel::registerDoParallel(cores = ncores)
-  seed_i = if(is.null(seed) | is.null(divisor)) NULL else (seed*i) %% divisor
+  seed_i = if(is.null(seed) | is.null(divisor)) NULL else seed %% divisor
   RNGkind("L'Ecuyer-CMRG")
   doRNG::registerDoRNG(seed_i)
 
@@ -194,7 +205,7 @@ eval_logLik_single.spatPomp = function(
 ){
   units = as.data.frame(model_obj)$unit |> unique()
   doParallel::registerDoParallel(cores = ncores)
-  seed_i = if(is.null(seed) | is.null(divisor)) NULL else (seed*i) %% divisor
+  seed_i = if(is.null(seed) | is.null(divisor)) NULL else seed %% divisor
   RNGkind("L'Ecuyer-CMRG")
   doRNG::registerDoRNG(seed_i)
   foreach::foreach(
@@ -206,9 +217,9 @@ eval_logLik_single.spatPomp = function(
       Np = np_pf,
       block_size = block_size
     )
-    pfilter_obj@block.cond.loglik
-  } -> block.cond.logLik_list
-
+    pfilter_obj
+  } -> pf_list
+  block.cond.logLik_list = lapply(pf_list, function(x) x@block.cond.loglik)
   logLik_vec = sapply(block.cond.logLik_list, sum)
   logLikSE = pomp::logmeanexp(logLik_vec, se = TRUE)
 
@@ -248,6 +259,7 @@ eval_logLik_single.spatPomp = function(
     logLikSE = logLikSE,
     pf_ull = pf_ull,
     pf_se = pf_se,
-    cll_calcs = cll_calcs
+    cll_calcs = cll_calcs,
+    pf_list = pf_list
   )
 }

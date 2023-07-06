@@ -36,8 +36,8 @@ tidy_results_helper = function(
       block = block
     ) |>
     dplyr::select(
-      path, N_fitr, np_fitr, cooling_frac, block, np_eval, nreps_eval,
-      dplyr::everything()
+      "path", "N_fitr", "np_fitr", "cooling_frac", "block", "np_eval",
+      "nreps_eval", dplyr::everything()
     )
 }
 
@@ -77,12 +77,12 @@ tidy_results.fit_results = function(x, path = NA){
   } else {
     FITR_O = x$fitr_out[[1]]
   }
-  if(class(FITR_O) == "ibpfd_spatPomp"){
+  if(inherits(FITR_O, "ibpfd_spatPomp")){
     N_fitr = FITR_O@Nbpf
     block = NA
     Np = mean(FITR_O@Np)
   }
-  if(class(FITR_O) == "mif2d.ppomp"){
+  if(inherits(FITR_O, "mif2d.ppomp")){
     N_fitr = FITR_O@Nmif
     block = FITR_O@block
     Np = FITR_O@Np

@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_mod = AK_model()
 #' EL_out = eval_logLik(
 #'   list(AK_mod, AK_mod, AK_mod),
@@ -21,6 +22,7 @@
 #' )
 #' EL_out$fits
 #' combine_top_fits(EL_out, top_n = 2)
+#' }
 combine_top_fits = function(
     x,
     top_n = 1,
@@ -28,14 +30,15 @@ combine_top_fits = function(
     is_spat = FALSE
 ){
   unit_names = colnames(x$ull)
-  coef_conversion_func = ifelse(is_spat, spatCoef_to_pparams, coef_to_pparams)
-  best_shared = coef_conversion_func(
-    dplyr::select(
-      x$fits[order(x$fits$logLik, decreasing = TRUE),][1,],
-      -"logLik", -"se"
-    ),
-    units = unit_names
-  )[[1]]
+  best_fit = dplyr::select(
+    x$fits[order(x$fits$logLik, decreasing = TRUE),][1,],
+    -"logLik", -"se"
+  )
+  if(is_spat){
+    best_shared = spatCoef_to_pparams(best_fit, units = unit_names)[[1]]
+  } else {
+    best_shared = coef_to_pparams(best_fit)[[1]]
+  }
   shared_names = names(best_shared)
   is_unique = sapply(shared_names, function(z)
     length(unique(x$fits[[z]])) == 1

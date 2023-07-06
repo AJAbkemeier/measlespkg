@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_mod = AK_model()
 #' EL_out = eval_logLik(
 #'   list(AK_mod, AK_mod, AK_mod),
@@ -21,6 +22,7 @@
 #'   nreps = 2
 #' )
 #' duplicate_top_pparams(EL_out, out_length = 6, top_n = 2)
+#' }
 duplicate_top_pparams = function(
     x,
     out_length,

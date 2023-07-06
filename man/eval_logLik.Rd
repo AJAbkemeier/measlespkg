@@ -35,15 +35,25 @@ worthwhile.)}
 \item{divisor}{\code{seed} mod \code{divisor*i} is used to obtain seed for ith
 repetition. If NULL, does not set new seed.}
 
-\item{return_n_pfilter_objs}{Number of \code{pfilter} objects to return. Currently
-only works for \code{panelPomp} models.}
+\item{return_n_pfilter_objs}{Number of \code{pfilter} objects to return.}
 }
 \value{
 Object of type \code{EL_list}, a list of data frames containing log
-likelihood and standard error estimates. The unit log likelihoods estimated
-for \code{spatPomp} objects are not real unit log likelihoods given that the
-units are dependent, but they may still be useful when evaluating model
-fit.
+likelihood and standard error estimates.
+
+Note that the unit log likelihoods estimated for \code{spatPomp} objects are not
+real unit log likelihoods given that the units are dependent, but they may
+still be useful when evaluating model fit.
+
+For \code{panelPomp}, log likelihood estimates are obtained by using
+\code{\link[panelPomp:panel_logmeanexp]{panelPomp::panel_logmeanexp()}} over the \code{pfilter()} log likelihood
+replications. For \code{spatPomp}, log likelihood estimates are obtained by
+using \code{\link[pomp:logmeanexp]{pomp::logmeanexp()}} over the \code{pfilter()} log likelihood
+replications. For both model types, unit log likelihood estimates are
+obrained by using \code{logmeanexp()} over the unit log likelihood replications
+for each unit, and conditional log likelihood estimates are obtained by
+using \code{logmeanexp()} over the condtional log likelihood replications for
+each unit and time point.
 }
 \description{
 Evaluate the log likelihood of a model using \code{pfilter()}

@@ -14,8 +14,7 @@ make_spatMeaslesPomp = function(
     data,
     model,
     interp_method = c("shifted_splines", "linear"),
-    dt = 1/365.25,
-    ...
+    dt = 1/365.25
 ){
   units = unique(data$measles$unit)
   U = length(units)
@@ -26,7 +25,7 @@ make_spatMeaslesPomp = function(
       time = julian(.data$date, origin = as.Date("1950-01-01"))/365.25 + 1950
     ) |>
     dplyr::filter(.data$time > 1950 & .data$time < 1964) |>
-    dplyr::select(.data$unit, .data$time, .data$cases) |>
+    dplyr::select("unit", "time", "cases") |>
     dplyr::arrange(.data$time, .data$unit)
 
   covar_list = vector("list", length(units))
@@ -67,7 +66,7 @@ make_spatMeaslesPomp = function(
     covar_list[[i]] = covar_list[[i]] |>
       dplyr::mutate(
         pop_1950 = dplyr::filter(
-          data$demog, unit == units[[i]], year == 1950
+          data$demog, .data$unit == units[[i]], .data$year == 1950
         )$pop,
         unit = units[[i]]
       )
@@ -84,7 +83,7 @@ make_spatMeaslesPomp = function(
   }
   covar_df = dplyr::bind_rows(covar_list) |>
     dplyr::arrange(.data$time, .data$unit) |>
-    dplyr::select(unit, time, dplyr::everything())
+    dplyr::select("unit", "time", dplyr::everything())
 
   # Haversine formula for great circle distance between two points on a sphere
   # of radius r. Here, r defaults to a mean radius for the earth, in miles.
@@ -142,7 +141,7 @@ make_spatMeaslesPomp = function(
   #   lapply(model$shp_names, function(x) paste0(x,1))
   # ))
 
-  first_unit_df = dplyr::filter(cases_df, unit == cases_df$unit[[1]])
+  first_unit_df = dplyr::filter(cases_df, .data$unit == cases_df$unit[[1]])
   model_out = spatPomp::spatPomp(
     cases_df,
     units = "unit",

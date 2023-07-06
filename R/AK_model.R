@@ -13,7 +13,7 @@
 AK_model = function(){
   shared = c(mu = measlespkg::AK_mles$mu[[1]])
   specific = measlespkg::AK_mles |>
-    dplyr::select(-.data$loglik, -.data$loglik.sd, -.data$mu, -.data$delay) |>
+    dplyr::select(-"loglik", -"loglik.sd", -"mu", -"delay") |>
     tibble::column_to_rownames(var = "town") |>
     t()
   pparams = list(shared = shared, specific = specific)

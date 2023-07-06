@@ -28,9 +28,9 @@ sim_plots = function(
     make_obs_tibble = function(ppomp, rep_name){
       real_obs = sapply(1:length(ppomp), function(x) pomp::obs(ppomp[[x]]))
       colnames(real_obs) = names(ppomp)
-      real_obs = real_obs %>%
-        dplyr::as_tibble() %>%
-        dplyr::mutate(time = pomp::time(ppomp[[1]]), rep_name = rep_name) %>%
+      real_obs = real_obs |>
+        dplyr::as_tibble() |>
+        dplyr::mutate(time = pomp::time(ppomp[[1]]), rep_name = rep_name) |>
         tidyr::pivot_longer(
           cols = names(ppomp),
           names_to = "unit",
@@ -49,18 +49,18 @@ sim_plots = function(
     dplyr::bind_rows(obs_list)
   }
   sim_tibble = make_sim_tibble(true_model, sim_model, n_sims)
-  bound_tibble = sim_tibble %>%
-    dplyr::filter(.data$rep_name != "real") %>%
-    dplyr::group_by(.data$unit, .data$time) %>%
+  bound_tibble = sim_tibble |>
+    dplyr::filter(.data$rep_name != "real") |>
+    dplyr::group_by(.data$unit, .data$time) |>
     dplyr::summarize(
       lq = stats::quantile(.data$cases, 0.025, na.rm = TRUE),
       uq = stats::quantile(.data$cases, 0.975, na.rm = TRUE)
     )
 
-  sim_tibble = sim_tibble %>%
+  sim_tibble = sim_tibble |>
     dplyr::left_join(bound_tibble, by = c("time","unit"))
 
-  first_10_sim_tibble = sim_tibble %>%
+  first_10_sim_tibble = sim_tibble |>
     dplyr::filter(.data$rep_name %in% paste0("sim", 1:10))
 
   ggplot_list = vector("list", 4)

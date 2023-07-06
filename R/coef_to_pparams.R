@@ -16,7 +16,7 @@
 #' @examples
 #' coef_out = panelPomp::coef(AK_model())
 #' coef_to_pparams(coef_out)
-coef_to_pparams = function(coef, ...){
+coef_to_pparams = function(coef){
   coef_tibble = tibble::tibble(
     full_param_name = names(coef),
     value = as.numeric(coef)
@@ -34,7 +34,7 @@ coef_to_pparams = function(coef, ...){
   names(shared_params) = shared_tibble$param
 
   specific_params = specific_tibble |>
-    tidyr::pivot_wider(names_from = .data$unit, values_from = .data$value) |>
+    tidyr::pivot_wider(names_from = "unit", values_from = "value") |>
     tibble::column_to_rownames(var = "param")
 
   list(shared = shared_params, specific = specific_params)

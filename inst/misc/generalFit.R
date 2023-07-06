@@ -13,7 +13,7 @@ library(foreach)
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
-if(is.na(ncores)) ncores = 2
+if(is.na(ncores)) ncores = 4
 print(ncores)
 
 # Set fitting and filter parameters

@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_mod = AK_model()
 #' EL_out = eval_logLik(
 #'   list(AK_mod, AK_mod, AK_mod),
@@ -17,6 +18,7 @@
 #'   nreps = 2
 #' )
 #' grab_top_fits(EL_out)$fits[, 1:4]
+#' }
 grab_top_fits = function(
     x,
     top_n = 1,

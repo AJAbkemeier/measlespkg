@@ -27,6 +27,7 @@ List of parameters in the form of \code{\link[panelPomp:pparams]{panelPomp::ppar
 Duplicate top fits from \code{EL_list}
 }
 \examples{
+\dontrun{
 AK_mod = AK_model()
 EL_out = eval_logLik(
   list(AK_mod, AK_mod, AK_mod),
@@ -35,4 +36,5 @@ EL_out = eval_logLik(
   nreps = 2
 )
 duplicate_top_pparams(EL_out, out_length = 6, top_n = 2)
+}
 }

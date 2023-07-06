@@ -33,15 +33,15 @@ plot_traces = function(
 ){
   nreps = length(fitr_list)
   #niter = fitr_list[[1]]@Nmif
-  if(class(fitr_list[[1]]) == "mif2d.ppomp"){
+  if(inherits(fitr_list[[1]], "mif2d.ppomp")){
     niter = fitr_list[[1]]@Nmif
     plot_units = names(fitr_list[[1]])
     traces_list = lapply(1:nreps, function(i)
       pomp::traces(fitr_list[[i]])
     )
-  } else if(class(fitr_list[[1]]) == "ibpfd_spatPomp"){
+  } else if(inherits(fitr_list[[1]], "ibpfd_spatPomp")){
     niter = fitr_list[[1]]@Nbpf
-    plot_units = unit_names(fitr_list[[1]])
+    plot_units = spatPomp::unit_names(fitr_list[[1]])
     traces_list = lapply(1:nreps, function(i){
       fitr_obj = fitr_list[[i]]
       un = spatPomp::unit_names(fitr_obj)

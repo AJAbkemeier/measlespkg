@@ -14,7 +14,10 @@ EL_list(fits, ull, se, cll, cll_se, np_pf, nreps)
 
 \item{se}{Data frame of unit standard errors. Column names are unit names.}
 
-\item{cll}{List of matrices containing standard errors for estimated
+\item{cll}{List of matrices containing estimated conditional log likelihoods
+for each unit.}
+
+\item{cll_se}{List of matrices containing standard errors for estimated
 conditional log likelihoods for each unit.}
 
 \item{np_pf}{Number of particles used by \code{eval_logLik()}.}

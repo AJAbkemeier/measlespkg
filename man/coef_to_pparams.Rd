@@ -4,7 +4,7 @@
 \alias{coef_to_pparams}
 \title{Convert coef-style object to pparams-style object.}
 \usage{
-coef_to_pparams(coef, ...)
+coef_to_pparams(coef)
 }
 \arguments{
 \item{coef}{Vector in the style of \code{coef(panelPomp_obj)}. That is, a numeric
