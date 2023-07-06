@@ -59,6 +59,8 @@ each unit and time point.
 Evaluate the log likelihood of a model using \code{pfilter()}
 }
 \examples{
+\dontrun{
 model_list = list(AK_model())
 eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
+}
 }

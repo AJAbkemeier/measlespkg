@@ -14,7 +14,7 @@
 # })
 # For some reason the logLik is -118729 when run via devtools::check()
 
-test_that("logLik has not changed for panelPomp", {
+test_that("eval_logLik() works for panelPomp models", {
   set.seed(1)
   model_list = list(AK_mod)
   out = try(eval_logLik(

@@ -17,7 +17,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
+#' }
 make_measlesPomp = function(
     data,
     starting_pparams,
@@ -57,12 +59,12 @@ make_measlesPomp = function(
         )/365.25 + first_year
       ) |>
       dplyr::filter(.data$time > first_year & .data$time < (last_year + 1)) |>
-      dplyr::select(.data$time, .data$cases)
+      dplyr::select("time", "cases")
     if(!is.null(custom_obs_list)) dat_list[[i]]$cases = custom_obs_list[[i]]
 
     demog_list[[i]] = demog |>
       dplyr::filter(.data$unit == units[[i]]) |>
-      dplyr::select(-.data$unit)
+      dplyr::select(-"unit")
   }
   ## ----prep-covariates-------------------------------------------------
   covar_list = vector("list", length(units))

@@ -44,13 +44,13 @@ sample_initial_pparams_ul = function(
     units,
     n_draws
 ){
-  shared_box_specs_rc = shared_box_specs %>%
+  shared_box_specs_rc = shared_box_specs |>
     dplyr::transmute(
       param = .data$param,
       center = (.data$upper + .data$lower)/2,
       radius = (.data$upper - .data$lower)/2
     )
-  radii_tbl = specific_box_specs %>%
+  radii_tbl = specific_box_specs |>
     dplyr::transmute(
       param = .data$param,
       radius = (.data$upper - .data$lower)/2

@@ -13,20 +13,20 @@ library(foreach)
 ## ############# OPTIONS #############################
 # Set number of cores
 ncores = as.numeric(Sys.getenv("SLURM_NTASKS_PER_NODE", unset = NA))
-if(is.na(ncores)) ncores = 4
+if(is.na(ncores)) ncores = 2
 print(ncores)
 
 # Set fitting and filter parameters
 RUN_LEVEL = 1
-NP_FITR      = switch(RUN_LEVEL, 4, 5000)
-NFITR        = switch(RUN_LEVEL, 4,  100)
+NP_FITR      = switch(RUN_LEVEL, 2, 5000)
+NFITR        = switch(RUN_LEVEL, 2,  100)
 NREPS_FITR   = switch(RUN_LEVEL, ncores, ncores)
-NP_EVAL      = switch(RUN_LEVEL, 4, 10000)
+NP_EVAL      = switch(RUN_LEVEL, 2, 10000)
 NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores)
 NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH. TOP_N_FITS must divide NREPS_FITR.
-TOP_N_FITS   = switch(RUN_LEVEL, 2,  12)
+TOP_N_FITS   = switch(RUN_LEVEL, 1,  12)
 DATA = clean_twentycities()
 # Units to select from data
 UNITS = unique(twentycities$measles$unit)
@@ -101,11 +101,11 @@ USE_BEST_COMBO = TRUE
 ################## SETUP ###########################################
 set.seed(MAIN_SEED)
 # Create directory for output if it does not exist
-write_path = switch(
-  RUN_LEVEL,
-  "./output2/DUMMY/",
-  out_dir
-)
+if(RUN_LEVEL == 1 & is.na(out_dir)){
+  write_path = "./output2/DUMMY/"
+} else {
+  write_path = out_dir
+}
 if(!dir.exists(write_path)) dir.create(write_path)
 write_results_to = paste0(write_path, RESULTS_FILE)
 

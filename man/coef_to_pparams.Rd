@@ -22,6 +22,8 @@ unit-specific whereas those with name in the style of \code{param} are assumed t
 be shared.
 }
 \examples{
+\dontrun{
 coef_out = panelPomp::coef(AK_model())
 coef_to_pparams(coef_out)
+}
 }

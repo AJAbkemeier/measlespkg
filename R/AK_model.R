@@ -9,7 +9,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' AK_model()
+#' }
 AK_model = function(){
   shared = c(mu = measlespkg::AK_mles$mu[[1]])
   specific = measlespkg::AK_mles |>

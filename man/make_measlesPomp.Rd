@@ -43,5 +43,7 @@ A panelPomp object using the data and model supplied.
 Make a panelPomp model using measles data
 }
 \examples{
+\dontrun{
 make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
+}
 }

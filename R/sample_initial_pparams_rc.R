@@ -63,28 +63,28 @@ sample_initial_pparams_rc = function(
     unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0")
 ){
   specific_box_specs_f = function(specific_pparams_df, radii_tbl){
-    specific_centers_tbl = specific_pparams_df %>%
-      as.data.frame() %>%
+    specific_centers_tbl = specific_pparams_df |>
+      as.data.frame() |>
       tibble::rownames_to_column(var = "param")
-    specific_box = radii_tbl %>%
-      dplyr::right_join(specific_centers_tbl, by = "param") %>%
+    specific_box = radii_tbl |>
+      dplyr::right_join(specific_centers_tbl, by = "param") |>
       tidyr::pivot_longer(
-        c(-.data$param, -.data$radius),
+        cols = c(-"param", -"radius"),
         values_to = "center",
         names_to = "unit"
-      ) %>%
+      ) |>
       dplyr::arrange(.data$unit)
     specific_box
   }
   specific_box_specs = specific_box_specs_f(specific_pparams_df, radii_tbl)
   adjust_params = function(x){
-    x %>%
+    x |>
       dplyr::mutate(lower = ifelse(
         .data$param %in% c(pos_params, unit_interval_params) &
           .data$center - .data$radius < buffer,
         buffer,
         .data$center - .data$radius
-      )) %>%
+      )) |>
       dplyr::mutate(upper = ifelse(
         .data$param %in% unit_interval_params &
           .data$lower + 2*.data$radius > 1 - buffer,
@@ -92,11 +92,11 @@ sample_initial_pparams_rc = function(
         .data$lower + 2*.data$radius
       ))
   }
-  shared_bounds = adjust_params(shared_box_specs) %>%
-    dplyr::select(.data$param, .data$lower, .data$upper)
-  specific_bounds = adjust_params(specific_box_specs) %>%
-    dplyr::select(.data$param, .data$unit, .data$lower, .data$upper) %>%
-    tidyr::unite(.data$param, .data$unit, sep = "[", col = "param[unit]") %>%
+  shared_bounds = adjust_params(shared_box_specs) |>
+    dplyr::select("param", "lower", "upper")
+  specific_bounds = adjust_params(specific_box_specs) |>
+    dplyr::select("param", "unit", "lower", "upper") |>
+    tidyr::unite("param", "unit", sep = "[", col = "param[unit]") |>
     dplyr::mutate(`param[unit]` = paste0(.data$`param[unit]`, "]"))
 
   to_named_vec = function(x, name_col, val_col){

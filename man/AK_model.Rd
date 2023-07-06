@@ -16,5 +16,7 @@ are shifted +0.5 years. In contrast, He10 uses linear interpolation and
 makes no shift. In addition, AK's MLE's are different.
 }
 \examples{
+\dontrun{
 AK_model()
+}
 }

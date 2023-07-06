@@ -35,8 +35,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' model_list = list(AK_model())
 #' eval_logLik(model_list, ncores = 1, np_pf = 3, nreps = 2)
+#' }
 eval_logLik = function(
     model_obj_list,
     block_size = 1,

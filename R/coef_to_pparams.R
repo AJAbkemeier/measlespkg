@@ -14,8 +14,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' coef_out = panelPomp::coef(AK_model())
 #' coef_to_pparams(coef_out)
+#' }
 coef_to_pparams = function(coef){
   coef_tibble = tibble::tibble(
     full_param_name = names(coef),
