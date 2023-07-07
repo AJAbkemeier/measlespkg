@@ -88,8 +88,8 @@ INITIAL_RW_SD = c(
 if(!is.null(EVAL_PARAM))
   INITIAL_RW_SD[[EVAL_PARAM]] = 0
 stopifnot(
-  names(INITIAL_RW_SD) %in% MODEL$paramnames &
-  MODEL$paramnames %in% names(INITIAL_RW_SD)
+  all(names(INITIAL_RW_SD) %in% MODEL$paramnames,
+  MODEL$paramnames %in% names(INITIAL_RW_SD))
 )
 
 # Specify names of output files
@@ -207,20 +207,23 @@ if(IS_SPAT){
     names(z) = paste0(x,1:U)
     z
   }))
-  measlesPomp_maker = make_spatMeaslesPomp
+  measlesPomp_mod = make_spatMeaslesPomp(
+    data = DATA |> choose_units(UNITS),
+    model = MODEL,
+    interp_method = INTERP_METHOD,
+    dt = DT
+  )
   initial_rw_sd = expanded_rw_sd
 } else {
-  measlesPomp_maker = make_measlesPomp
+  measlesPomp_mod = make_measlesPomp(
+    data = DATA |> choose_units(UNITS),
+    starting_pparams = initial_pparams_list[[1]],
+    model = MODEL,
+    interp_method = INTERP_METHOD,
+    dt = DT
+  )
   initial_rw_sd = INITIAL_RW_SD
 }
-
-measlesPomp_mod = measlesPomp_maker(
-  data = DATA |> choose_units(UNITS),
-  starting_pparams = initial_pparams_list[[1]],
-  model = MODEL,
-  interp_method = INTERP_METHOD,
-  dt = DT
-)
 
 if(!is.null(EVAL_POINTS)){
   is_shared = bounds_tbl[bounds_tbl$param == EVAL_PARAM, "shared"] |>

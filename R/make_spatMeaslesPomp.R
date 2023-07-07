@@ -88,10 +88,10 @@ make_spatMeaslesPomp = function(
   # Haversine formula for great circle distance between two points on a sphere
   # of radius r. Here, r defaults to a mean radius for the earth, in miles.
   distGreatCircle <- function(p1, p2, r = 3963.191) {
-    Lon1 <- p1[,1]*pi/180
-    Lat1 <- p1[,2]*pi/180
-    Lon2 <- p2[,1]*pi/180
-    Lat2 <- p2[,2]*pi/180
+    Lon1 <- as.numeric(p1[,1])*pi/180
+    Lat1 <- as.numeric(p1[,2])*pi/180
+    Lon2 <- as.numeric(p2[,1])*pi/180
+    Lat2 <- as.numeric(p2[,2])*pi/180
     a <- sin((Lat2-Lat1)/2)^2 + cos(Lat1)*cos(Lat2)*sin((Lon2-Lon1)/2)^2
     atan2(sqrt(a), sqrt(1 - a))*2*r
   }
