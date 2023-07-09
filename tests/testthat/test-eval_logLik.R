@@ -29,7 +29,7 @@ test_that("eval_logLik() works for panelPomp models", {
 
 test_that("logLik is correct for spatPomp", {
   set.seed(1)
-  model_list = list(spatPomp_example())
+  model_list = list(spatPomp_ex)
   out = eval_logLik(
     model_obj_list = model_list,
     ncores = 1,

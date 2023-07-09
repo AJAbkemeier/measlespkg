@@ -47,8 +47,7 @@ tidy_pfilter_dfs = function(x){
       dplyr::left_join(tidy_se_df, by = "unit") |>
       dplyr::mutate(total_ll = x$fits$logLik[[z]], total_se = x$fits$se[[z]]) |>
       dplyr::select(
-        .data$rep, .data$total_ll, .data$total_se, .data$unit, .data$ull,
-        .data$se, dplyr::everything()
+        "rep", "total_ll", "total_se", "unit", "ull", "se", dplyr::everything()
       )
     tidy_df
   }) |>
