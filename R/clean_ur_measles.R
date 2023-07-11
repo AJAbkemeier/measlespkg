@@ -55,8 +55,8 @@ clean_ur_measles = function(){
     urm$measles$unit == "London" &
       urm$measles$date == "1955-08-26",
     "cases"
-  ] = 76
-  # The value 76 was used in He10.
+  ] = NA
+  # The value 76 was used in He10, but it seems safer to use NA.
 
   # Sheffield 1961-05-05   266
   # Sheffield 1961-05-12   346
