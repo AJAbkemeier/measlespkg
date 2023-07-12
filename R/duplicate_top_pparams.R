@@ -30,12 +30,7 @@ duplicate_top_pparams = function(
     combine = FALSE,
     units = NULL
 ){
-  if(out_length %% top_n != 0){
-    stop(
-      "top_n should divide out_length",
-      call. = FALSE
-    )
-  }
+  is_spat = !is.null(units)
   if(ncol(x$ull) == 1 | combine == FALSE){
     grabbed_params = grab_top_fits(x, top_n = top_n)$fits |>
       dplyr::select(-"logLik", -"se")
@@ -43,7 +38,7 @@ duplicate_top_pparams = function(
     grabbed_params = combine_top_fits(
       x,
       top_n = top_n,
-      is_spat = !is.null(units)
+      is_spat = is_spat
     )$fits |>
       dplyr::select(-"logLik", -"se")
   }
@@ -52,7 +47,7 @@ duplicate_top_pparams = function(
     rep_len(1:nrow(grabbed_params), length.out = out_length)
   )
   lapply(1:nrow(top_params), function(z){
-    if(is.null(units))
+    if(!is_spat)
       coef_to_pparams(top_params[z,])
     else
       spatCoef_to_pparams(top_params[z,], units)

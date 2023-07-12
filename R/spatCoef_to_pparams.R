@@ -25,10 +25,9 @@ spatCoef_to_pparams = function(spatCoef, units){
     }, a = _) |>
     unlist()
   spatCoef_sorted_final = spatCoef_sorted[order(spatCoef_enumeration)]
-  units_sorted_final = units_sorted[order(spatCoef_enumeration[1:U])]
   specific_params = lapply(1:length(param_names), function(i){
     params = spatCoef_sorted_final[1:U + U*(i - 1)]
-    names(params) = units_sorted_final
+    names(params) = units
     params
   }) |>
     dplyr::bind_rows() |>

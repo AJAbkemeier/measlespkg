@@ -30,5 +30,6 @@ update_fit_results = function(x){
   if(is.null(x$EL_out$np_pf)) x$EL_out$np_pf = NA
   if(is.null(x$EL_out$nreps)) x$EL_out$nreps = NA
   x$EL_out = x$EL_out[c("fits", "ull", "se", "cll", "cll_se", "np_pf", "nreps")]
+  class(x$EL_out) = "EL_list"
   x
 }

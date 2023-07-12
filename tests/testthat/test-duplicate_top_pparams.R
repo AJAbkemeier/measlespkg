@@ -260,3 +260,84 @@ test_that("function works for spatPomp output", {
   )
 })
 
+
+test_that("function doesn't mix parameter between units for spatPomp output with
+          many units",
+{
+  U = 35
+  units = paste0("unit",1:U)
+  ell = EL_list(
+    fits = data.frame(
+      logLik = c(1.1, 2.1, 3.1),
+      se = c(1.2, 2.2, 3.2),
+      check.names = FALSE
+    ) |> dplyr::bind_cols(
+      lapply(1:U, function(i) c(1, 2, 3)) |>
+        `names<-`(paste0("shared",1:U)),
+      lapply(1:U, function(i) c(1, 2, 3) + i/100) |>
+        `names<-`(paste0("specific",1:U))
+    ),
+    ull = dplyr::bind_cols(
+      lapply(1:U, function(i) c(1, 2, 3) + i/100) |>
+        `names<-`(units)
+    ),
+    se = dplyr::bind_cols(
+      lapply(1:U, function(i) c(1, 2, 3) + i/100) |>
+        `names<-`(units)
+    ),
+    cll = lapply(1:U, function(x){
+      mat = matrix(
+        10*x + c(1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3),
+        nrow = 3,
+        ncol = 3
+      )
+    }) |> `names<-`(units),
+    cll_se = lapply(1:U, function(x){
+      matrix(
+        10*x + c(1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3),
+        nrow = 3,
+        ncol = 3
+      )
+    }) |> `names<-`(units),
+    np_pf = 10,
+    nreps = 20
+  )
+
+  out1 = duplicate_top_pparams(
+    ell, out_length = 3, top_n = 1, combine = FALSE,
+    units = units
+  )
+  out2 = duplicate_top_pparams(
+    ell, out_length = 3, top_n = 3, combine = FALSE,
+    units = units
+  )
+
+  expect_equal(
+    out1[[1]]$specific["specific",] |> unlist(),
+    (3 + 1:U/100) |> `names<-`(units)
+  )
+  expect_equal(
+    out2[[3]]$specific["specific",] |> unlist(),
+    (1 + 1:U/100) |> `names<-`(units)
+  )
+
+  out1c = duplicate_top_pparams(
+    ell, out_length = 3, top_n = 1, combine = TRUE,
+    units = units
+  )
+  out2c = duplicate_top_pparams(
+    ell, out_length = 3, top_n = 3, combine = TRUE,
+    units = units
+  )
+
+  expect_equal(
+    out1c[[1]]$specific["specific",] |> unlist(),
+    (3 + 1:U/100) |> `names<-`(units)
+  )
+  expect_equal(
+    out2c[[3]]$specific["specific",] |> unlist(),
+    (1 + 1:U/100) |> `names<-`(units)
+  )
+
+})
+
