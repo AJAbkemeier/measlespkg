@@ -25,6 +25,11 @@ gather_results = function(file_names, parent_dir = "."){
   out_paths = paste0(parent_dir,"/",out_paths)
   lapply(out_paths, function(path){
     loaded_obj = readRDS(path)
+    loaded_obj = if(inherits(loaded_obj, "EL_list")){
+      loaded_obj
+    } else {
+      update_fit_results(loaded_obj)
+    }
     tidy_results(loaded_obj, path = path)
   }) |>
     dplyr::bind_rows()
