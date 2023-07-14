@@ -97,3 +97,21 @@ test_that("function produces expected output with He10 parameters", {
   colnames(expected2$specific) = units2
   expect_equal(out2, expected2)
 })
+
+test_that("function throws error when name assumption is violated", {
+  units = c('Bedwellty', 'Birmingham', 'Bradford', 'Bristol', 'Cardiff',
+            'Consett', 'Dalton.in.Furness', 'Halesworth', 'Hastings', 'Hull',
+            'Leeds', 'Lees', 'Liverpool', 'London', 'Manchester', 'Mold',
+            'Northwich', 'Nottingham', 'Oswestry', 'Sheffield')
+  U = length(units)
+  spatCoef = c(
+    1 + 0.01*1:U,
+    2 + 0.01*1:U
+  )
+  names(spatCoef) = c(
+    paste0("param0",1:U),
+    paste0("param1",1:U)
+  )
+
+  expect_error(spatCoef_to_pparams(spatCoef, units = units))
+})

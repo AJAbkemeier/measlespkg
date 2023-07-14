@@ -7,7 +7,11 @@
 spatCoef_to_pparams(spatCoef, units)
 }
 \arguments{
-\item{spatCoef}{Named numeric vector in format of \code{coef.spatPomp} object.}
+\item{spatCoef}{Named numeric vector in format of \code{coef.spatPomp} object.
+This function assumes that parameters are named according to the scheme
+"param1, param2, param3,..." where "param" is the base parameter name and
+doesn't end with a digit other than 0. Hence, R0 and S_0 would be valid
+base parameter names but gamma1 would not be.}
 
 \item{units}{Character vector of unit names in the order they are enumerated
 in \code{spatCoef}.}
