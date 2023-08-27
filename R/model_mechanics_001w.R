@@ -36,7 +36,8 @@ model_mechanics_001w = function(param, U){
     }),
     sapply(basic_params_trunc, function(x) paste0("double _",x," = ", x,";\n")),
     "double _",param," = ",param,"_sh + w*param_sp;\n",
-    if(param %in% log_params) paste0("_",param," = exp(_",param,");")
+    if(param %in% log_params) paste0("_",param," = exp(_",param,");"),
+    if(param %in% logit_params) paste0("_",param," = 1/(1+exp(-_",param,"));")
   ) |> paste0(collapse = "")
 
   rproc <- pomp::Csnippet(paste0(
