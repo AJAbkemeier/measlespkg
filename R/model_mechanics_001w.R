@@ -11,6 +11,9 @@ model_mechanics_001w = function(param, U){
   basic_params = c("R0", "mu", "sigma", "gamma", "alpha", "iota", "rho",
                    "sigmaSE", "psi", "cohort", "amplitude", "S_0", "E_0",
                    "I_0", "R_0")
+  log_params = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota")
+  logit_params = c("cohort","amplitude", "rho")
+  barycentric_params = c("S_0","E_0","I_0","R_0")
   stopifnot(length(U) == 1)
   stopifnot(length(param) == 1)
   stopifnot(param %in% basic_params)
@@ -32,7 +35,8 @@ model_mechanics_001w = function(param, U){
       ")
     }),
     sapply(basic_params_trunc, function(x) paste0("double _",x," = ", x,";\n")),
-    "double _",param," = ",param,"_sh + w*param_sp;"
+    "double _",param," = ",param,"_sh + w*param_sp;\n",
+    if(param %in% log_params) paste0("_",param," = exp(_",param,");")
   ) |> paste0(collapse = "")
 
   rproc <- pomp::Csnippet(paste0(
@@ -133,10 +137,6 @@ model_mechanics_001w = function(param, U){
     W = 0;
     C = 0;
   "))
-
-  log_params = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota")
-  logit_params = c("cohort","amplitude", "rho")
-  barycentric_params = c("S_0","E_0","I_0","R_0")
 
   pt <- pomp::parameter_trans(
     toEst = pomp::Csnippet(paste0(

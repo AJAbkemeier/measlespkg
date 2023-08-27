@@ -77,13 +77,14 @@ INITIAL_RW_SD = c(
   sigmaSE = DEFAULT_SD,
   amplitude = DEFAULT_SD*0.5,
   rho = DEFAULT_SD*0.5,
-  gamma = DEFAULT_SD*0.5,
+  gamma_sh = DEFAULT_SD*0.5,
   psi = DEFAULT_SD*0.25,
   iota = DEFAULT_SD,
   sigma = DEFAULT_SD,
   cohort = DEFAULT_SD*0.5,
   alpha = DEFAULT_SD*10^(-2),
   mu = 0,
+  w = DEFAULT_SD,
   sapply(MODEL$pseudo_sp, function(x) DEFAULT_SD/4)
 )
 if(!is.null(EVAL_PARAM))
@@ -141,7 +142,7 @@ bounds_tbl = tibble::tribble(
   "gamma_sh",       25,           320,          TRUE,
   "mu",           0.02,          0.02,          TRUE,
   "w",             550,           750,          TRUE
-) dplyr::bind_rows(
+) |> dplyr::bind_rows(
   tibble::tibble(param = MODEL$pseudo_sp, lower = -0.9, upper = 0.9, shared = TRUE)
 )
 if(!is.null(EVAL_PARAM)){
