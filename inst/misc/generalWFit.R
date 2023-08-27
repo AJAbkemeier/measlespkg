@@ -139,9 +139,9 @@ bounds_tbl = tibble::tribble(
   "psi",          0.05,             3,         FALSE,
   "alpha",       0.935,          1.05,         FALSE,
   "cohort",        0.1,           0.7,         FALSE,
-  "gamma_sh",       25,           320,          TRUE,
+  "gamma_sh",  log(25),      log(320),          TRUE,
   "mu",           0.02,          0.02,          TRUE,
-  "w",             550,           750,          TRUE
+  "w",             250,           450,          TRUE
 ) |> dplyr::bind_rows(
   tibble::tibble(param = MODEL$pseudo_sp, lower = -0.9, upper = 0.9, shared = TRUE)
 )
