@@ -1,16 +1,19 @@
-#' panelPOMP model with log-log relationship between gamma and standardized
-#' 1950 population
+#' panelPOMP model with log-log relationship between gamma and standardized 1950
+#' population
+#'
+#' @name model_mechanics_002
+#' @param shared_params Character vector of parameters to be treated as shared.
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-model_mechanics_002 = function(){
+model_mechanics_002 = function(shared_params = "mu"){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
     // Population-varying parameters
-    double gamma = exp(gamma1*std_log_pop_1950 + gamma0);
+    double gamma = exp(gamma_2*std_log_pop_1950 + gamma_1);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -106,15 +109,24 @@ model_mechanics_002 = function(){
   )
 
   paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "psi",
+                 "S_0","E_0","I_0","R_0", "gamma_2", "gamma_1", "psi",
                  "iota", "sigma")
+  full_shared_params = union(shared_params, c("gamma_2", "gamma_1"))
 
-  list(
+  if(!all(shared_params %in% paramnames)){
+    stop(
+      "At least one parameter name given to shared_params is not in the model.",
+      call. = FALSE
+    )
+  }
+
+  panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    paramnames = paramnames
+    shared_params = full_shared_params,
+    specific_params = setdiff(paramnames, full_shared_params)
   )
 }

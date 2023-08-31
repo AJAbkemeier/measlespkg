@@ -2,16 +2,19 @@
 #' the standardized 1950 population, as well as between psi and the
 #' standardized 1950 population
 #'
+#' @name model_mechanics_005
+#' @param shared_params Character vector of parameters to be treated as shared.
+#'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-model_mechanics_005 = function( ){
+model_mechanics_005 = function(shared_params = "mu"){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
     // Population-varying parameters
-    double gamma = exp(gamma1*std_log_pop_1950 + gamma0);
+    double gamma = exp(gamma_2*std_log_pop_1950 + gamma_1);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -62,7 +65,7 @@ model_mechanics_005 = function( ){
   ")
 
   dmeas <- pomp::Csnippet("
-    double psi = exp(psi1*std_log_pop_1950 + psi0);
+    double psi = exp(psi_2*std_log_pop_1950 + psi_1);
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
@@ -80,7 +83,7 @@ model_mechanics_005 = function( ){
   ")
 
   rmeas <- pomp::Csnippet("
-    double psi = exp(psi1*std_log_pop_1950 + psi0);
+    double psi = exp(psi_2*std_log_pop_1950 + psi_1);
     double m = rho*C;
     double v = m*(1.0-rho+psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
@@ -109,15 +112,26 @@ model_mechanics_005 = function( ){
   )
 
   paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "gamma1", "gamma0", "iota",
-                 "psi1", "psi0", "sigma")
+                 "S_0","E_0","I_0","R_0", "gamma_2", "gamma_1", "iota",
+                 "psi_2", "psi_1", "sigma")
+  full_shared_params = union(
+    shared_params, c("gamma_2", "gamma_1", "psi_2", "psi_1")
+  )
 
-  list(
+  if(!all(shared_params %in% paramnames)){
+    stop(
+      "At least one parameter name given to shared_params is not in the model.",
+      call. = FALSE
+    )
+  }
+
+  panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    paramnames = paramnames
+    shared_params = full_shared_params,
+    specific_params = setdiff(paramnames, full_shared_params)
   )
 }

@@ -5,9 +5,9 @@
 \title{Make a panelPomp model using measles data}
 \usage{
 make_measlesPomp(
-  data,
-  starting_pparams,
   model,
+  data,
+  starting_pparams = NULL,
   interp_method = c("shifted_splines", "linear"),
   first_year = 1950,
   last_year = 1963,
@@ -16,12 +16,13 @@ make_measlesPomp(
 )
 }
 \arguments{
-\item{data}{List in the format of \code{twentycities}.}
-
-\item{starting_pparams}{Parameters in the format of \code{pparams()} output.}
-
 \item{model}{List of objects in the format of the output for the
 \code{model_mechanics_XXX()} functions.}
+
+\item{data}{List in the format of \code{twentycities}.}
+
+\item{starting_pparams}{Parameters in the format of \code{pparams()} output. Set
+to NULL to assign NA values.}
 
 \item{interp_method}{Method used to interpolate population and births.
 Possible options are \code{"shifted_splines"} and \verb{"linear}.}

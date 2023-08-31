@@ -1,7 +1,8 @@
 #' Make a panelPomp model using measles data
 #'
 #' @param data List in the format of `twentycities`.
-#' @param starting_pparams Parameters in the format of `pparams()` output.
+#' @param starting_pparams Parameters in the format of `pparams()` output. Set
+#'   to NULL to assign NA values.
 #' @param model List of objects in the format of the output for the
 #'   `model_mechanics_XXX()` functions.
 #' @param interp_method Method used to interpolate population and births.
@@ -21,9 +22,9 @@
 #' make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
 #' }
 make_measlesPomp = function(
-    data,
-    starting_pparams,
     model,
+    data,
+    starting_pparams = NULL,
     interp_method = c("shifted_splines", "linear"),
     first_year = 1950,
     last_year = 1963,
@@ -141,9 +142,37 @@ make_measlesPomp = function(
   names(pomp_list) = units
 
   ## ----panelPomp-construction-----------------------------------------------
+  if(is.null(starting_pparams)){
+    shared = as.numeric(rep(NA, length(model$shared_params)))
+    specific = matrix(
+      NA,
+      nrow = length(model$specific_params),
+      ncol = length(units)
+    )
+    class(specific) = "numeric"
+    storage.mode(specific) = "numeric"
+    rownames(specific) = model$specific_params
+    colnames(specific) = units
+    names(shared) = model$shared_params
+  } else {
+    shared = starting_pparams$shared
+    specific = as.matrix(starting_pparams$specific)
+    if(!setequal(names(shared), model$shared_params)){
+      stop(
+        "Starting shared parameters do not match parameters in model mechanics.",
+        call. = FALSE
+      )
+    }
+    if(!setequal(rownames(specific), model$specific_params)){
+      stop(
+        "Starting unit-specific parameters do not match parameters in model mechanics.",
+        call. = FALSE
+      )
+    }
+  }
   panelPomp::panelPomp(
     pomp_list,
-    shared = starting_pparams$shared,
-    specific = as.matrix(starting_pparams$specific)
+    shared = shared,
+    specific = specific
   )
 }

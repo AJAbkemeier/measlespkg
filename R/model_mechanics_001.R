@@ -1,9 +1,12 @@
 #' He10 POMP model for UK measles
 #'
 #' @return List of objects required for `make_measlesPomp`.
+#' @param shared_params Character vector of parameters to be treated as shared.
 #' @export
 #'
-model_mechanics_001 = function(){
+model_mechanics_001 = function(
+  shared_params = "mu"
+){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
@@ -104,13 +107,19 @@ model_mechanics_001 = function(){
   paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
                  "sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
-
-  list(
+  if(!all(shared_params %in% paramnames)){
+    stop(
+      "At least one parameter name given to shared_params is not in the model.",
+      call. = FALSE
+    )
+  }
+  panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    paramnames = paramnames
+    shared_params = shared_params,
+    specific_params = setdiff(paramnames, shared_params)
   )
 }

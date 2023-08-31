@@ -2,15 +2,18 @@
 % Please edit documentation in R/model_mechanics_002.R
 \name{model_mechanics_002}
 \alias{model_mechanics_002}
-\title{panelPOMP model with log-log relationship between gamma and standardized
-1950 population}
+\title{panelPOMP model with log-log relationship between gamma and standardized 1950
+population}
 \usage{
-model_mechanics_002()
+model_mechanics_002(shared_params = "mu")
+}
+\arguments{
+\item{shared_params}{Character vector of parameters to be treated as shared.}
 }
 \value{
 List of objects required for \code{make_measlesPomp()}.
 }
 \description{
-panelPOMP model with log-log relationship between gamma and standardized
-1950 population
+panelPOMP model with log-log relationship between gamma and standardized 1950
+population
 }

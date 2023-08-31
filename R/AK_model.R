@@ -20,7 +20,7 @@ AK_model = function(){
     t()
   pparams = list(shared = shared, specific = specific)
   make_measlesPomp(
-    measlespkg::clean_twentycities(),
+    data = measlespkg::clean_twentycities(),
     starting_pparams = pparams,
     model = model_mechanics_001(),
     interp_method = "shifted_splines",

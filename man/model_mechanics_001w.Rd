@@ -4,13 +4,15 @@
 \alias{model_mechanics_001w}
 \title{He10 POMP model for UK measles with an auxiliary weight parameter}
 \usage{
-model_mechanics_001w(param, U)
+model_mechanics_001w(param, U, shared_params = "mu")
 }
 \arguments{
 \item{param}{Name of the parameter you would like to express in terms of
 a shared parameter and a weighted unit-specific parameter.}
 
 \item{U}{Number of units in the model.}
+
+\item{shared_params}{Character vector of parameters to be treated as shared.}
 }
 \value{
 List of objects required for \code{make_measlesPomp}.

@@ -166,7 +166,7 @@ bounds_tbl = tibble::tribble(
   "alpha",       0.935,          1.05,         FALSE,
   "cohort",        0.1,           0.7,         FALSE,
   "gamma",          25,           320,         FALSE,
-  "mu",           0.02,          0.02,         FALSE
+  "mu",           0.02,          0.02,          TRUE
 )
 if(!is.null(EVAL_PARAM)){
   eval_param_rows = bounds_tbl[["param"]] == EVAL_PARAM

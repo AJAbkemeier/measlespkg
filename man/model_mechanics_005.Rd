@@ -6,7 +6,10 @@
 the standardized 1950 population, as well as between psi and the
 standardized 1950 population}
 \usage{
-model_mechanics_005()
+model_mechanics_005(shared_params = "mu")
+}
+\arguments{
+\item{shared_params}{Character vector of parameters to be treated as shared.}
 }
 \value{
 List of objects required for \code{make_measlesPomp()}.

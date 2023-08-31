@@ -3,11 +3,12 @@
 #' @param param Name of the parameter you would like to express in terms of
 #' a shared parameter and a weighted unit-specific parameter.
 #' @param U Number of units in the model.
+#' @param shared_params Character vector of parameters to be treated as shared.
 #'
 #' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
-model_mechanics_001w = function(param, U){
+model_mechanics_001w = function(param, U, shared_params = "mu"){
   basic_params = c("R0", "mu", "sigma", "gamma", "alpha", "iota", "rho",
                    "sigmaSE", "psi", "cohort", "amplitude", "S_0", "E_0",
                    "I_0", "R_0")
@@ -174,15 +175,28 @@ model_mechanics_001w = function(param, U){
   paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
                  "sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0", paste0(param,"_sh"), "w", params)
-  paramnames = paramnames[paramnames != param]
+  paramnames = setdiff(paramnames, param)
 
-  list(
+  if(!all(shared_params %in% paramnames)){
+    stop(
+      "At least one parameter name given to shared_params is not in the model.",
+      call. = FALSE
+    )
+  }
+  if(length(intersect(param, shared_params)) != 0){
+    stop(
+      "There is overlap between shared_params and param.",
+      call. = FALSE
+    )
+  }
+  full_shared_params = union(shared_params, c("w", paste0(param,"_sh")))
+  panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    paramnames = paramnames,
-    pseudo_sp = params
+    shared_params = full_shared_params,
+    specific_params = setdiff(paramnames, full_shared_params)
   )
 }
