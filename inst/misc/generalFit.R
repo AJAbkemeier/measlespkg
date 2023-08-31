@@ -31,8 +31,6 @@ DATA = clean_twentycities()
 # Units to select from data
 UNITS = unique(twentycities$measles$unit)
 MODEL = model_mechanics_001()
-# Set equal to true if using spatPomp model
-IS_SPAT = FALSE
 # Time step
 DT = 1/365.25
 BLOCK_MIF2 = TRUE
@@ -87,10 +85,7 @@ INITIAL_RW_SD = c(
 )
 if(!is.null(EVAL_PARAM))
   INITIAL_RW_SD[[EVAL_PARAM]] = 0
-stopifnot(
-  all(names(INITIAL_RW_SD) %in% MODEL$paramnames,
-  MODEL$paramnames %in% names(INITIAL_RW_SD))
-)
+stopifnot(setequal(names(INITIAL_RW_SD), MODEL$paramnames))
 
 # Specify names of output files
 RESULTS_FILE = "fit_results_out.rds"
@@ -121,6 +116,7 @@ if(!is.null(SIM_MODEL)){
 }
 
 ###### Starting parameters #############################
+is_spat = inherits(MODEL, "spat_mechanics")
 
 # Specify box to sample initial shared parameters from
 # shared_box_specs = tibble::tribble(
@@ -150,24 +146,32 @@ if(!is.null(SIM_MODEL)){
 #   specific_radii[specific_radii[["param"]] == EVAL_PARAM, "radius"] = 0
 
 bounds_tbl = tibble::tribble(
-  ~param,       ~lower,        ~upper,       ~shared,
-  #"g",              10,           500,         FALSE,
-  "R0",             10,            60,         FALSE,
-  "rho",           0.1,           0.9,         FALSE,
-  "sigmaSE",      0.04,           0.1,         FALSE,
-  "amplitude",     0.1,           0.6,         FALSE,
-  "S_0",          0.01,          0.07,         FALSE,
-  "E_0",      0.000004,        0.0001,         FALSE,
-  "I_0",      0.000003,         0.001,         FALSE,
-  "R_0",           0.9,          0.99,         FALSE,
-  "sigma",          25,           100,         FALSE,
-  "iota",        0.004,             3,         FALSE,
-  "psi",          0.05,             3,         FALSE,
-  "alpha",       0.935,          1.05,         FALSE,
-  "cohort",        0.1,           0.7,         FALSE,
-  "gamma",          25,           320,         FALSE,
-  "mu",           0.02,          0.02,          TRUE
+  ~param,       ~lower,        ~upper,
+  #"g",              10,           500,
+  "R0",             10,            60,
+  "rho",           0.1,           0.9,
+  "sigmaSE",      0.04,           0.1,
+  "amplitude",     0.1,           0.6,
+  "S_0",          0.01,          0.07,
+  "E_0",      0.000004,        0.0001,
+  "I_0",      0.000003,         0.001,
+  "R_0",           0.9,          0.99,
+  "sigma",          25,           100,
+  "iota",        0.004,             3,
+  "psi",          0.05,             3,
+  "alpha",       0.935,          1.05,
+  "cohort",        0.1,           0.7,
+  "gamma",          25,           320,
+  "mu",           0.02,          0.02
 )
+stopifnot(setequal(bounds_tbl$param, MODEL$paramnames))
+if(is_spat){
+  bounds_tbl = bounds_tbl |>
+    dplyr::mutate(shared = FALSE)
+} else {
+  bounds_tbl = bounds_tbl |>
+    dplyr::mutate(shared = param %in% MODEL$shared_params)
+}
 if(!is.null(EVAL_PARAM)){
   eval_param_rows = bounds_tbl[["param"]] == EVAL_PARAM
   bounds_tbl[eval_param_rows, "lower"] = EVAL_POINTS[[array_job_id]]
@@ -195,33 +199,27 @@ if(!is.null(PREVIOUS_FIT_PATH)){
     out_length = NREPS_FITR,
     top_n = TOP_N_FITS,
     combine = COMBINE_TOP_SPECIFIC,
-    units = ifelse(rep(IS_SPAT, length(UNITS)), UNITS, NULL)
+    units = ifelse(rep(is_spat, length(UNITS)), UNITS, NULL)
   )
 }
 
 ################## Construct panelPomp object ##########################
-if(IS_SPAT){
+measlesPomp_mod = make_measlesPomp(
+  data = DATA |> choose_units(UNITS),
+  model = MODEL,
+  interp_method = INTERP_METHOD,
+  dt = DT
+)
+
+if(is_spat){
   U = length(UNITS)
   expanded_rw_sd = unlist(lapply(names(INITIAL_RW_SD), function(x){
     z = rep(INITIAL_RW_SD[[x]], U)
     names(z) = paste0(x,1:U)
     z
   }))
-  measlesPomp_mod = make_spatMeaslesPomp(
-    data = DATA |> choose_units(UNITS),
-    model = MODEL,
-    interp_method = INTERP_METHOD,
-    dt = DT
-  )
   initial_rw_sd = expanded_rw_sd
 } else {
-  measlesPomp_mod = make_measlesPomp(
-    data = DATA |> choose_units(UNITS),
-    starting_pparams = initial_pparams_list[[1]],
-    model = MODEL,
-    interp_method = INTERP_METHOD,
-    dt = DT
-  )
   initial_rw_sd = INITIAL_RW_SD
 }
 
@@ -247,8 +245,8 @@ round_out = run_round(
   print_times = TRUE,
   spat_block_size = SPAT_BLOCK_SIZE,
   spat_regression = SPAT_REGR,
-  spat_sharedParNames = MODEL$shp_names,
-  spat_unitParNames = MODEL$spp_names
+  spat_sharedParNames = MODEL$shared_params,
+  spat_unitParNames = MODEL$specific_params
 )
 
 EL_final = round_out$EL_out
@@ -257,7 +255,7 @@ print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
   tictoc::tic()
-  top_params = combine_top_fits(EL_final, is_spat = IS_SPAT)$fits[-(1:2)]
+  top_params = combine_top_fits(EL_final, is_spat = is_spat)$fits[-(1:2)]
   eval_model = measlesPomp_mod
   panelPomp::coef(eval_model) = top_params
   EL_out_best = pomp::bake(file = paste0(write_path, "best_eval.rds"),

@@ -190,7 +190,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
     )
   }
   full_shared_params = union(shared_params, c("w", paste0(param,"_sh")))
-  panel_mechanics(
+  out = panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
@@ -199,4 +199,6 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
     shared_params = full_shared_params,
     specific_params = setdiff(paramnames, full_shared_params)
   )
+  out$pseudo_sp = params
+  out
 }

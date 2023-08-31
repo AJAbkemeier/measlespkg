@@ -46,3 +46,10 @@ test_that("make_measlesPomp works for model_mechanics_006", {
   expect_true(TRUE)
 })
 
+test_that("make_measlesPomp works for model_mechanics_007", {
+  make_measlesPomp(
+    model_mechanics_007(U = 2),
+    choose_units(twentycities, c("London", "Mold"))
+  )
+  expect_true(TRUE)
+})

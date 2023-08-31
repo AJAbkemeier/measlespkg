@@ -3,7 +3,7 @@
 #' @param U Number of units to be included.
 #' @param shared_params Character vector of parameters to be treated as shared.
 #'
-#' @return List of objects required for `make_spatMeaslesPomp`.
+#' @return `spat_mechanics` object.
 #' @export
 #'
 model_mechanics_007 = function(U, shared_params = "muD"){

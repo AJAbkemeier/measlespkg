@@ -2,7 +2,9 @@
 % Please edit documentation in R/make_measlesPomp.R
 \name{make_measlesPomp}
 \alias{make_measlesPomp}
-\title{Make a panelPomp model using measles data}
+\alias{make_measlesPomp.panel_mechanics}
+\alias{make_measlesPomp.spat_mechanics}
+\title{Make a panelPomp or spatPomp model using measles data}
 \usage{
 make_measlesPomp(
   model,
@@ -14,18 +16,39 @@ make_measlesPomp(
   custom_obs_list = NULL,
   dt = 1/365.25
 )
+
+\method{make_measlesPomp}{panel_mechanics}(
+  model,
+  data,
+  starting_pparams = NULL,
+  interp_method = c("shifted_splines", "linear"),
+  first_year = 1950,
+  last_year = 1963,
+  custom_obs_list = NULL,
+  dt = 1/365.25
+)
+
+\method{make_measlesPomp}{spat_mechanics}(
+  model,
+  data,
+  starting_pparams = NULL,
+  interp_method = c("shifted_splines", "linear"),
+  first_year = 1950,
+  last_year = 1963,
+  custom_obs_list = NULL,
+  dt = 1/365.25
+)
 }
 \arguments{
-\item{model}{List of objects in the format of the output for the
-\code{model_mechanics_XXX()} functions.}
+\item{model}{\code{panel_mechanics} or \code{spat_mechanics} object.}
 
 \item{data}{List in the format of \code{twentycities}.}
 
 \item{starting_pparams}{Parameters in the format of \code{pparams()} output. Set
-to NULL to assign NA values.}
+to NULL to assign NA values. Only for panelPomp models currently.}
 
 \item{interp_method}{Method used to interpolate population and births.
-Possible options are \code{"shifted_splines"} and \verb{"linear}.}
+Possible options are \code{"shifted_splines"} and \code{"linear"}.}
 
 \item{first_year}{Integer for the first full year of data desired.}
 
@@ -33,18 +56,19 @@ Possible options are \code{"shifted_splines"} and \verb{"linear}.}
 
 \item{custom_obs_list}{List of observations where each element supplies
 observations for a different city. Useful when using simulated
-observations. Set to \code{NULL} to use real observations.}
+observations. Set to \code{NULL} to use real observations. Only for panelPomp
+models currently.}
 
 \item{dt}{Size of the time step.}
 }
 \value{
-A panelPomp object using the data and model supplied.
+A panelPomp or spatPomp object using the model and data supplied.
 }
 \description{
-Make a panelPomp model using measles data
+Make a panelPomp or spatPomp model using measles data
 }
 \examples{
 \dontrun{
-make_measlesPomp(twentycities, AK_pparams, model_mechanics_001())
+make_measlesPomp(model_mechanics_001(), twentycities)
 }
 }
