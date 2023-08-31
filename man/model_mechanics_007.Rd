@@ -4,12 +4,12 @@
 \alias{model_mechanics_007}
 \title{spatPomp model for UK measles}
 \usage{
-model_mechanics_007(U, shared_names = "muD")
+model_mechanics_007(U, shared_params = "muD")
 }
 \arguments{
 \item{U}{Number of units to be included.}
 
-\item{shared_names}{Character vector of parameters to be treated as shared.}
+\item{shared_params}{Character vector of parameters to be treated as shared.}
 }
 \value{
 List of objects required for \code{make_spatMeaslesPomp}.

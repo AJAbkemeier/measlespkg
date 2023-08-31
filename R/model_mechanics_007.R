@@ -1,12 +1,12 @@
 #' spatPomp model for UK measles
 #'
 #' @param U Number of units to be included.
-#' @param shared_names Character vector of parameters to be treated as shared.
+#' @param shared_params Character vector of parameters to be treated as shared.
 #'
 #' @return List of objects required for `make_spatMeaslesPomp`.
 #' @export
 #'
-model_mechanics_007 = function(U, shared_names = "muD"){
+model_mechanics_007 = function(U, shared_params = "muD"){
   rproc <- spatPomp::spatPomp_Csnippet(
     unit_statenames = c('S','E','I','C'),
     unit_covarnames = c('pop','birthrate'),
@@ -165,40 +165,34 @@ model_mechanics_007 = function(U, shared_names = "muD"){
   all_params = c("R0","sigma","gamma","alpha","iota", "rho",
                 "sigmaSE","psi","cohort","amplitude",
                 "S_0","E_0","I_0", "muD", "g")
-  shp_names = shared_names
-  spp_names = setdiff(all_params, shp_names)
-  ivp_names = c("S_0", "E_0", "I_0")
-  paramnames = union(spp_names, shp_names)
-  log_names = c("sigma","gamma","sigmaSE","psi","R0", "muD", "alpha", "iota")
-  logit_names = c("cohort", "amplitude", "rho", "S_0", "E_0", "I_0")
-  log_spp_names = intersect(log_names, spp_names)
-  log_shp_names = intersect(log_names, shp_names)
-  logit_spp_names = intersect(logit_names, spp_names)
-  logit_shp_names = intersect(logit_names, shp_names)
-  total_log_names = unlist(lapply(
-    c(log_shp_names, log_spp_names), function(x,U) paste0(x,1:U),U
+  specific_params = setdiff(all_params, shared_params)
+  #ivps = c("S_0", "E_0", "I_0")
+  paramnames = union(specific_params, shared_params)
+  log_params = c("sigma","gamma","sigmaSE","psi","R0", "muD", "alpha", "iota")
+  logit_params = c("cohort", "amplitude", "rho", "S_0", "E_0", "I_0")
+  log_specific_params = intersect(log_params, specific_params)
+  log_shared_params = intersect(log_params, shared_params)
+  logit_specific_params = intersect(logit_params, specific_params)
+  logit_shared_params = intersect(logit_params, shared_params)
+  expanded_log_params = unlist(lapply(
+    c(log_shared_params, log_specific_params), function(x,U) paste0(x,1:U),U
   ))
-  total_logit_names = unlist(lapply(
-    c(logit_shp_names, logit_spp_names), function(x,U) paste0(x,1:U),U
+  expanded_logit_params = unlist(lapply(
+    c(logit_shared_params, logit_specific_params), function(x,U) paste0(x,1:U),U
   ))
-  total_shp_names =
-    unlist(lapply(shp_names, function(x,U) paste0(x,1:U),U))
-  total_spp_names =
-    unlist(lapply(spp_names, function(x,U) paste0(x,1:U),U))
-  pt <- pomp::parameter_trans(log = total_log_names, logit = total_logit_names)
+  pt <- pomp::parameter_trans(
+    log = expanded_log_params, logit = expanded_logit_params
+  )
 
-  list(
+  spat_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     dunit_measure = dunit_measure,
     pt = pt,
-    paramnames = paramnames,
-    spp_names = spp_names,
-    shp_names = shp_names,
-    ivp_names = ivp_names,
-    total_shp_names = total_shp_names,
-    total_spp_names = total_spp_names
+    specific_params = specific_params,
+    shared_params = shared_params,
+    U = U
   )
 }

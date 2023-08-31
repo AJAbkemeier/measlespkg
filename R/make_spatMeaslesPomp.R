@@ -125,10 +125,10 @@ make_spatMeaslesPomp = function(
   )
 
   set_unit_specific = pomp::Csnippet(
-    paste0("const int ", model$spp_names,"_unit = 1;\n", collapse=" ")
+    paste0("const int ", model$specific_params,"_unit = 1;\n", collapse=" ")
   )
   set_shared = pomp::Csnippet(
-    paste0("const int ", model$shp_names,"_unit = 0;\n", collapse=" ")
+    paste0("const int ", model$shared_params,"_unit = 0;\n", collapse=" ")
   )
 
   measles_globals = pomp::Csnippet(
@@ -137,8 +137,8 @@ make_spatMeaslesPomp = function(
 
   # add a "1" for shared parameter names to make the pointers work
   # measles_paramnames = unlist(c(
-  #   lapply(model$spp_names, function(x,U) paste0(x,1:U),U),
-  #   lapply(model$shp_names, function(x) paste0(x,1))
+  #   lapply(model$specific_params, function(x,U) paste0(x,1:U),U),
+  #   lapply(model$shared_params, function(x) paste0(x,1))
   # ))
 
   first_unit_df = dplyr::filter(cases_df, .data$unit == cases_df$unit[[1]])
@@ -151,7 +151,8 @@ make_spatMeaslesPomp = function(
     covar = covar_df,
     rprocess = pomp::euler(model$rproc, delta.t = dt),
     unit_accumvars = 'C',
-    paramnames = c(model$total_shp_names, model$total_spp_names),
+    paramnames =
+      c(model$expanded_shared_params, model$expanded_specific_params),
     partrans = model$pt,
     globals = measles_globals,
     rinit = model$rinit,
@@ -159,9 +160,11 @@ make_spatMeaslesPomp = function(
     rmeasure = model$rmeas,
     dunit_measure = model$dunit_measure
   )
-  total_param_names = c(model$total_shp_names, model$total_spp_names)
-  dummy_params = rep(0, length(total_param_names))
-  names(dummy_params) = total_param_names
+  expanded_params =
+    c(model$expanded_shared_params, model$expanded_specific_params)
+  # TODO replace 0 with NA?
+  dummy_params = rep(0, length(expanded_params))
+  names(dummy_params) = expanded_params
   pomp::coef(model_out) = dummy_params
   model_out
 }
