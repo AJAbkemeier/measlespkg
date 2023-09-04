@@ -136,6 +136,7 @@ eval_logLik_single.panelPomp = function(
     return_n_pfilter_objs,
     ...
 ){
+  units = names(model_obj)
   doParallel::registerDoParallel(cores = ncores)
   seed_i = if(is.null(seed) | is.null(divisor)) NULL else seed %% divisor
   RNGkind("L'Ecuyer-CMRG")
@@ -144,14 +145,28 @@ eval_logLik_single.panelPomp = function(
   foreach::foreach(
     j = 1:nreps,
     .packages = "panelPomp",
-    .combine = c
+    .combine = list
   ) %dopar% {
-    panelPomp::pfilter(model_obj, Np = np_pf)
+    out = panelPomp::pfilter(model_obj, Np = np_pf)
+    if(return_n_pfilter_objs == 0){
+      out = list(
+        ull = panelPomp::unitlogLik(out),
+        cll = lapply(seq_along(units), function(u){
+          out@unit.objects[[u]]@cond.logLik
+        })
+      )
+    }
+    out
   } -> pf_list
   if(nreps == 1) pf_list = list(pf_list)
 
-  pf_unitlogLik_matrix = lapply(pf_list, panelPomp::unitlogLik) |>
-    dplyr::bind_rows()
+  pf_unitlogLik_matrix = if(return_n_pfilter_objs > 0){
+    lapply(pf_list, panelPomp::unitlogLik) |>
+      dplyr::bind_rows()
+  } else {
+    lapply(pf_list, function(x) x$ull) |>
+      dplyr::bind_rows()
+  }
 
   logLikSE = panelPomp::panel_logmeanexp(
     pf_unitlogLik_matrix,
@@ -176,14 +191,28 @@ eval_logLik_single.panelPomp = function(
   pf_se = subset(unit_calcs, rownames(unit_calcs) == "se") |>
     as.data.frame()
 
-  units = names(pf_list[[1]]@unit.logliks)
-  cll_calcs = lapply(units, function(u){
-    sapply(seq_along(pf_list), function(x){
-      pf_list[[x]]@unit.objects[[u]]@cond.logLik
-    }) |>
-      apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
-  })
+  cll_calcs = if(return_n_pfilter_objs > 0){
+    lapply(units, function(u){
+      sapply(seq_along(pf_list), function(x){
+        pf_list[[x]]@unit.objects[[u]]@cond.logLik
+      }) |>
+        apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
+    })
+  } else {
+    lapply(seq_along(units), function(u){
+      sapply(seq_along(pf_list), function(x){
+        pf_list[[x]]$cll[[u]]
+      }) |>
+        apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
+    })
+  }
   names(cll_calcs) = units
+
+  pf_list = if(return_n_pfilter_objs > 0){
+    pf_list[1:return_n_pfilter_objs]
+  } else {
+    NULL
+  }
 
   list(
     logLikSE = logLikSE,
@@ -212,16 +241,26 @@ eval_logLik_single.spatPomp = function(
   doRNG::registerDoRNG(seed_i)
   foreach::foreach(
     j = 1:nreps,
-    .packages = "spatPomp"#.combine = c
+    .packages = "spatPomp",#.combine = c
+    .combine = list
   ) %dopar% {
-    pfilter_obj = spatPomp::bpfilter(
+    out = spatPomp::bpfilter(
       model_obj,
       Np = np_pf,
       block_size = block_size
     )
-    pfilter_obj
+    if(return_n_pfilter_objs == 0){
+      out = out@block.cond.loglik
+    }
+    out
   } -> pf_list
-  block.cond.logLik_list = lapply(pf_list, function(x) x@block.cond.loglik)
+  if(return_n_pfilter_objs == 0){
+    block.cond.logLik_list = pf_list
+    pf_list = NULL
+  } else {
+    block.cond.logLik_list = lapply(pf_list, function(x) x@block.cond.loglik)
+    pf_list = pf_list[1:return_n_pfilter_objs]
+  }
   logLik_vec = sapply(block.cond.logLik_list, sum)
   logLikSE = pomp::logmeanexp(logLik_vec, se = TRUE)
 

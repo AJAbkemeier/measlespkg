@@ -17,7 +17,7 @@ make_rw_sd = function(rw_sd_vec, weighted_param = NULL){
   ivp_indices = grep("_0", x = names(rw_sd_vec))
   if(special){
     special_indices = grep(
-      paste0(weighted_param,"[1-9][0-9]*$"),
+      paste0("^",weighted_param,"[1-9][0-9]*$"),
       x = names(rw_sd_vec)
     )
     si_ordered = sapply(seq_along(special_indices), function(x){

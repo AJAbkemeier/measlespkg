@@ -140,7 +140,7 @@ bounds_tbl = tibble::tribble(
   "cohort",        0.1,           0.7,
   "gamma_sh",  log(25),      log(320),
   "mu",           0.02,          0.02,
-  "w",             250,           450
+  "w",             2.5,             4
 ) |> dplyr::bind_rows(
   tibble::tibble(param = MODEL$pseudo_sp, lower = -0.9, upper = 0.9)
 )
@@ -213,7 +213,7 @@ if(!is.null(EVAL_POINTS)){
 round_out = run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
-  rw_sd_obj = make_rw_sd(initial_rw_sd, MODEL$pseudo_sp),
+  rw_sd_obj = make_rw_sd(initial_rw_sd, "gamma"),
   cooling_frac = COOLING_FRAC,
   N_fitr = NFITR,
   np_fitr = NP_FITR,
