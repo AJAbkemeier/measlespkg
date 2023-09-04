@@ -213,7 +213,7 @@ if(!is.null(EVAL_POINTS)){
 round_out = run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
-  rw_sd_obj = make_rw_sd(initial_rw_sd),
+  rw_sd_obj = make_rw_sd(initial_rw_sd, MODEL$pseudo_sp),
   cooling_frac = COOLING_FRAC,
   N_fitr = NFITR,
   np_fitr = NP_FITR,

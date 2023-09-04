@@ -4,12 +4,15 @@
 \alias{make_rw_sd}
 \title{Turn named numeric vector into \code{rw_sd}}
 \usage{
-make_rw_sd(rw_sd_vec)
+make_rw_sd(rw_sd_vec, weighted_param = NULL)
 }
 \arguments{
 \item{rw_sd_vec}{Named numerical vector. Names are parameters, values are
 desired random walk standard deviations. Names of initial value parameters
 should end in _0.}
+
+\item{weighted_param}{Name of the weighted parameter in a weighted model. Set
+to NULL (the default) if model does not contain a weighted parameter.}
 }
 \value{
 Returns \code{rw_sd} object.
