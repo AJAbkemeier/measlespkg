@@ -27,18 +27,21 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
     int unit_num_int = round(unit_num); \n
     double param_mean = (",paste0(params, collapse = " + "),")/",U,";
     double norm = sqrt(pow(",paste0(params, collapse = " - param_mean, 2) + pow("),", 2));
+    if(unit_num_int == 1){
+      param_sp = (",paste0(param,1)," - param_mean)/norm;
+    }
     ",
-    sapply(1:U, function(i){
+    sapply(2:U, function(i){
       paste0("
-        if(unit_num_int == ",i,"){
-          param_sp = (",paste0(param,i)," - param_mean)/norm;
-        }
+      else if(unit_num_int == ",i,"){
+        param_sp = (",paste0(param,i)," - param_mean)/norm;
+      }
       ")
     }),
     sapply(basic_params_trunc, function(x) paste0("double _",x," = ", x,";\n")),
     "double _",param," = ",param,"_sh + w*param_sp;\n",
     if(param %in% log_params) paste0("_",param," = exp(_",param,");"),
-    if(param %in% logit_params) paste0("_",param," = 1/(1+exp(-_",param,"));")
+    if(param %in% logit_params) paste0("_",param," = expit(_",param,");")
   ) |> paste0(collapse = "")
 
   rproc <- pomp::Csnippet(paste0(
@@ -189,7 +192,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
       call. = FALSE
     )
   }
-  full_shared_params = union(shared_params, c("w", paste0(param,"_sh")))
+  full_shared_params = union(shared_params, c("w", paste0(param,"_sh"), params))
   out = panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
