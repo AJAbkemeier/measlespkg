@@ -21,7 +21,7 @@ test_that("function works for panelPomp models", {
     model_list,
     ncores = 1,
     np_pf = 2,
-    nreps = 2,
+    nreps = 3,
     return_n_pfilter_objs = 2
   )
   expect_true(inherits(out, "EL_list"))
@@ -34,7 +34,20 @@ test_that("function works for panelPomp models (no pfilter objects returned)", {
     model_list,
     ncores = 1,
     np_pf = 2,
-    nreps = 2,
+    nreps = 3,
+    return_n_pfilter_objs = 0
+  )
+  expect_true(inherits(out, "EL_list"))
+})
+
+test_that("function works for panelPomp models with 1 rep", {
+  set.seed(1)
+  model_list = list(AK_mod)
+  out = eval_logLik(
+    model_list,
+    ncores = 1,
+    np_pf = 2,
+    nreps = 1,
     return_n_pfilter_objs = 0
   )
   expect_true(inherits(out, "EL_list"))
@@ -47,8 +60,8 @@ test_that("logLik is correct for spatPomp", {
     model_obj_list = model_list,
     ncores = 1,
     np_pf = 2,
-    nreps = 2,
-    return_n_pfilter_objs = 2
+    nreps = 3,
+    return_n_pfilter_objs = 3
   )
   expect_equal(
     out$fits$logLik,
@@ -63,7 +76,7 @@ test_that("function works for spatPomp models (no pfilter objects returned)", {
     model_obj_list = model_list,
     ncores = 1,
     np_pf = 2,
-    nreps = 2,
+    nreps = 3,
     return_n_pfilter_objs = 0
   )
   expect_true(TRUE)

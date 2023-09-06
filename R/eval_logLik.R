@@ -144,8 +144,7 @@ eval_logLik_single.panelPomp = function(
 
   foreach::foreach(
     j = 1:nreps,
-    .packages = "panelPomp",
-    .combine = list
+    .packages = "panelPomp"
   ) %dopar% {
     out = panelPomp::pfilter(model_obj, Np = np_pf)
     if(return_n_pfilter_objs == 0){
@@ -158,7 +157,6 @@ eval_logLik_single.panelPomp = function(
     }
     out
   } -> pf_list
-  if(nreps == 1) pf_list = list(pf_list)
 
   pf_unitlogLik_matrix = if(return_n_pfilter_objs > 0){
     lapply(pf_list, panelPomp::unitlogLik) |>
@@ -241,8 +239,7 @@ eval_logLik_single.spatPomp = function(
   doRNG::registerDoRNG(seed_i)
   foreach::foreach(
     j = 1:nreps,
-    .packages = "spatPomp",#.combine = c
-    .combine = list
+    .packages = "spatPomp"
   ) %dopar% {
     out = spatPomp::bpfilter(
       model_obj,

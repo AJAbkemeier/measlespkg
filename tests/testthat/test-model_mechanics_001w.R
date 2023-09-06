@@ -21,4 +21,3 @@ test_that("function works with amplitude", {
     all(mm$paramnames %in% c(names(model@shared), rownames(model@specific)))
   )
 })
-
