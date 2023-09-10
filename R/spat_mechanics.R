@@ -100,5 +100,5 @@ spat_mechanics = function(
     expanded_shared_params = expanded_shared_params,
     expanded_specific_params = expanded_specific_params
   )
-  validate_panel_mechanics(x)
+  validate_spat_mechanics(x)
 }

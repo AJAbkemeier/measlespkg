@@ -4,7 +4,16 @@
 \alias{panel_mechanics}
 \title{Make a list containing necessary specifications for a panelPomp model}
 \usage{
-panel_mechanics(rproc, dmeas, rmeas, rinit, pt, shared_params, specific_params)
+panel_mechanics(
+  rproc,
+  dmeas,
+  rmeas,
+  rinit,
+  pt,
+  shared_params,
+  specific_params,
+  states
+)
 }
 \arguments{
 \item{rproc}{Csnippet that simulates process step.}
@@ -21,6 +30,8 @@ estimation scale.}
 \item{shared_params}{Character vector of shared parameter names.}
 
 \item{specific_params}{Character vector of unit-specific parameter names.}
+
+\item{states}{Character vector of unobserved states.}
 }
 \value{
 The arguments in list form with class \code{panel_mechanics}.

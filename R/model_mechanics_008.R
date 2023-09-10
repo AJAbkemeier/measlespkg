@@ -1,19 +1,15 @@
-#' panelPOMP model with log-log relationship between gamma and current
-#' population
+#' He10 POMP model for UK measles with AR(1) gamma noise
 #'
-#' @name model_mechanics_003
+#' @return List of objects required for `make_measlesPomp`.
 #' @param shared_params Character vector of parameters to be treated as shared.
-#'
-#' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-model_mechanics_003 = function(shared_params = "mu"){
+model_mechanics_008 = function(
+  shared_params = "mu"
+){
   rproc <- pomp::Csnippet("
-    double beta, br, seas, foi, dw, births;
+    double beta, br, seas, foi, dw, dg, births;
     double rate[6], trans[6];
-
-    // Population-varying parameters
-    double gamma = exp(gamma_2*log(pop) + gamma_1);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -39,6 +35,8 @@ model_mechanics_003 = function(shared_params = "mu"){
 
     // white noise (extrademographic stochasticity)
     dw = rgammawn(sigmaSE,dt);
+    // red noise
+    dg = ar_1*G + dw;
 
     rate[0] = foi*dw/dt;  // stochastic force of infection
     rate[1] = mu;         // natural S death
@@ -61,19 +59,20 @@ model_mechanics_003 = function(shared_params = "mu"){
     R = pop - S - E - I;
     W += (dw - dt)/sigmaSE;  // standardized i.i.d. white noise
     C += trans[4];           // true incidence
+    G = dg;
   ")
 
   dmeas <- pomp::Csnippet("
     double m = rho*C;
-    double v = m*(1.0-rho+psi*psi*m);
+    double v = m*(1.0 - rho + psi*psi*m);
     double tol = 1.0e-18; // 1.0e-18 in He10 model; 0.0 is 'correct'
-    if(ISNA(cases)) {lik=1;} else {
+    if(ISNA(cases)) {lik = 1;} else {
         if (C < 0) {lik = 0;} else {
           if (cases > tol) {
-            lik = pnorm(cases+0.5,m,sqrt(v)+tol,1,0)-
-              pnorm(cases-0.5,m,sqrt(v)+tol,1,0)+tol;
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) -
+              pnorm(cases - 0.5 , m, sqrt(v) + tol, 1, 0) + tol;
           } else {
-            lik = pnorm(cases+0.5,m,sqrt(v)+tol,1,0)+tol;
+            lik = pnorm(cases + 0.5, m, sqrt(v) + tol, 1, 0) + tol;
           }
         }
       }
@@ -100,19 +99,19 @@ model_mechanics_003 = function(shared_params = "mu"){
     R = nearbyint(m*R_0);
     W = 0;
     C = 0;
+    G = 0;
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "psi", "sigma", "iota"),
+    log = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota"),
     logit = c("cohort","amplitude", "rho"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
 
-  paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "gamma_2", "gamma_1", "psi",
-                 "iota", "sigma")
-  full_shared_params = union(shared_params, c("gamma_2", "gamma_1"))
-  states = c("S", "E", "I", "R", "W", "C")
+  paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
+                 "sigmaSE","psi","cohort","amplitude", "ar_1",
+                 "S_0","E_0","I_0","R_0")
+  states = c("S", "E", "I", "R", "W", "C", "G")
 
   if(!all(shared_params %in% paramnames)){
     stop(
@@ -120,15 +119,14 @@ model_mechanics_003 = function(shared_params = "mu"){
       call. = FALSE
     )
   }
-
   panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,
     rmeas = rmeas,
     rinit = rinit,
     pt = pt,
-    shared_params = full_shared_params,
-    specific_params = setdiff(paramnames, full_shared_params),
+    shared_params = shared_params,
+    specific_params = setdiff(paramnames, shared_params),
     states = states
   )
 }

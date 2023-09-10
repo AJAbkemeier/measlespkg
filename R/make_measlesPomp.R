@@ -53,6 +53,7 @@ make_measlesPomp.panel_mechanics = function(
   rinit = model$rinit
   pt = model$pt
   paramnames = model$paramnames
+  states = model$states
   measles = data$measles
   demog = data$demog
 
@@ -151,7 +152,7 @@ make_measlesPomp.panel_mechanics = function(
         covar = pomp::covariate_table(covar_list[[i]], times = "time"),
         accumvars = c("C","W"),
         partrans = pt,
-        statenames = c("S","E","I","R","C","W"),
+        statenames = states,
         paramnames = paramnames
       )
   }) -> pomp_list

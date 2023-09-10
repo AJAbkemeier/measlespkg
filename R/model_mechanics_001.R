@@ -107,6 +107,8 @@ model_mechanics_001 = function(
   paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
                  "sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
+  states = c("S", "E", "I", "R", "W", "C")
+
   if(!all(shared_params %in% paramnames)){
     stop(
       "At least one parameter name given to shared_params is not in the model.",
@@ -120,6 +122,7 @@ model_mechanics_001 = function(
     rinit = rinit,
     pt = pt,
     shared_params = shared_params,
-    specific_params = setdiff(paramnames, shared_params)
+    specific_params = setdiff(paramnames, shared_params),
+    states = states
   )
 }

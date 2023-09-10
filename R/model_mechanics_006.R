@@ -107,6 +107,7 @@ model_mechanics_006 = function(shared_params = "mu"){
   paramnames = c("R0","mu","sigma","gamma","alpha","iota",
                  "rho","sigmaSE","psi","cohort","amplitude",
                  "S_0","E_0","I_0","R_0")
+  states = c("S", "E", "I", "R", "W", "C")
 
   if(!all(shared_params %in% paramnames)){
     stop(
@@ -122,6 +123,7 @@ model_mechanics_006 = function(shared_params = "mu"){
     rinit = rinit,
     pt = pt,
     shared_params = shared_params,
-    specific_params = setdiff(paramnames, shared_params)
+    specific_params = setdiff(paramnames, shared_params),
+    states = states
   )
 }

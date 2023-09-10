@@ -9,6 +9,7 @@
 #'   estimation scale.
 #' @param shared_params Character vector of shared parameter names.
 #' @param specific_params Character vector of unit-specific parameter names.
+#' @param states Character vector of unobserved states.
 #'
 #' @return The arguments in list form with class `panel_mechanics`.
 #'
@@ -21,7 +22,8 @@ new_panel_mechanics = function(
     rinit,
     pt,
     shared_params,
-    specific_params
+    specific_params,
+    states
 ){
   out = list(
     rproc = rproc,
@@ -31,18 +33,19 @@ new_panel_mechanics = function(
     pt = pt,
     shared_params = shared_params,
     specific_params = specific_params,
-    paramnames = c(shared_params, specific_params)
+    paramnames = c(shared_params, specific_params),
+    states = states
   )
   structure(out, class = "panel_mechanics")
 }
 
 validate_panel_mechanics = function(x){
   if(
-    !all(c("rproc", "dmeas", "rmeas", "rinit", "pt", "paramnames") %in% names(x))
+    !all(c("rproc", "dmeas", "rmeas", "rinit", "pt", "paramnames", "states") %in% names(x))
   ){
     stop(
       "`x` must have names 'rproc', 'dmeas', 'rmeas', 'rinit', 'pt',
-      'shared_params', 'specific_params', and 'paramnames'",
+      'shared_params', 'specific_params', 'paramnames', and 'states'",
       call. = FALSE
     )
   }
@@ -71,7 +74,8 @@ panel_mechanics = function(
     rinit,
     pt,
     shared_params,
-    specific_params
+    specific_params,
+    states
 ){
   x = new_panel_mechanics(
     rproc,
@@ -80,7 +84,8 @@ panel_mechanics = function(
     rinit,
     pt,
     shared_params,
-    specific_params
+    specific_params,
+    states
   )
   validate_panel_mechanics(x)
 }
