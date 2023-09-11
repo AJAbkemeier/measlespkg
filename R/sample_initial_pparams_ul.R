@@ -46,30 +46,39 @@ sample_initial_pparams_ul = function(
     units,
     n_draws
 ){
-  shared_box_specs_rc = shared_box_specs |>
-    dplyr::transmute(
-      param = .data$param,
-      center = (.data$upper + .data$lower)/2,
-      radius = (.data$upper - .data$lower)/2
+  specific_param_names = sapply(specific_box_specs$param, function(x){
+    paste0(x,"[",units,"]")
+  }) |> as.character()
+
+  helper_df = tidyr::expand_grid(
+    x = specific_box_specs$param,
+    y = units
+  ) |>
+    dplyr::rename(param = x, unit = y)
+
+  expanded_specific = specific_box_specs |>
+    dplyr::right_join(helper_df, by = "param") |>
+    dplyr::mutate(`param[unit]` = paste0(.data$param,"[",.data$unit,"]"))
+
+  to_named_vec = function(x, name_col, val_col){
+    named_vec = x[[val_col]]
+    names(named_vec) = x[[name_col]]
+    named_vec
+  }
+
+  initial_parameters_tbl = dplyr::bind_cols(
+    pomp::runif_design(
+      lower = to_named_vec(shared_box_specs, "param", "lower"),
+      upper = to_named_vec(shared_box_specs, "param", "upper"),
+      nseq = n_draws
+    ),
+    pomp::runif_design(
+      lower = to_named_vec(expanded_specific, "param[unit]", "lower"),
+      upper = to_named_vec(expanded_specific, "param[unit]", "upper"),
+      nseq = n_draws
     )
-  radii_tbl = specific_box_specs |>
-    dplyr::transmute(
-      param = .data$param,
-      radius = (.data$upper - .data$lower)/2
-    )
-  centers = (specific_box_specs$lower + specific_box_specs$upper)/2
-  specific_pparams = matrix(
-    centers,
-    nrow = length(centers),
-    ncol = length(units)
   )
-  colnames(specific_pparams) = units
-  rownames(specific_pparams) = specific_box_specs$param
-  sample_initial_pparams_rc(
-    shared_box_specs = shared_box_specs_rc,
-    specific_pparams_df = as.data.frame(specific_pparams),
-    radii_tbl = radii_tbl,
-    n_draws = n_draws,
-    buffer = 0
+  lapply(1:nrow(initial_parameters_tbl), function(z)
+    coef_to_pparams(initial_parameters_tbl[z,])
   )
 }
