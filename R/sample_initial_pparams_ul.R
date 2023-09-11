@@ -46,10 +46,6 @@ sample_initial_pparams_ul = function(
     units,
     n_draws
 ){
-  specific_param_names = sapply(specific_box_specs$param, function(x){
-    paste0(x,"[",units,"]")
-  }) |> as.character()
-
   helper_df = tidyr::expand_grid(
     x = specific_box_specs$param,
     y = units
