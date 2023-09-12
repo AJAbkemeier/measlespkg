@@ -12,7 +12,8 @@ tidy_traces = function(x){
   lapply(seq_along(x), function(u){
     panelPomp::traces(x[[u]]) |>
       as.data.frame() |>
-      tidyr::pivot_longer(dplyr::everything(), names_to = "str") |>
+      tibble::rownames_to_column(var = "iteration") |>
+      tidyr::pivot_longer(-"iteration", names_to = "str") |>
       dplyr::mutate(rep = u, str = sub("]$", "", .data$str)) |>
       tidyr::separate_wider_delim(
         cols = "str",
@@ -25,5 +26,5 @@ tidy_traces = function(x){
       )
   }) |>
     dplyr::bind_rows() |>
-    dplyr::select("rep", "unit", "name", "value")
+    dplyr::select("rep", "unit", "name", "iteration", "value")
 }
