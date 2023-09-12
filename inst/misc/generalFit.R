@@ -49,6 +49,7 @@ EVAL_POINTS = NULL
 EVAL_PARAM = NULL
 
 MAIN_SEED = 169566665
+SIM_MODEL_SEED = 1
 # Add to MAIN_SEED if running array job
 if(!is.na(array_job_id)){
   MAIN_SEED = MAIN_SEED + array_job_id
@@ -106,7 +107,7 @@ write_results_to = paste0(write_path, RESULTS_FILE)
 
 # Use observations from simulation?
 if(!is.null(SIM_MODEL)){
-  sim = simulate(SIM_MODEL, seed = SIM_MODEL_SEED)
+  sim = panelPomp::simulate(SIM_MODEL, seed = SIM_MODEL_SEED)
   sim_obs_list = lapply(seq_along(sim), function(x){
     pomp::obs(sim[[x]]) |>
       as.numeric()
@@ -199,7 +200,7 @@ if(!is.null(PREVIOUS_FIT_PATH)){
     out_length = NREPS_FITR,
     top_n = TOP_N_FITS,
     combine = COMBINE_TOP_SPECIFIC,
-    units = ifelse(rep(is_spat, length(UNITS)), UNITS, NULL)
+    units = if(is_spat) UNITS else NULL
   )
 }
 
