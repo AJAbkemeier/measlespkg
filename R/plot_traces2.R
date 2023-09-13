@@ -25,12 +25,15 @@ plot_traces2 = function(
   stopifnot(inherits(fitr_list[[1]], what = "mif2d.ppomp"))
   unit_names = names(fitr_list[[1]]@unit.objects)
   specific_params = union(rownames(fitr_list[[1]]@specific), "unitLoglik")
-  shared_params = union(rownames(fitr_list[[1]]@shared), "loglik")
+  shared_params = union(names(fitr_list[[1]]@shared), "loglik")
   traces_tbl = tidy_traces(fitr_list)
-  if(!plotted_params == ".ALL"){
+  if(plotted_params != ".ALL"){
     specific_params = intersect(specific_params, plotted_params)
     shared_params = intersect(shared_params, plotted_params)
   }
+  ull_tbl = dplyr::filter(traces_tbl, .data$name == "unitLoglik") |>
+    dplyr::select(-"name") |>
+    dplyr::rename(ull = .data$value)
   for(param in specific_params){
     lapply(unit_names, function(u){
       param_tbl = traces_tbl |>
@@ -38,10 +41,7 @@ plot_traces2 = function(
           .data$name == param, .data$unit == u, .data$iteration >= skip_n
         ) |>
         dplyr::left_join(
-          dplyr::filter(traces_tbl, .data$name == "unitLoglik") |>
-            dplyr::select(-"name") |>
-            dplyr::rename(ull = .data$value),
-          by = dplyr::join_by("rep", "iteration", "unit")
+          ull_tbl, by = dplyr::join_by("rep", "iteration", "unit")
         ) |>
         dplyr::mutate(
           ull = ifelse(
@@ -68,15 +68,13 @@ plot_traces2 = function(
       gridExtra::arrangeGrob(grobs = _) |>
       gridExtra::grid.arrange()
   }
+  ll_tbl = dplyr::filter(traces_tbl, .data$name == "loglik") |>
+    dplyr::select(-"name") |>
+    dplyr::rename(ll = .data$value)
   for(param in shared_params){
     param_tbl = traces_tbl |>
       dplyr::filter(.data$name == param, .data$iteration >= skip_n) |>
-      dplyr::left_join(
-        dplyr::filter(traces_tbl, .data$name == "loglik") |>
-          dplyr::select(-"name") |>
-          dplyr::rename(ll = .data$value),
-        by = dplyr::join_by("rep", "iteration")
-      ) |>
+      dplyr::left_join(ll_tbl, by = dplyr::join_by("rep", "iteration")) |>
       dplyr::mutate(
         ull = ifelse(
           .data$ll > quantile(.data$ll, lq, na.rm = TRUE),
