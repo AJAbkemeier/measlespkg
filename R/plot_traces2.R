@@ -33,7 +33,14 @@ plot_traces2 = function(
   }
   ull_tbl = dplyr::filter(traces_tbl, .data$name == "unitLoglik") |>
     dplyr::select(-"name") |>
-    dplyr::rename(ull = .data$value)
+    dplyr::rename(ull = .data$value) |>
+    dplyr::mutate(
+      ull = ifelse(
+        .data$ull > quantile(.data$ull, lq, na.rm = TRUE),
+        .data$ull,
+        quantile(.data$ull, lq, na.rm = TRUE)
+      )
+    )
   for(param in specific_params){
     lapply(unit_names, function(u){
       param_tbl = traces_tbl |>
@@ -42,13 +49,6 @@ plot_traces2 = function(
         ) |>
         dplyr::left_join(
           ull_tbl, by = dplyr::join_by("rep", "iteration", "unit")
-        ) |>
-        dplyr::mutate(
-          ull = ifelse(
-            .data$ull > quantile(.data$ull, lq, na.rm = TRUE),
-            .data$ull,
-            quantile(.data$ull, lq, na.rm = TRUE)
-          )
         )
       gg = ggplot2::ggplot(
         param_tbl,
@@ -70,18 +70,18 @@ plot_traces2 = function(
   }
   ll_tbl = dplyr::filter(traces_tbl, .data$name == "loglik") |>
     dplyr::select(-"name") |>
-    dplyr::rename(ll = .data$value)
+    dplyr::rename(ll = .data$value) |>
+    dplyr::mutate(
+      ll = ifelse(
+        .data$ll > quantile(.data$ll, lq, na.rm = TRUE),
+        .data$ll,
+        quantile(.data$ll, lq, na.rm = TRUE)
+      )
+    )
   for(param in shared_params){
     param_tbl = traces_tbl |>
       dplyr::filter(.data$name == param, .data$iteration >= skip_n) |>
-      dplyr::left_join(ll_tbl, by = dplyr::join_by("rep", "iteration")) |>
-      dplyr::mutate(
-        ull = ifelse(
-          .data$ll > quantile(.data$ll, lq, na.rm = TRUE),
-          .data$ll,
-          quantile(.data$ll, lq, na.rm = TRUE)
-        )
-      )
+      dplyr::left_join(ll_tbl, by = dplyr::join_by("rep", "iteration"))
     gg = ggplot2::ggplot(
       param_tbl,
       ggplot2::aes(
