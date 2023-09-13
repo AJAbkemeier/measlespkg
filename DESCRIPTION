@@ -15,6 +15,7 @@ Imports:
     dplyr,
     foreach,
     ggplot2,
+    gridExtra,
     magrittr,
     panelPomp,
     pomp,
