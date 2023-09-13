@@ -14,7 +14,11 @@ tidy_traces = function(x){
       as.data.frame() |>
       tibble::rownames_to_column(var = "iteration") |>
       tidyr::pivot_longer(-"iteration", names_to = "str") |>
-      dplyr::mutate(rep = u, str = sub("]$", "", .data$str)) |>
+      dplyr::mutate(
+        rep = u,
+        str = sub("]$", "", .data$str),
+        iteration = as.integer(.data$iteration)
+      ) |>
       tidyr::separate_wider_delim(
         cols = "str",
         delim = "[",

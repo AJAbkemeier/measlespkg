@@ -38,7 +38,7 @@ model_mechanics_008 = function(
     // red noise
     dg = ar_1*G + dw;
 
-    rate[0] = foi*dw/dt;  // stochastic force of infection
+    rate[0] = foi*dg/dt;  // stochastic force of infection
     rate[1] = mu;         // natural S death
     rate[2] = sigma;      // rate of ending of latent stage
     rate[3] = mu;         // natural E death
@@ -104,7 +104,7 @@ model_mechanics_008 = function(
 
   pt <- pomp::parameter_trans(
     log = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota"),
-    logit = c("cohort","amplitude", "rho"),
+    logit = c("cohort","amplitude", "rho", "ar_1"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
 
