@@ -34,6 +34,7 @@ plot_traces2 = function(
   ull_tbl = dplyr::filter(traces_tbl, .data$name == "unitLoglik") |>
     dplyr::select(-"name") |>
     dplyr::rename(ull = .data$value) |>
+    dplyr::group_by(.data$unit) |>
     dplyr::mutate(
       ull = ifelse(
         .data$ull > quantile(.data$ull, lq, na.rm = TRUE),
@@ -71,6 +72,7 @@ plot_traces2 = function(
   ll_tbl = dplyr::filter(traces_tbl, .data$name == "loglik") |>
     dplyr::select(-"name") |>
     dplyr::rename(ll = .data$value) |>
+    dplyr::group_by(.data$unit) |>
     dplyr::mutate(
       ll = ifelse(
         .data$ll > quantile(.data$ll, lq, na.rm = TRUE),
