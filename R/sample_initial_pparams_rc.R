@@ -61,8 +61,9 @@ sample_initial_pparams_rc = function(
     radii_tbl,
     n_draws,
     buffer = 5e-8,
-    pos_params = c("R0", "mu", "rho", "sigmaSE"),
-    unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0")
+    pos_params = c("R0", "mu", "sigmaSE", "iota", "sigma", "psi", "alpha"),
+    unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0",
+                             "rho")
 ){
   specific_box_specs_f = function(specific_pparams_df, radii_tbl){
     specific_centers_tbl = specific_pparams_df |>

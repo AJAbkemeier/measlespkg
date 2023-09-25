@@ -22,7 +22,8 @@ tidy_results_helper = function(
     cf,
     np_eval,
     nreps_eval,
-    block
+    block,
+    obs_hash
 ){
   ELL |>
     measlespkg::tidy_pfilter_dfs() |>
@@ -33,7 +34,8 @@ tidy_results_helper = function(
       cooling_frac = cf,
       np_eval = np_eval,
       nreps_eval = nreps_eval,
-      block = block
+      block = block,
+      obs_hash = obs_hash
     ) |>
     dplyr::select(
       "path", "N_fitr", "np_fitr", "cooling_frac", "block", "np_eval",
@@ -49,6 +51,7 @@ tidy_results.EL_list = function(x, path = NA){
   cf = NA
   block = NA
   Np = NA
+  obs_hash = NA
   np_eval = ELL$np_pf
   nreps_eval = ELL$nreps
   tidy_results_helper(
@@ -59,7 +62,8 @@ tidy_results.EL_list = function(x, path = NA){
     cf = cf,
     np_eval = np_eval,
     nreps_eval = nreps_eval,
-    block = block
+    block = block,
+    obs_hash = obs_hash
   )
 }
 
@@ -67,16 +71,10 @@ tidy_results.EL_list = function(x, path = NA){
 #' @export
 tidy_results.fit_results = function(x, path = NA){
   ### Backwards compatibility ###
-  if(length(x$EL_out) == 1){
-    ELL = x$EL_out[[1]]
-  } else {
-    ELL = x$EL_out
-  }
-  if(names(x)[[1]] %in% c("mif2_out", "ibpf_out")){
-    FITR_O = x[[1]][[1]]
-  } else {
-    FITR_O = x$fitr_out[[1]]
-  }
+  x = update_fit_results(x)
+  FITR_O = x$fitr_out[[1]]
+  ELL = x$EL_out
+  ###
   if(inherits(FITR_O, "ibpfd_spatPomp")){
     N_fitr = FITR_O@Nbpf
     block = NA
@@ -87,6 +85,7 @@ tidy_results.fit_results = function(x, path = NA){
     block = FITR_O@block
     Np = FITR_O@Np
   }
+  obs_hash = rlang::hash(obs2(FITR_O))
   ###############################
   cf = FITR_O@cooling.fraction.50
   np_eval = ELL$np_pf
@@ -99,7 +98,8 @@ tidy_results.fit_results = function(x, path = NA){
     cf = cf,
     np_eval = np_eval,
     nreps_eval = nreps_eval,
-    block = block
+    block = block,
+    obs_hash = obs_hash
   )
 }
 

@@ -4,7 +4,14 @@
 \alias{plot_traces2}
 \title{Plot traces from fitted objects}
 \usage{
-plot_traces2(fitr_list, plotted_params = ".ALL", log_y = FALSE, skip_n = 0)
+plot_traces2(
+  fitr_list,
+  plotted_params = ".ALL",
+  log_y = FALSE,
+  skip_n = 0,
+  lq = 0,
+  pseudo_shared_param = NULL
+)
 }
 \arguments{
 \item{fitr_list}{List of \code{mif2d.ppomp} or \code{ibpfd_spatPomp} objects.}
@@ -18,6 +25,15 @@ traces.}
 
 \item{skip_n}{Skip plotting the first \code{skip_n} iterations. Useful when
 extreme early values make it difficult to observe later behavior.}
+
+\item{lq}{Lower quantile cutoff. When shading the traces with the log
+likelihood of the fit, values below the lower quantile are rounded up to
+the lower quantile.}
+
+\item{pseudo_shared_param}{Name of a pseudo-shared parameter in the model
+without the number attached at the end. Supplying this argument will cause
+the function to to treat the pseudo-shared parameter as unit-specific. Does
+nothing if set to NULL.}
 }
 \value{
 Returns \code{NULL}.

@@ -10,8 +10,8 @@ sample_initial_pparams_rc(
   radii_tbl,
   n_draws,
   buffer = 5e-08,
-  pos_params = c("R0", "mu", "rho", "sigmaSE"),
-  unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0")
+  pos_params = c("R0", "mu", "sigmaSE", "iota", "sigma", "psi", "alpha"),
+  unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0", "rho")
 )
 }
 \arguments{
