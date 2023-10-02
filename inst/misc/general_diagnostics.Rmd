@@ -1,0 +1,327 @@
+---
+title: "General Diagnostics"
+author: "Aaron Abkemeier"
+date: "2023-5-3"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+library(tidyverse)
+library(panelPomp)
+library(spatPomp)
+library(measlespkg)
+library(DT)
+library(knitr)
+library(xtable)
+library(gridExtra)
+```
+
+```{r, include = FALSE}
+invisible(sapply(list.files(path = "./R/functions2", pattern = "*.R"),
+                  function(x) source(paste0("./R/functions2/", x))))
+```
+
+```{r options}
+# Give path to fit_results
+RESULTS_PATH = 
+  NULL
+# Give path to EL_list
+# This loaded EL_list overrides EL_list from fit_results
+EVAL_PATH = NULL
+  #"output2/mod_07/group_01/search_02/eval_02/logLik_eval.rds"
+# Plot valid traces on the log scale?
+TRACE_LOG = FALSE
+# Produce conditional log likelihood plots?
+CLL = TRUE
+# Which number replication should be used for CLL and simulation sections?
+PRIMARY_REP = NULL
+# Produce simulation-based plots?
+SIMS = TRUE
+# Name of "pseudo-shared-parameter," a parameter that is coded as being shared
+# but which has a separate copy for each unit. Include this to condense trace
+# plots for the PSP.
+PSP = NULL
+```
+
+These diagnostics are for `r RESULTS_PATH`.
+
+```{r Load and prep output}
+fit_results_in = if(!is.null(RESULTS_PATH)){
+  readRDS(RESULTS_PATH) |> measlespkg:::update_fit_results()
+} else {
+  NULL
+}
+
+if(!is.null(fit_results_in)){
+  is_spat_results = inherits(fit_results_in$fitr_out[[1]], "spatPomp")
+} else {
+  is_spat_results = FALSE
+}
+
+eval_in = if(is.null(EVAL_PATH)){
+  fit_results_in$EL_out
+} else {
+  readRDS(EVAL_PATH) 
+}
+units = names(eval_in$cll)
+
+if(!is.null(PRIMARY_REP)){
+  primary_rep = PRIMARY_REP
+} else {
+  primary_rep = which(eval_in$fits$logLik == max(eval_in$fits$logLik))
+}
+param_names = c(
+  names(fit_results_in$fitr_out[[1]]@shared),
+  rownames(fit_results_in$fitr_out[[1]]@specific)
+)
+observations = fit_results_in$fitr_out[[1]] |> obs2()
+```
+
+## Trace plots
+
+```{r, fig.width=16, fig.height=10}
+if(!is.null(fit_results_in)){
+  if(inherits(fit_results_in$fitr_out[[1]], "panelPomp")){
+    plot_traces2(
+      fit_results_in$fitr_out, 
+      skip_n = 0, 
+      log_y = TRACE_LOG, 
+      lq = 0.1,
+      pseudo_shared_param = PSP
+    )
+  } else {
+    plot_traces(
+      fit_results_in$fitr_out,
+      plot_shared = ".ALL",
+      plot_specific = ".ALL",
+      print_plots = TRUE,
+      save_dir = NULL,
+      log_y = TRACE_LOG,
+      skip_n = 0
+    )
+  }
+}
+
+
+```
+
+## ULL against final parameter estimates
+
+```{r, fig.width=16, fig.height=10}
+tdy_res = tidy_results(fit_results_in)
+
+tdy_res_long = tdy_res |>
+  pivot_longer(any_of(param_names), names_to = "parameter")
+
+for(pn in setdiff(param_names, "mu")){
+  gg = tdy_res_long |>
+    group_by(unit) |>
+    filter(parameter == pn, ull >= median(ull)) |>
+    ggplot(aes(x = value, y = ull)) +
+      geom_point() +
+      facet_wrap(vars(unit), scales = "free") +
+      labs(title = paste0("ull vs. ",pn," (top 50%)")) + 
+      xlab(pn)
+  print(gg)
+}
+```
+
+
+## Conditional log likelihood
+
+```{r, eval = CLL, fig.width=16, fig.height=10}
+if(is_spat_results){
+  benchmark = spatPomp::arma_benchmark(fit_results_in$fitr_out[[1]])
+} else {
+  benchmark = NULL
+}
+
+cll_df = lapply(seq_along(units), function(u){
+  data.frame(
+    unit = units[[u]],
+    benchmark = if(is_spat_results) as.numeric(benchmark$cond[u,]) else NA,
+    cll = as.numeric(eval_in$cll[[u]][primary_rep,]),
+    time = 1:ncol(eval_in$cll[[1]]),
+    cases = if(!is.null(fit_results_in)) observations[u,] else NA
+  )
+}) |> 
+  bind_rows() |>
+  mutate(`cll - benchmark` = cll - benchmark)
+
+if(!is.null(fit_results_in)){
+  print(
+    cll_df |>
+      ggplot(aes(x = time, y = -cll)) +
+        geom_line() +
+        geom_line(aes(x = time, y = log(cases + 1)), color = "red", alpha = 0.5) +
+        facet_wrap(vars(unit), scales = "free")
+  )
+  print(
+    cll_df |>
+      ggplot(aes(x = time, y = cll - benchmark)) +
+        geom_line() +
+        geom_line(aes(x = time, y = log(cases + 1)), color = "red", alpha = 0.5) +
+        facet_wrap(vars(unit), scales = "free")
+  )
+} else {
+  print(
+    cll_df |>
+    ggplot(aes(x = time, y = cll)) +
+      geom_line() +
+      facet_wrap(vars(unit), scales = "free")
+  )
+  print(
+    cll_df |>
+      ggplot(aes(x = time, y = cll - benchmark)) +
+      geom_line() +
+      facet_wrap(vars(unit), scales = "free")
+  )
+}
+```
+
+## Simulations
+
+```{r, eval = SIMS, fig.width=16, fig.height=14}
+set.seed(1)
+sim_tbl = make_sim_tbl(
+  sim_model = fit_results_in$fitr_out[[primary_rep]],
+  true_model = fit_results_in$fitr_out[[primary_rep]],
+  n_sims = 100
+)
+
+filter(sim_tbl, rep_name %in% paste0("sim", 1:2)) |>
+  ggplot(aes(x = time, y = log(cases + 1), color = rep_name)) +
+    geom_line(alpha = 0.8) +
+    geom_line(
+      data = filter(sim_tbl, rep_name == "real"), color = "black", alpha = 0.8
+    ) +
+    facet_wrap(vars(unit), scales = "free")
+```
+
+```{r, eval = SIMS, fig.width=16, fig.height=14}
+# example probes under ?pomp::basic_probes
+summary_tbl = sim_tbl |>
+  group_by(rep_name, unit) |> 
+  summarize(
+    fadeout_prop = mean(cases == 0, na.rm = TRUE),
+    final_cumulative = sum(cases, na.rm = TRUE),
+    period = (function(x){
+      zz <- spec.pgram(
+        x = x[!is.na(x)], 
+        kernel = kernel("modified.daniell", m = 2, r = NA), 
+        taper = 0, fast = FALSE, pad = 0, detrend = FALSE, plot = FALSE,
+        na.action = na.pass)
+    1/zz$freq[which.max(zz$spec)]
+    })(cases)
+  )
+summary_tbl = summary_tbl |>
+  left_join(
+    sim_tbl |>
+      mutate(year = floor(time)) |>
+      group_by(rep_name, unit, year) |>
+      summarize(peak_yearly = max(cases, na.rm = TRUE)) |>
+      group_by(rep_name, unit) |>
+      summarize(avg_peak_yearly = mean(peak_yearly, na.rm = TRUE)),
+    join_by(rep_name, unit)
+  )
+```
+
+```{r eval = SIMS, fig.width=16, fig.height=14}
+ggplot(mapping = aes(x = fadeout_prop)) +
+  geom_density(
+    data = filter(summary_tbl, rep_name != "real")
+  ) +
+  geom_vline(
+    data = filter(summary_tbl, rep_name == "real"),
+    mapping = aes(xintercept = fadeout_prop),
+    color = "red"
+  ) +
+  facet_wrap(vars(unit), scales = "free")
+```
+
+```{r eval = SIMS, fig.width=16, fig.height=14}
+ggplot(mapping = aes(x = final_cumulative)) +
+  geom_density(
+    data = filter(summary_tbl, rep_name != "real")
+  ) +
+  geom_vline(
+    data = filter(summary_tbl, rep_name == "real"),
+    mapping = aes(xintercept = final_cumulative),
+    color = "red"
+  ) +
+  facet_wrap(vars(unit), scales = "free")
+```
+
+```{r eval = SIMS, fig.width=16, fig.height=14}
+ggplot(mapping = aes(x = avg_peak_yearly)) +
+  geom_density(
+    data = filter(summary_tbl, rep_name != "real")
+  ) +
+  geom_vline(
+    data = filter(summary_tbl, rep_name == "real"),
+    mapping = aes(xintercept = avg_peak_yearly),
+    color = "red"
+  ) +
+  facet_wrap(vars(unit), scales = "free")
+```
+
+```{r eval = SIMS, fig.width=16, fig.height=14}
+ggplot(mapping = aes(x = period)) +
+  geom_density(
+    data = filter(summary_tbl, rep_name != "real")
+  ) +
+  geom_vline(
+    data = filter(summary_tbl, rep_name == "real"),
+    mapping = aes(xintercept = period),
+    color = "red"
+  ) +
+  facet_wrap(vars(unit), scales = "free")
+```
+
+```{r eval = SIMS, fig.width=16, fig.height=14}
+perios = lapply(c("real", paste0("sim",1:5)), function(z){
+  lapply(units, function(u){
+    x = filter(sim_tbl, unit == u, rep_name == z, !is.na(cases))$cases |>
+      spectrum(plot = FALSE)
+    data.frame(
+      unit = u,
+      freq = x$freq,
+      spec = x$spec,
+      rep_name = z
+    )
+  }) |>
+    bind_rows()
+}) |>
+  bind_rows()
+
+ggplot(
+  filter(perios, rep_name != "real"), 
+  aes(x = freq, y = spec, color = rep_name)
+) +
+  geom_smooth(method = "loess", formula = y ~ x, span = 0.25, se = FALSE) +
+  geom_smooth(
+    data = filter(perios, rep_name == "real"),
+    method = "loess", formula = y ~ x, span = 0.25, se = FALSE, color = "black"
+  ) +
+  facet_wrap(vars(unit), scales = "free") +
+  scale_y_log10()
+```
+
+## Session info
+
+```{r extra info}
+Sys.time()
+devtools::session_info()
+```
+
+
+
