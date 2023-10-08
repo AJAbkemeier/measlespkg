@@ -18,12 +18,12 @@ print(ncores)
 
 # Set fitting and filter parameters
 RUN_LEVEL = 1
-NP_FITR      = switch(RUN_LEVEL, 2, 5000)
-NFITR        = switch(RUN_LEVEL, 2,  100)
-NREPS_FITR   = switch(RUN_LEVEL, ncores, ncores)
-NP_EVAL      = switch(RUN_LEVEL, 2, 10000)
-NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores)
-NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
+NP_FITR      = switch(RUN_LEVEL, 2, 3000, 5000)
+NFITR        = switch(RUN_LEVEL, 2,   25,  100)
+NREPS_FITR   = switch(RUN_LEVEL, ncores, ncores, ncores)
+NP_EVAL      = switch(RUN_LEVEL, 2, 3000,10000)
+NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores, ncores)
+NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores, ncores*8)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH.
 TOP_N_FITS   = switch(RUN_LEVEL, 1,  12)

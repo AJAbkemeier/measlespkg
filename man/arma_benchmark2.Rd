@@ -4,13 +4,21 @@
 \alias{arma_benchmark2}
 \title{Produce log-ARMA log-likelihood benchmark for panelPomp and spatPomp models}
 \usage{
-arma_benchmark2(xpomp, order = c(2, 0, 1))
+arma_benchmark2(xpomp, order = c(2, 0, 1), na.rm = FALSE)
 }
 \arguments{
 \item{xpomp}{A panelPomp or spatPomp object.}
 
 \item{order}{A triple (p, d, q) for the ARIMA model fitted to the data.
 Function code assumes that d will be set to 0.}
+
+\item{na.rm}{Should NA's be removed when summing conditional log likelihoods
+to obtain unit log likelihoods and total log likelihoods?}
+}
+\value{
+A list with a named vector of unit log likelihoods, a vector
+containing the total log likelihood, and a matrix of conditional log
+likelihoods.
 }
 \description{
 Produce log-ARMA log-likelihood benchmark for panelPomp and spatPomp models

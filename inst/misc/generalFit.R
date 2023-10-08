@@ -18,12 +18,12 @@ print(ncores)
 
 # Set fitting and filter parameters
 RUN_LEVEL = 1
-NP_FITR      = switch(RUN_LEVEL, 2, 5000)
-NFITR        = switch(RUN_LEVEL, 2,  100)
-NREPS_FITR   = switch(RUN_LEVEL, ncores, ncores)
-NP_EVAL      = switch(RUN_LEVEL, 2, 10000)
-NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores)
-NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores*8)
+NP_FITR      = switch(RUN_LEVEL, 2, 3000, 5000)
+NFITR        = switch(RUN_LEVEL, 2,   25,  100)
+NREPS_FITR   = switch(RUN_LEVEL, ncores, ncores, ncores)
+NP_EVAL      = switch(RUN_LEVEL, 2, 3000,10000)
+NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores, ncores)
+NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores, ncores*8)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH.
 TOP_N_FITS   = switch(RUN_LEVEL, 1,  12)
@@ -231,7 +231,7 @@ if(!is.null(EVAL_POINTS)){
   panelPomp::coef(measlesPomp_mod)[coef_names] = EVAL_POINTS[[array_job_id]]
 }
 ###### MODEL FITTING #####################################
-round_out = run_round(
+round_out <- run_round(
   measlesPomp_mod,
   initial_pparams_list = initial_pparams_list,
   rw_sd_obj = make_rw_sd(initial_rw_sd),
@@ -252,7 +252,6 @@ round_out = run_round(
 
 EL_final = round_out$EL_out
 print(as.data.frame(dplyr::arrange(EL_final$fits[,1:2], dplyr::desc(logLik))))
-
 # Evaluate at parameters of best ULL combination
 if(USE_BEST_COMBO){
   tictoc::tic()
