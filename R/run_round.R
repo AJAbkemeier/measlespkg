@@ -80,7 +80,6 @@ run_round = function(
       np_pf = np_eval,
       nreps = nreps_eval,
       seed = NULL,
-      divisor = NULL,
       block_size = spat_block_size
     )
     if(print_times) print(Sys.time() - start_t)

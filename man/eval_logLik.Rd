@@ -4,16 +4,7 @@
 \alias{eval_logLik}
 \title{Evaluate the log likelihood of a model using \code{pfilter()}}
 \usage{
-eval_logLik(
-  model_obj_list,
-  block_size = 1,
-  ncores,
-  np_pf,
-  nreps,
-  seed = NULL,
-  divisor = NULL,
-  return_n_pfilter_objs = 0
-)
+eval_logLik(model_obj_list, block_size = 1, ncores, np_pf, nreps, seed = NULL)
 }
 \arguments{
 \item{model_obj_list}{List of \code{panelPomp} or \code{spatPomp} objects to evaluate
@@ -31,11 +22,6 @@ worthwhile.)}
 \item{nreps}{Number of particle filter repetitions.}
 
 \item{seed}{Seed for particle filter. If NULL, does not set new seed.}
-
-\item{divisor}{\code{seed} mod \code{divisor*i} is used to obtain seed for ith
-repetition. If NULL, does not set new seed.}
-
-\item{return_n_pfilter_objs}{Number of \code{pfilter} objects to return.}
 }
 \value{
 Object of type \code{EL_list}, a list of data frames containing log

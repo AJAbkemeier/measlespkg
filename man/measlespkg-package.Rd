@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Aaron Abkemeier \email{aaronabk@umich.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Aaron Abkemeier \email{aaronabk@umich.edu} (\href{https://orcid.org/0009-0007-1936-2246}{ORCID})
 
 }
 \keyword{internal}

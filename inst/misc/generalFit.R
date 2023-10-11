@@ -264,8 +264,7 @@ if(USE_BEST_COMBO){
       ncores = ncores,
       np_pf = NP_EVAL,
       nreps = NREPS_EVAL2,
-      seed = NULL,
-      divisor = 8164
+      seed = NULL
     )
   )
   tictoc::toc()

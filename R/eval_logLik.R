@@ -10,9 +10,6 @@
 #' @param np_pf Number of particles to use.
 #' @param nreps Number of particle filter repetitions.
 #' @param seed Seed for particle filter. If NULL, does not set new seed.
-#' @param divisor `seed` mod `divisor*i` is used to obtain seed for ith
-#'   repetition. If NULL, does not set new seed.
-#' @param return_n_pfilter_objs Number of `pfilter` objects to return.
 #'
 #'
 #' @return Object of type `EL_list`, a list of data frames containing log
@@ -45,11 +42,17 @@ eval_logLik = function(
     ncores,
     np_pf,
     nreps,
-    seed = NULL,
-    divisor = NULL,
-    return_n_pfilter_objs = 0
+    seed = NULL
 ){
+  if(inherits(model_obj_list[[1]], "panelPomp")) pType = "panelPomp"
+  if(inherits(model_obj_list[[1]], "spatPomp")) pType = "spatPomp"
+
   N_models = length(model_obj_list)
+  units = switch(pType,
+    panelPomp = names(model_obj_list[[1]]),
+    spatPomp = model_obj_list[[1]]@unit_names
+  )
+
   pf_logLik_frame = data.frame(
     logLik = rep(0, N_models),
     se = rep(0, N_models)
@@ -62,242 +65,95 @@ eval_logLik = function(
   pf_unitSE_list = vector("list", N_models)
   pf_cll_list = vector("list", N_models)
 
-  for(i in 1:N_models){
-    ELS_out = eval_logLik_single(
-      model_obj = model_obj_list[[i]],
-      block_size = block_size,
-      ncores = ncores,
-      np_pf = np_pf,
-      nreps = nreps,
-      seed = if(is.null(seed)) NULL else seed*i,
-      divisor = divisor,
-      return_n_pfilter_objs = return_n_pfilter_objs
-    )
-    pf_logLik_frame[i, 1:2] = ELS_out$logLikSE
-    pf_unitlogLik_list[[i]] = ELS_out$pf_ull
-    pf_unitSE_list[[i]] = ELS_out$pf_se
-    pf_cll_list[[i]] = ELS_out$cll_calcs
+  doParallel::registerDoParallel(cores = ncores)
+  RNGkind("L'Ecuyer-CMRG")
+  doRNG::registerDoRNG(seed)
+
+  foreach_out = foreach::foreach(
+    i = 1:nreps,
+    .packages = pType
+  ) %dopar% {
+    lapply(1:N_models, function(j){
+      if(pType == "panelPomp"){
+        out = panelPomp::pfilter(model_obj_list[[j]], Np = np_pf)
+        out = list(
+          ull = panelPomp::unitlogLik(out),
+          cll = sapply(seq_along(units), function(u){
+            out@unit.objects[[u]]@cond.logLik
+          }) |> t() |> `rownames<-`(units)
+        )
+      } else if (pType == "spatPomp"){
+        out = spatPomp::bpfilter(
+          model_obj_list[[j]],
+          Np = np_pf,
+          block_size = block_size
+        )
+        out = list(
+          ull = rowSums(out@block.cond.loglik),
+          cll = out@block.cond.loglik
+        )
+        names(out$ull) = units
+        rownames(out$cll) = units
+      }
+      out
+    })
   }
 
-  pf_unitlogLik_frame = data.frame(dplyr::bind_rows(pf_unitlogLik_list))
-  rownames(pf_unitlogLik_frame) = 1:nrow(pf_unitlogLik_frame)
+  ull_matrices = lapply(1:N_models, function(i){
+    sapply(1:nreps, function(j){
+      foreach_out[[j]][[i]]$ull
+    }) |> t()
+  })
 
-  pf_unitSE_frame = data.frame(dplyr::bind_rows(pf_unitSE_list))
-  rownames(pf_unitSE_frame) = 1:nrow(pf_unitSE_frame)
+  cllse_matrices = lapply(1:N_models, function(i){
+    lapply(units, function(u){
+      sapply(1:nreps, function(j){
+        foreach_out[[j]][[i]]$cll[u,]
+      }) |> apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
+    }) |> `names<-`(units)
+  })
 
-  units = colnames(pf_unitlogLik_frame)
+  llse = sapply(1:N_models, function(i){
+    if(pType == "panelPomp"){
+      panelPomp::panel_logmeanexp(ull_matrices[[i]], MARGIN = 2, se = TRUE)
+    } else if(pType == "spatPomp"){
+      pomp::logmeanexp(rowSums(ull_matrices[[i]]), se = TRUE)
+    }
+  }) |> t()
+  pf_logLik_frame[,1:2] = llse
+
+  ullse = lapply(1:N_models, function(i){
+    apply(ull_matrices[[i]], MARGIN = 2, FUN = pomp::logmeanexp, se = TRUE)
+  }) |> t()
+
+  ull = sapply(1:N_models, function(i){
+    ullse[[i]][1,]
+  }) |> t() |> as.data.frame()
+
+  se = sapply(1:N_models, function(i){
+    ullse[[i]][2,]
+  }) |> t() |> as.data.frame()
+
   cll = lapply(units, function(u){
     sapply(1:N_models, function(i){
-      pf_cll_list[[i]][[u]]["est",]
+      cllse_matrices[[i]][[u]]["est",]
     }) |> t()
   })
   names(cll) = units
   cll_se = lapply(units, function(u){
     sapply(1:N_models, function(i){
-      pf_cll_list[[i]][[u]]["se",]
+      cllse_matrices[[i]][[u]]["se",]
     }) |> t()
   })
   names(cll_se) = units
 
-  pf_frames_list = new_EL_list(
+  new_EL_list(
     fits = pf_logLik_frame,
-    ull = pf_unitlogLik_frame,
-    se = pf_unitSE_frame,
+    ull = ull,
+    se = se,
     cll = cll,
     cll_se = cll_se,
     np_pf = np_pf,
     nreps = nreps
-  )
-  if(return_n_pfilter_objs > 0)
-    pf_frames_list$pfilter_list = ELS_out$pf_list[1:return_n_pfilter_objs]
-  pf_frames_list
-}
-
-eval_logLik_single = function(
-    model_obj,
-    ncores,
-    np_pf,
-    nreps,
-    seed,
-    divisor,
-    return_n_pfilter_objs,
-    ...
-){
-  UseMethod("eval_logLik_single")
-}
-
-eval_logLik_single.panelPomp = function(
-    model_obj,
-    ncores,
-    np_pf,
-    nreps,
-    seed,
-    divisor,
-    return_n_pfilter_objs,
-    ...
-){
-  units = names(model_obj)
-  doParallel::registerDoParallel(cores = ncores)
-  seed_i = if(is.null(seed) | is.null(divisor)) NULL else seed %% divisor
-  RNGkind("L'Ecuyer-CMRG")
-  doRNG::registerDoRNG(seed_i)
-
-  foreach::foreach(
-    j = 1:nreps,
-    .packages = "panelPomp"
-  ) %dopar% {
-    out = panelPomp::pfilter(model_obj, Np = np_pf)
-    if(return_n_pfilter_objs == 0){
-      out = list(
-        ull = panelPomp::unitlogLik(out),
-        cll = lapply(seq_along(units), function(u){
-          out@unit.objects[[u]]@cond.logLik
-        })
-      )
-    }
-    out
-  } -> pf_list
-
-  pf_unitlogLik_matrix = if(return_n_pfilter_objs > 0){
-    lapply(pf_list, panelPomp::unitlogLik) |>
-      dplyr::bind_rows()
-  } else {
-    lapply(pf_list, function(x) x$ull) |>
-      dplyr::bind_rows()
-  }
-
-  logLikSE = panelPomp::panel_logmeanexp(
-    pf_unitlogLik_matrix,
-    MARGIN = 2,
-    se = TRUE
-  )
-
-  unit_calcs = apply(
-    pf_unitlogLik_matrix,
-    MARGIN = 2,
-    FUN = pomp::logmeanexp,
-    se = TRUE
-  )
-  rownames(unit_calcs)[[1]] = "loglik"
-
-  pf_ull = subset(
-    unit_calcs,
-    rownames(unit_calcs) == "loglik"
-  ) |>
-    as.data.frame()
-
-  pf_se = subset(unit_calcs, rownames(unit_calcs) == "se") |>
-    as.data.frame()
-
-  cll_calcs = if(return_n_pfilter_objs > 0){
-    lapply(units, function(u){
-      sapply(seq_along(pf_list), function(x){
-        pf_list[[x]]@unit.objects[[u]]@cond.logLik
-      }) |>
-        apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
-    })
-  } else {
-    lapply(seq_along(units), function(u){
-      sapply(seq_along(pf_list), function(x){
-        pf_list[[x]]$cll[[u]]
-      }) |>
-        apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
-    })
-  }
-  names(cll_calcs) = units
-
-  pf_list = if(return_n_pfilter_objs > 0){
-    pf_list[1:return_n_pfilter_objs]
-  } else {
-    NULL
-  }
-
-  list(
-    logLikSE = logLikSE,
-    pf_ull = pf_ull,
-    pf_se = pf_se,
-    cll_calcs = cll_calcs,
-    pf_list = pf_list
-  )
-}
-
-eval_logLik_single.spatPomp = function(
-    model_obj,
-    block_size,
-    ncores,
-    np_pf,
-    nreps,
-    seed,
-    divisor,
-    return_n_pfilter_objs,
-    ...
-){
-  units = as.data.frame(model_obj)$unit |> unique()
-  doParallel::registerDoParallel(cores = ncores)
-  seed_i = if(is.null(seed) | is.null(divisor)) NULL else seed %% divisor
-  RNGkind("L'Ecuyer-CMRG")
-  doRNG::registerDoRNG(seed_i)
-  foreach::foreach(
-    j = 1:nreps,
-    .packages = "spatPomp"
-  ) %dopar% {
-    out = spatPomp::bpfilter(
-      model_obj,
-      Np = np_pf,
-      block_size = block_size
-    )
-    if(return_n_pfilter_objs == 0){
-      out = out@block.cond.loglik
-    }
-    out
-  } -> pf_list
-  if(return_n_pfilter_objs == 0){
-    block.cond.logLik_list = pf_list
-    pf_list = NULL
-  } else {
-    block.cond.logLik_list = lapply(pf_list, function(x) x@block.cond.loglik)
-    pf_list = pf_list[1:return_n_pfilter_objs]
-  }
-  logLik_vec = sapply(block.cond.logLik_list, sum)
-  logLikSE = pomp::logmeanexp(logLik_vec, se = TRUE)
-
-  pf_unitlogLik_matrix = lapply(block.cond.logLik_list, function(x){
-    ull = rowSums(x)
-    names(ull) = units
-    ull
-  }) |>
-    dplyr::bind_rows()
-
-  unit_calcs = apply(
-    pf_unitlogLik_matrix,
-    MARGIN = 2,
-    FUN = pomp::logmeanexp,
-    se = TRUE
-  )
-  rownames(unit_calcs)[[1]] = "loglik"
-
-  pf_ull = subset(
-    unit_calcs,
-    rownames(unit_calcs) == "loglik"
-  ) |>
-    as.data.frame()
-
-  pf_se = subset(unit_calcs, rownames(unit_calcs) == "se") |>
-    as.data.frame()
-
-  cll_calcs = lapply(seq_along(units), function(u){
-    sapply(seq_along(block.cond.logLik_list), function(x){
-      block.cond.logLik_list[[x]][u,]
-    }) |>
-      apply(MARGIN = 1, FUN = pomp::logmeanexp, se = TRUE)
-  })
-  names(cll_calcs) = units
-
-  list(
-    logLikSE = logLikSE,
-    pf_ull = pf_ull,
-    pf_se = pf_se,
-    cll_calcs = cll_calcs,
-    pf_list = pf_list
   )
 }

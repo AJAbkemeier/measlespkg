@@ -62,7 +62,6 @@ ELL_out = pomp::bake(file = paste0(WRITE_ELL_DIR, WRITE_FILE), {
     np_pf = NP_PF,
     nreps = NREPS_EVAL,
     seed = NULL,
-    divisor = NULL,
     return_n_pfilter_objs = N_PFILTER_OBJS
   )
 })
