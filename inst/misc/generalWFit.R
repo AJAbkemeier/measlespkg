@@ -112,13 +112,9 @@ write_results_to = paste0(write_path, RESULTS_FILE)
 
 # Use observations from simulation?
 if(!is.null(SIM_MODEL)){
-  sim = panelPomp::simulate(SIM_MODEL, seed = SIM_MODEL_SEED)
-  sim_obs_list = lapply(seq_along(sim), function(x){
-    pomp::obs(sim[[x]]) |>
-      as.numeric()
-  })
+  sim_obs = obs2(panelPomp::simulate(SIM_MODEL, seed = SIM_MODEL_SEED))
 } else {
-  sim_obs_list = NULL
+  sim_obs = NULL
 }
 
 ###### Starting parameters #############################
@@ -191,6 +187,13 @@ measlesPomp_mod = make_measlesPomp(
   interp_method = INTERP_METHOD,
   dt = DT
 )
+
+if(!is.null(sim_obs)){
+  for(u in UNITS){
+    measlesPomp_mod@unit.objects[[u]]@data = sim_obs[u,, drop = FALSE]
+    rownames(measlesPomp_mod@unit.objects[[u]]@data) = "cases"
+  }
+}
 
 if(is_spat){
   U = length(UNITS)
