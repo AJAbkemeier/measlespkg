@@ -26,7 +26,7 @@ NREPS_EVAL   = switch(RUN_LEVEL, ncores, ncores, ncores)
 NREPS_EVAL2  = switch(RUN_LEVEL, ncores, ncores, ncores*8)
 # TOP_N_FITS selects top fits from likelihood evaluation file specified in
 # PREVIOUS_FIT_PATH.
-TOP_N_FITS   = switch(RUN_LEVEL, 1,  12)
+TOP_N_FITS   = switch(RUN_LEVEL, 1,  12, 12)
 DATA = clean_twentycities()
 # Units to select from data
 UNITS = unique(twentycities$measles$unit)

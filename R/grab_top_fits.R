@@ -27,9 +27,9 @@ grab_top_fits = function(
   score = x$fits$logLik - se_penalty*x$fits$se
   ranking = order(score, decreasing = TRUE)
   new_EL_list(
-    fits = x$fits[ranking,][1:top_n,, drop = FALSE],
-    ull = x$ull[ranking,][1:top_n,, drop = FALSE],
-    se = x$se[ranking,][1:top_n,, drop = FALSE],
+    fits = x$fits[ranking,, drop = FALSE][1:top_n,, drop = FALSE],
+    ull = x$ull[ranking,, drop = FALSE][1:top_n,, drop = FALSE],
+    se = x$se[ranking,, drop = FALSE][1:top_n,, drop = FALSE],
     cll = x$cll |>
       lapply(function(y) y[ranking,, drop = FALSE][1:top_n,, drop = FALSE]),
     cll_se = x$cll_se |>

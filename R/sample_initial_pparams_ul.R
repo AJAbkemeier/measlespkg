@@ -50,7 +50,7 @@ sample_initial_pparams_ul = function(
     x = specific_box_specs$param,
     y = units
   ) |>
-    dplyr::rename(param = .data$x, unit = .data$y)
+    dplyr::rename(param = "x", unit = "y")
 
   expanded_specific = specific_box_specs |>
     dplyr::right_join(helper_df, by = "param") |>

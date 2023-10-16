@@ -1,4 +1,4 @@
-test_that("function works", {
+test_that("function returns correct output", {
   ell = EL_list(
     fits = data.frame(
       logLik = c(1.1, 2.1, 3.1),
@@ -43,9 +43,9 @@ test_that("function works", {
   expect_equal(out1$fits, ell$fits[3,])
   expect_equal(out1$ull, ell$ull[3,])
   expect_equal(out1$se, ell$se[3,])
-  expect_equal(out1$cll$unit1, ell$cll$unit1[3,])
-  expect_equal(out1$cll$unit2, ell$cll$unit2[3,])
-  expect_equal(out1$cll$unit3, ell$cll$unit3[3,])
+  expect_equal(out1$cll$unit1, ell$cll$unit1[3,, drop = FALSE])
+  expect_equal(out1$cll$unit2, ell$cll$unit2[3,, drop = FALSE])
+  expect_equal(out1$cll$unit3, ell$cll$unit3[3,, drop = FALSE])
   expect_equal(out1$np_pf, ell$np_pf)
   expect_equal(out1$nreps, ell$nreps)
 
@@ -69,3 +69,4 @@ test_that("function works", {
   expect_equal(names(out3$cll), names(ell$cll))
   expect_equal(names(out3$cll_se), names(ell$cll_se))
 })
+
