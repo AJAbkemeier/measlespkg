@@ -4,21 +4,36 @@
 \alias{combine_top_fits}
 \title{Combine parameter estimates with best unit log likelihoods}
 \usage{
-combine_top_fits(x, top_n = 1, se_penalty = 0, is_spat = FALSE)
+combine_top_fits(
+  x,
+  top_n = 1,
+  top_n_shared = 1,
+  se_penalty = 0,
+  omit = NULL,
+  is_spat = FALSE
+)
 }
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
 
-\item{top_n}{Number of rows to grab.}
+\item{top_n}{Number of top unit-specific parameters to use.}
+
+\item{top_n_shared}{Number of top shared parameters to use.}
 
 \item{se_penalty}{Penalizes log likelihood in ranking based on
 \code{se*se_penalty}.}
+
+\item{omit}{A vector of names for unit-specific parameters that shouldn't be
+combined based on unit log likelihood. Instead, they are packaged with the
+shared parameters of the given fit and their efficacy is based on the
+overall log likelihood.}
 
 \item{is_spat}{Indicates whether parameters in \code{x} are for a spatPOMP model.
 Function will fail to return desired results if wrong.}
 }
 \value{
-Object of class \code{EL_list}.
+Object of class \code{EL_list}. Log likelihoods are not necessarily
+correct after combining.
 }
 \description{
 Combine parameter estimates with best unit log likelihoods

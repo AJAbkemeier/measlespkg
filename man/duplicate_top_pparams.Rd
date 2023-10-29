@@ -4,14 +4,35 @@
 \alias{duplicate_top_pparams}
 \title{Duplicate top fits from \code{EL_list}}
 \usage{
-duplicate_top_pparams(x, out_length, top_n = 1, combine = FALSE, units = NULL)
+duplicate_top_pparams(
+  x,
+  out_length,
+  top_n = 1,
+  top_n_shared = 1,
+  se_penalty = 0,
+  omit = NULL,
+  combine = FALSE,
+  units = NULL
+)
 }
 \arguments{
 \item{x}{Object of class \code{EL_list}.}
 
 \item{out_length}{Number of parameter sets to output.}
 
-\item{top_n}{Number of top fits to duplicate.}
+\item{top_n}{Number of top fits to duplicate. If \code{combine = TRUE}, the number
+of top unit-specific parameters to combine.}
+
+\item{top_n_shared}{Number of top shared parameters to use. Only used with
+\code{combine = TRUE}.}
+
+\item{se_penalty}{Penalizes log likelihood in ranking based on
+\code{se*se_penalty}. Only used with \code{combine = TRUE}.}
+
+\item{omit}{A vector of names for unit-specific parameters that shouldn't be
+combined based on unit log likelihood. Instead, they are packaged with the
+shared parameters of the given fit and their efficacy is based on the
+overall log likelihood. Only used with \code{combine = TRUE}.}
 
 \item{combine}{Boolean specifying whether best specific fits should be
 combined.}

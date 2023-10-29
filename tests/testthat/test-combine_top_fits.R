@@ -1,4 +1,4 @@
-test_that("function works for panelPomp output", {
+test_that("function works for panelPomp", {
   ell = EL_list(
     fits = data.frame(
       logLik = c(1.1, 2.1, 3.1),
@@ -36,7 +36,6 @@ test_that("function works for panelPomp output", {
     np_pf = 10,
     nreps = 20
   )
-  expect_warning(combine_top_fits(ell, top_n = 1, is_spat = FALSE))
 
   ell$fits$shared = 1
 
@@ -163,8 +162,78 @@ test_that("function works for panelPomp output", {
   )
 })
 
+test_that("omit and top_n_shared work for panelPomp", {
+  ell = EL_list(
+    fits = data.frame(
+      logLik = c(1.1, 2.1, 3.1),
+      se = c(1.2, 2.2, 3.2),
+      shared = c(1.3, 2.3, 3.3),
+      shared2 = c(1.4, 2.4, 3.4),
+      `specific[unit1]` = c(1.5, 2.5, 3.5),
+      `specific[unit2]` = c(1.6, 2.6, 3.6),
+      `specific[unit3]` = c(1.7, 2.7, 3.7),
+      `specific2[unit1]` = c(1.8, 2.8, 3.8),
+      `specific2[unit2]` = c(1.9, 2.9, 3.9),
+      `specific2[unit3]` = c(1.10, 2.10, 3.10),
+      check.names = FALSE
+    ),
+    ull = data.frame(
+      unit1 = c(3.1, 2.1, 1.1),
+      unit2 = c(1.2, 3.2, 2.2),
+      unit3 = c(1.3, 2.3, 3.3)
+    ),
+    se = data.frame(
+      unit1 = c(1.1, 2.1, 3.1),
+      unit2 = c(1.2, 2.2, 3.2),
+      unit3 = c(1.3, 2.3, 3.3)
+    ),
+    cll = lapply(1:3, function(x){
+      mat = matrix(
+        10*x + c(1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3),
+        nrow = 3,
+        ncol = 3
+      )
+    }) |> `names<-`(c("unit1", "unit2", "unit3")),
+    cll_se = lapply(1:3, function(x){
+      matrix(
+        10*x + c(1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3),
+        nrow = 3,
+        ncol = 3
+      )
+    }) |> `names<-`(c("unit1", "unit2", "unit3")),
+    np_pf = 10,
+    nreps = 20
+  )
 
-test_that("function works for spatPomp output", {
+  out1 = combine_top_fits(ell, top_n = 3, top_n_shared = 2, is_spat = FALSE)
+  out1a = combine_top_fits(ell, top_n = 3, is_spat = FALSE)
+  out2 = combine_top_fits(ell, top_n = 2, top_n_shared = 3, is_spat = FALSE)
+  out3 = combine_top_fits(
+    ell,
+    top_n = 3,
+    top_n_shared = 3,
+    omit = "specific",
+    is_spat = FALSE
+  )
+
+  expect_equal(out1$fits$shared, c(3.3, 3.3, 2.3))
+  expect_equal(out1$fits$shared2, c(3.4, 3.4, 2.4))
+  expect_equal(out1$fits[5:10], out1a$fits[5:10])
+  expect_equal(
+    out1[c("ull", "se", "cll", "cll_se")],
+    out1a[c("ull", "se", "cll", "cll_se")]
+  )
+  expect_equal(out2$fits$shared, c(3.3, 2.3, 1.3))
+  expect_equal(out2$fits[,5:10], out1a$fits[c(1, 1, 2), 5:10])
+  expect_equal(out2$ull, out1a$ull[c(1, 1, 2),])
+  expect_equal(out2$se, out1a$se[c(1, 1, 2),])
+  expect_equal(out2$cll[[1]], out1a$cll[[1]][c(1, 1, 2),])
+  expect_equal(out2$cll_se[[1]], out1a$cll_se[[1]][c(1, 1, 2),])
+  expect_equal(out3$fits[,5:7], ell$fits[3:1, 5:7])
+  expect_equal(out3$fits[,8:10], out1a$fits[,8:10])
+})
+
+test_that("function works for spatPomp", {
   ell = EL_list(
     fits = data.frame(
       logLik = c(1.1, 2.1, 3.1),

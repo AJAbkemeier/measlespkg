@@ -66,10 +66,6 @@ test_that("function works for panelPomp output", {
     }) |> rep(2)
   )
 
-  expect_warning(
-    duplicate_top_pparams(ell, out_length = 4, top_n = 1, combine = TRUE)
-  )
-
   ell$fits$shared = 1
 
   out1c = duplicate_top_pparams(ell, out_length = 4, top_n = 1, combine = TRUE)
