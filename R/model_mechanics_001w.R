@@ -1,14 +1,17 @@
 #' He10 POMP model for UK measles with an auxiliary weight parameter
 #'
-#' @param param Name of the parameter you would like to express in terms of
-#' a shared parameter and a weighted unit-specific parameter.
+#' @param param Name of the parameter you would like to express in terms of a
+#'   shared parameter and a weighted unit-specific parameter.
 #' @param U Number of units in the model.
 #' @param shared_params Character vector of parameters to be treated as shared.
+#' @param reg Number between 0 and 1 determining the strength of the
+#'   reparameterization constraint imposed at each observation step. Setting
+#'   this equal to 1 enforces the constraint exactly.
 #'
 #' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
-model_mechanics_001w = function(param, U, shared_params = "mu"){
+model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
   basic_params = c("R0", "mu", "sigma", "gamma", "alpha", "iota", "rho",
                    "sigmaSE", "psi", "cohort", "amplitude", "S_0", "E_0",
                    "I_0", "R_0")
@@ -25,16 +28,14 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
   set_param_str = c("
     double param_sp;\n
     int unit_num_int = round(unit_num); \n
-    double param_mean = (",paste0(params, collapse = " + "),")/",U,";
-    double norm = sqrt(pow(",paste0(params, collapse = " - param_mean, 2) + pow("),", 2));
     if(unit_num_int == 1){
-      param_sp = (",paste0(param,1)," - param_mean)/norm;
+      param_sp = ",paste0(param,1),";
     }
     ",
     sapply(2:U, function(i){
       paste0("
       else if(unit_num_int == ",i,"){
-        param_sp = (",paste0(param,i)," - param_mean)/norm;
+        param_sp = ",paste0(param,i),";
       }
       ")
     }),
@@ -161,7 +162,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu"){
     ",
       sapply(1:U, function(i){
         paste0("
-          ",param,i," = (T_",param,i," - param_mean)/norm;
+          ",param,i," = (1-",reg,")*T_",param,i," + ",reg,"*(T_",param,i," - param_mean)/norm;
         ")
       }) |> paste0(collapse = ""),
       "if(T_w == -INFINITY){
