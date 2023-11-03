@@ -110,9 +110,9 @@ run_round_helper.panelPomp = function(
     panel_block,
     ...
 ){
-  i = NULL # prevents check() note
+  z = NULL # prevents check() note
   mif2_out = foreach::foreach(
-    i = 1:length(initial_pparams_list),
+    z = initial_pparams_list,
     .packages = "panelPomp"
   ) %dopar% {
     panelPomp::mif2(
@@ -122,8 +122,8 @@ run_round_helper.panelPomp = function(
       rw.sd = rw_sd_obj,
       cooling.type = "geometric",
       Nmif = N_fitr,
-      shared.start = initial_pparams_list[[i]]$shared,
-      specific.start = initial_pparams_list[[i]]$specific,
+      shared.start = z$shared,
+      specific.start = z$specific,
       block = panel_block
     )
   }
@@ -143,12 +143,12 @@ run_round_helper.spatPomp = function(
     spat_regression,
     ...
 ){
-  i = NULL # prevents check() note
+  z = NULL # prevents check() note
   ibpf_out = foreach::foreach(
-    i = 1:length(initial_pparams_list),
+    z = initial_pparams_list,
     .packages = "spatPomp"
   ) %dopar% {
-    pomp::coef(x) = pparams_to_spatCoef(initial_pparams_list[[i]])
+    pomp::coef(x) = pparams_to_spatCoef(z)
     spatPomp::ibpf(
       x,
       Np = np_fitr,

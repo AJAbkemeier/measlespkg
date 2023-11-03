@@ -73,9 +73,9 @@ eval_logLik = function(
     i = 1:nreps,
     .packages = pType
   ) %dopar% {
-    lapply(1:N_models, function(j){
+    lapply(model_obj_list, function(x){
       if(pType == "panelPomp"){
-        out = panelPomp::pfilter(model_obj_list[[j]], Np = np_pf)
+        out = panelPomp::pfilter(x, Np = np_pf)
         out = list(
           ull = panelPomp::unitlogLik(out),
           cll = sapply(seq_along(units), function(u){
@@ -84,7 +84,7 @@ eval_logLik = function(
         )
       } else if (pType == "spatPomp"){
         out = spatPomp::bpfilter(
-          model_obj_list[[j]],
+          x,
           Np = np_pf,
           block_size = block_size
         )
