@@ -100,9 +100,9 @@ eval_logLik = function(
   }
 
   ull_matrices = lapply(1:N_models, function(i){
-    sapply(1:nreps, function(j){
+    lapply(1:nreps, function(j){
       foreach_out[[j]][[i]]$ull
-    }) |> t()
+    }) |> dplyr::bind_rows() |> as.matrix()
   })
 
   cllse_matrices = lapply(1:N_models, function(i){
@@ -126,13 +126,17 @@ eval_logLik = function(
     apply(ull_matrices[[i]], MARGIN = 2, FUN = pomp::logmeanexp, se = TRUE)
   }) |> t()
 
-  ull = sapply(1:N_models, function(i){
-    ullse[[i]][1,]
-  }) |> t() |> as.data.frame()
+  ull = lapply(1:N_models, function(i){
+    out = as.data.frame(ullse[[i]][1,, drop = FALSE])
+    rownames(out) = NULL
+    out
+  }) |> dplyr::bind_rows()
 
-  se = sapply(1:N_models, function(i){
-    ullse[[i]][2,]
-  }) |> t() |> as.data.frame()
+  se = lapply(1:N_models, function(i){
+    out = as.data.frame(ullse[[i]][2,, drop = FALSE])
+    rownames(out) = NULL
+    out
+  }) |> dplyr::bind_rows()
 
   cll = lapply(units, function(u){
     sapply(1:N_models, function(i){
