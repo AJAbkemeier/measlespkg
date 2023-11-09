@@ -20,7 +20,8 @@ run_round(
   spat_block_size = 1,
   spat_sharedParNames = NULL,
   spat_unitParNames = NULL,
-  spat_regression = 0.2
+  spat_regression = 0.2,
+  rparam = NULL
 )
 }
 \arguments{
@@ -66,6 +67,11 @@ unit-specific by \code{ibpf()}. Only used when \code{x} is a \code{spatPomp} obj
 \item{spat_regression}{Numeric specifying the mean-regressing coefficient to
 use when fitting shared parameters in a \code{spatPomp} model. Only used when
 \code{x} is a \code{spatPomp} object.}
+
+\item{rparam}{If using a reparameterization for GMCAP, specify which
+parameter is reparameterized using this argument so the reparameterization
+constraint can be applied before evaluating the log likelihood. Set to NULL
+otherwise.}
 }
 \value{
 Object of class \code{fit_results} containing a list of \code{mif2d.ppomp} or

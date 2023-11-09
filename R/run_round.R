@@ -31,6 +31,10 @@
 #' @param spat_regression Numeric specifying the mean-regressing coefficient to
 #'   use when fitting shared parameters in a `spatPomp` model. Only used when
 #'   `x` is a `spatPomp` object.
+#' @param rparam If using a reparameterization for GMCAP, specify which
+#'   parameter is reparameterized using this argument so the reparameterization
+#'   constraint can be applied before evaluating the log likelihood. Set to NULL
+#'   otherwise.
 #'
 #' @return Object of class `fit_results` containing a list of `mif2d.ppomp` or
 #'   `ibpfd_spatPomp` objects and a list of `EL_list` objects.
@@ -52,7 +56,8 @@ run_round = function(
     spat_block_size = 1,
     spat_sharedParNames = NULL,
     spat_unitParNames = NULL,
-    spat_regression = 0.2
+    spat_regression = 0.2,
+    rparam = NULL
 ){
   doParallel::registerDoParallel(cores = ncores)
   RNGkind("L'Ecuyer-CMRG")
@@ -73,6 +78,16 @@ run_round = function(
       spat_regression = spat_regression
     )
     if(print_times) print(Sys.time() - start_t)
+    if(!is.null(rparam)){
+      for(i in seq_along(fitr_out)){
+        pp = panelPomp::pparams(fitr_out[[i]])
+        rparams = paste0(rparam,seq_along(fitr_out[[i]]))
+        param_avg = mean(pp$shared[rparams])
+        param_norm = sqrt(sum((pp$shared[rparams] - param_avg)^2))
+        fitr_out[[i]]@shared[rparams] =
+          (pp$shared[rparams] - param_avg)/param_norm
+      }
+    }
     if(print_times) start_t = Sys.time()
     EL_out = eval_logLik(
       model_obj_list = fitr_out,
