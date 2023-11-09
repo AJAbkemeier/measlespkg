@@ -12,8 +12,8 @@ test_that("output structure is correct", {
   )
   units = c("unit1", "unit2", "unit3")
   out1 = sample_initial_pparams_ul(
-    shared_box_specs = shared_bounds,
-    specific_box_specs = specific_bounds,
+    sh_ul = shared_bounds,
+    sp_ul = specific_bounds,
     units = units,
     n_draws = 3
   )
@@ -40,8 +40,8 @@ test_that("output is correct when bounds are equal", {
   )
   units = c("unit1", "unit2", "unit3")
   out1 = sample_initial_pparams_ul(
-    shared_box_specs = shared_bounds,
-    specific_box_specs = specific_bounds,
+    sh_ul = shared_bounds,
+    sp_ul = specific_bounds,
     units = units,
     n_draws = 3
   )

@@ -8,10 +8,10 @@
 #' around each one using radii for `parameter1`, `parameter2`, etc.
 #'
 #'
-#' @param shared_box_specs `tbl` with `param`, `center`, and `radius` columns.
-#' @param specific_pparams_df `data.frame` of specific parameter values in
+#' @param sh_rc `tbl` with `param`, `center`, and `radius` columns.
+#' @param sp_c `data.frame` of specific parameter values in
 #' format of `pparams()` output.
-#' @param radii_tbl `tbl` with `param` and `radius` columns.
+#' @param sp_r `tbl` with `param` and `radius` columns.
 #' @param n_draws Number of initial parameter sets to draw.
 #' @param buffer The minimum space required between the boundaries of the
 #' sampling box and the boundaries of the possible values for the parameters.
@@ -19,13 +19,13 @@
 #' @param unit_interval_params Character vector of parameters which must be
 #' between 0 and 1.
 #'
-#' @return A list of parameters sets in the `pparams()` format.
+#' @return A list of parameter sets in the `pparams()` format.
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' AK_mod = AK_model()
-#' shared_box_specs = tibble::tribble(
+#' sh_rc = tibble::tribble(
 #'   ~param, ~center, ~radius,
 #'  "gamma1",    -0.63695, 0.05,
 #'  "gamma0",    4.61215,    0.5,
@@ -49,27 +49,27 @@
 #'   "gamma",     30
 #' )
 #' sample_initial_pparams_rc(
-#'   shared_box_specs = shared_box_specs,
-#'   specific_pparams_df = panelPomp::pparams(AK_mod)$specific,
-#'   radii_tbl = specific_radii,
+#'   sh_rc = sh_rc,
+#'   sp_c = panelPomp::pparams(AK_mod)$specific,
+#'   sp_r = specific_radii,
 #'   n_draws = 3
 #' )
 #' }
 sample_initial_pparams_rc = function(
-    shared_box_specs,
-    specific_pparams_df,
-    radii_tbl,
+    sh_rc,
+    sp_c,
+    sp_r,
     n_draws,
     buffer = 5e-8,
     pos_params = c("R0", "mu", "sigmaSE", "iota", "sigma", "psi", "alpha"),
     unit_interval_params = c("cohort", "amplitude", "S_0", "E_0", "I_0", "R_0",
                              "rho")
 ){
-  specific_box_specs_f = function(specific_pparams_df, radii_tbl){
-    specific_centers_tbl = specific_pparams_df |>
+  specific_box_specs_f = function(sp_c, sp_r){
+    specific_centers_tbl = sp_c |>
       as.data.frame() |>
       tibble::rownames_to_column(var = "param")
-    specific_box = radii_tbl |>
+    specific_box = sp_r |>
       dplyr::right_join(specific_centers_tbl, by = "param") |>
       tidyr::pivot_longer(
         cols = c(-"param", -"radius"),
@@ -79,7 +79,7 @@ sample_initial_pparams_rc = function(
       dplyr::arrange(.data$unit)
     specific_box
   }
-  specific_box_specs = specific_box_specs_f(specific_pparams_df, radii_tbl)
+  specific_box_specs = specific_box_specs_f(sp_c, sp_r)
   adjust_params = function(x){
     x |>
       dplyr::mutate(lower = ifelse(
@@ -95,7 +95,7 @@ sample_initial_pparams_rc = function(
         .data$lower + 2*.data$radius
       ))
   }
-  shared_bounds = adjust_params(shared_box_specs) |>
+  shared_bounds = adjust_params(sh_rc) |>
     dplyr::select("param", "lower", "upper")
   specific_bounds = adjust_params(specific_box_specs) |>
     dplyr::select("param", "unit", "lower", "upper") |>

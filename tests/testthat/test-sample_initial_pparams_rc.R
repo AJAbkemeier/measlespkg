@@ -17,9 +17,9 @@ test_that("function produces correct structure", {
   ) |>
     `rownames<-`(c("specific1", "specific2"))
   out1 = sample_initial_pparams_rc(
-    shared_box_specs = shared_box_specs,
-    specific_pparams_df = specific_pparams_df,
-    radii_tbl = specific_radii,
+    sh_rc = shared_box_specs,
+    sp_c = specific_pparams_df,
+    sp_r = specific_radii,
     n_draws = 3
   )
   expect_equal(length(out1), 3)
@@ -50,9 +50,9 @@ test_that("function produces correct values when radius is 0", {
   ) |>
     `rownames<-`(c("specific1", "specific2"))
   out1 = sample_initial_pparams_rc(
-    shared_box_specs = shared_box_specs,
-    specific_pparams_df = specific_pparams_df,
-    radii_tbl = specific_radii,
+    sh_rc = shared_box_specs,
+    sp_c = specific_pparams_df,
+    sp_r = specific_radii,
     n_draws = 3
   )
   expected1 = list(

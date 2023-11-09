@@ -4,12 +4,12 @@
 \alias{sample_initial_pparams_ul}
 \title{Use upper and lower bounds to sample initial parameters from box}
 \usage{
-sample_initial_pparams_ul(shared_box_specs, specific_box_specs, units, n_draws)
+sample_initial_pparams_ul(sh_ul, sp_ul, units, n_draws)
 }
 \arguments{
-\item{shared_box_specs}{\code{tbl} with \code{param}, \code{lower}, and \code{upper} columns.}
+\item{sh_ul}{\code{tbl} with \code{param}, \code{lower}, and \code{upper} columns.}
 
-\item{specific_box_specs}{\code{tbl} with \code{param}, \code{lower}, and \code{upper} columns.
+\item{sp_ul}{\code{tbl} with \code{param}, \code{lower}, and \code{upper} columns.
 format of pparams.}
 
 \item{units}{Character vector of unit names.}
@@ -47,8 +47,8 @@ specific_bounds = tibble::tribble(
   "gamma",          25,           320
 )
 sample_initial_pparams_ul(
-  shared_box_specs = shared_bounds,
-  specific_box_specs = specific_bounds,
+  sh_ul = shared_bounds,
+  sp_ul = specific_bounds,
   units = names(AK_mod),
   n_draws = 3
 )

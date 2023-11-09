@@ -1,7 +1,7 @@
 #' Use upper and lower bounds to sample initial parameters from box
 #'
-#' @param shared_box_specs `tbl` with `param`, `lower`, and `upper` columns.
-#' @param specific_box_specs `tbl` with `param`, `lower`, and `upper` columns.
+#' @param sh_ul `tbl` with `param`, `lower`, and `upper` columns.
+#' @param sp_ul `tbl` with `param`, `lower`, and `upper` columns.
 #' format of pparams.
 #' @param units Character vector of unit names.
 #' @param n_draws Number of initial parameter sets to draw.
@@ -34,25 +34,25 @@
 #'   "gamma",          25,           320
 #' )
 #' sample_initial_pparams_ul(
-#'   shared_box_specs = shared_bounds,
-#'   specific_box_specs = specific_bounds,
+#'   sh_ul = shared_bounds,
+#'   sp_ul = specific_bounds,
 #'   units = names(AK_mod),
 #'   n_draws = 3
 #' )
 #' }
 sample_initial_pparams_ul = function(
-    shared_box_specs,
-    specific_box_specs,
+    sh_ul,
+    sp_ul,
     units,
     n_draws
 ){
   helper_df = tidyr::expand_grid(
-    x = specific_box_specs$param,
+    x = sp_ul$param,
     y = units
   ) |>
     dplyr::rename(param = "x", unit = "y")
 
-  expanded_specific = specific_box_specs |>
+  expanded_specific = sp_ul |>
     dplyr::right_join(helper_df, by = "param") |>
     dplyr::mutate(`param[unit]` = paste0(.data$param,"[",.data$unit,"]"))
 
@@ -64,8 +64,8 @@ sample_initial_pparams_ul = function(
 
   initial_parameters_tbl = dplyr::bind_cols(
     pomp::runif_design(
-      lower = to_named_vec(shared_box_specs, "param", "lower"),
-      upper = to_named_vec(shared_box_specs, "param", "upper"),
+      lower = to_named_vec(sh_ul, "param", "lower"),
+      upper = to_named_vec(sh_ul, "param", "upper"),
       nseq = n_draws
     ),
     pomp::runif_design(

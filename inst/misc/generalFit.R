@@ -177,8 +177,8 @@ if(!is.null(EVAL_PARAM)){
 
 # Sample initial parameters and place into lists
 initial_pparams_list = sample_initial_pparams_ul(
-  shared_box_specs = dplyr::filter(bounds_tbl, shared == TRUE),
-  specific_box_specs = dplyr::filter(bounds_tbl, shared == FALSE),
+  sh_ul = dplyr::filter(bounds_tbl, shared == TRUE),
+  sp_ul = dplyr::filter(bounds_tbl, shared == FALSE),
   units = UNITS,
   n_draws = NREPS_FITR
 )

@@ -18,8 +18,8 @@ test_that("function runs without error", {
     "mu",           0.02,          0.02,      TRUE
   )
   initial_pparams_list = sample_initial_pparams_ul(
-    shared_box_specs = dplyr::filter(bounds_tbl, shared == TRUE),
-    specific_box_specs = dplyr::filter(bounds_tbl, shared == FALSE),
+    sh_ul = dplyr::filter(bounds_tbl, shared == TRUE),
+    sp_ul = dplyr::filter(bounds_tbl, shared == FALSE),
     units = names(AK_mod),
     n_draws = 3
   )

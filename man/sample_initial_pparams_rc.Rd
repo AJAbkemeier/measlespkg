@@ -5,9 +5,9 @@
 \title{Use centers and radii to sample initial parameters from box}
 \usage{
 sample_initial_pparams_rc(
-  shared_box_specs,
-  specific_pparams_df,
-  radii_tbl,
+  sh_rc,
+  sp_c,
+  sp_r,
   n_draws,
   buffer = 5e-08,
   pos_params = c("R0", "mu", "sigmaSE", "iota", "sigma", "psi", "alpha"),
@@ -15,12 +15,12 @@ sample_initial_pparams_rc(
 )
 }
 \arguments{
-\item{shared_box_specs}{\code{tbl} with \code{param}, \code{center}, and \code{radius} columns.}
+\item{sh_rc}{\code{tbl} with \code{param}, \code{center}, and \code{radius} columns.}
 
-\item{specific_pparams_df}{\code{data.frame} of specific parameter values in
+\item{sp_c}{\code{data.frame} of specific parameter values in
 format of \code{pparams()} output.}
 
-\item{radii_tbl}{\code{tbl} with \code{param} and \code{radius} columns.}
+\item{sp_r}{\code{tbl} with \code{param} and \code{radius} columns.}
 
 \item{n_draws}{Number of initial parameter sets to draw.}
 
@@ -33,7 +33,7 @@ sampling box and the boundaries of the possible values for the parameters.}
 between 0 and 1.}
 }
 \value{
-A list of parameters sets in the \code{pparams()} format.
+A list of parameter sets in the \code{pparams()} format.
 }
 \description{
 This is useful when you want to sample initial parameters
@@ -46,7 +46,7 @@ around each one using radii for \code{parameter1}, \code{parameter2}, etc.
 \examples{
 \dontrun{
 AK_mod = AK_model()
-shared_box_specs = tibble::tribble(
+sh_rc = tibble::tribble(
   ~param, ~center, ~radius,
  "gamma1",    -0.63695, 0.05,
  "gamma0",    4.61215,    0.5,
@@ -70,9 +70,9 @@ specific_radii = tibble::tribble(
   "gamma",     30
 )
 sample_initial_pparams_rc(
-  shared_box_specs = shared_box_specs,
-  specific_pparams_df = panelPomp::pparams(AK_mod)$specific,
-  radii_tbl = specific_radii,
+  sh_rc = sh_rc,
+  sp_c = panelPomp::pparams(AK_mod)$specific,
+  sp_r = specific_radii,
   n_draws = 3
 )
 }
