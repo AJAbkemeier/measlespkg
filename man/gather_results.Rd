@@ -19,5 +19,10 @@ file, the number of particles used for the fitting algorithm and likelihood
 evaluation, and the parameters that the likelihood was evaluated at.
 }
 \description{
-Gather information on fit results from subdirectories and tidy them
+Given a parent directory and a vector of rds file names, this function will
+attempt to load any rds files with those names under the parent directory. If
+the rds file contains a \code{fit_results} object or an \code{EL_list} object, it will
+call \code{tidy_results()} on it and row bind the resultings data frames. If an
+error occurs at any point when trying to load and tidy a given file, the file
+will be skipped over.
 }

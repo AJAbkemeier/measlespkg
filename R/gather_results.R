@@ -1,5 +1,12 @@
 #' Gather information on fit results from subdirectories and tidy them
 #'
+#' Given a parent directory and a vector of rds file names, this function will
+#' attempt to load any rds files with those names under the parent directory. If
+#' the rds file contains a `fit_results` object or an `EL_list` object, it will
+#' call `tidy_results()` on it and row bind the resultings data frames. If an
+#' error occurs at any point when trying to load and tidy a given file, the file
+#' will be skipped over.
+#'
 #' @param file_names Character vector of names of rds files to load.
 #' @param parent_dir Path to the directory that we want to search the
 #'   subdirectories of.
@@ -24,13 +31,20 @@ gather_results = function(file_names, parent_dir = "."){
   }
   out_paths = paste0(parent_dir,"/",out_paths)
   lapply(out_paths, function(path){
-    loaded_obj = readRDS(path)
-    loaded_obj = if(inherits(loaded_obj, "EL_list")){
-      loaded_obj
+    out = try({
+      loaded_obj = readRDS(path)
+      loaded_obj = if(inherits(loaded_obj, "EL_list")){
+        loaded_obj
+      } else {
+        update_fit_results(loaded_obj)
+      }
+      tidy_results(loaded_obj, path = path)
+    })
+    if(inherits(out, "try-error")){
+      NULL
     } else {
-      update_fit_results(loaded_obj)
+      out
     }
-    tidy_results(loaded_obj, path = path)
   }) |>
     dplyr::bind_rows()
 }
