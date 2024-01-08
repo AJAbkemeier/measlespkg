@@ -50,7 +50,9 @@ plot_traces2 = function(
     psp_regex = paste0("^",pseudo_shared_param,"[1-9][0-9]*$")
     psp_rows = grepl(psp_regex, traces_tbl$name)
     psp_tbl = traces_tbl[psp_rows,] |>
-      dplyr::mutate(name = as.numeric(gsub("gamma", "", .data$name))) |>
+      dplyr::mutate(
+        name = as.numeric(gsub(pseudo_shared_param, "", .data$name))
+      ) |>
       dplyr::mutate(unit = unit_names[.data$name]) |>
       dplyr::mutate(name = pseudo_shared_param)
     traces_tbl = traces_tbl |>
