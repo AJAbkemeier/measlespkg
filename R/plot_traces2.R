@@ -4,8 +4,10 @@
 #' @param plotted_params String specifying which traces should be plotted. This
 #'   includes log-likelihoods and shared parameters. Set to `".ALL"` to plot all
 #'   traces.
-#' @param log_y Boolean specifying whether y-axis should be scaled by log base
-#'   10 for positive-valued traces.
+#' @param log_y Character vector specifying for which parameters traces the
+#'   y-axis should be log scaled.
+#' @param logit_y Character vector specifying for which parameters traces the
+#'   y-axis should be logit scaled.
 #' @param skip_n Skip plotting the first `skip_n` iterations. Useful when
 #'   extreme early values make it difficult to observe later behavior.
 #' @param lq Lower quantile cutoff. When shading the traces with the log
@@ -22,7 +24,8 @@
 plot_traces2 = function(
     fitr_list,
     plotted_params = ".ALL",
-    log_y = FALSE,
+    log_y = NULL,
+    logit_y = NULL,
     skip_n = 0,
     lq = 0,
     pseudo_shared_param = NULL
@@ -93,7 +96,11 @@ plot_traces2 = function(
         ggplot2::geom_line() +
         ggplot2::facet_wrap(ggplot2::vars(.data$unit)) +
         ggplot2::ylab(param)
-      if(log_y && all(param_tbl$value > 0)) gg = gg + ggplot2::scale_y_log10()
+      if(param %in% log_y){
+        gg = gg + ggplot2::scale_y_continuous(trans = "log")
+      } else if(param %in% logit_y){
+        gg = gg + ggplot2::scale_y_continuous(trans = "logit")
+      }
       gg
     }) |>
       gridExtra::arrangeGrob(grobs = _) |>
@@ -127,7 +134,11 @@ plot_traces2 = function(
     ) +
       ggplot2::geom_line() +
       ggplot2::ylab(param)
-    if(log_y && all(param_tbl$value > 0)) gg = gg + ggplot2::scale_y_log10()
+    if(param %in% log_y){
+      gg = gg + ggplot2::scale_y_continuous(trans = "log")
+    } else if(param %in% logit_y){
+      gg = gg + ggplot2::scale_y_continuous(trans = "logit")
+    }
     print(gg)
   }
 }

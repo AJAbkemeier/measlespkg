@@ -7,7 +7,8 @@
 plot_traces2(
   fitr_list,
   plotted_params = ".ALL",
-  log_y = FALSE,
+  log_y = NULL,
+  logit_y = NULL,
   skip_n = 0,
   lq = 0,
   pseudo_shared_param = NULL
@@ -20,8 +21,11 @@ plot_traces2(
 includes log-likelihoods and shared parameters. Set to \code{".ALL"} to plot all
 traces.}
 
-\item{log_y}{Boolean specifying whether y-axis should be scaled by log base
-10 for positive-valued traces.}
+\item{log_y}{Character vector specifying for which parameters traces the
+y-axis should be log scaled.}
+
+\item{logit_y}{Character vector specifying for which parameters traces the
+y-axis should be logit scaled.}
 
 \item{skip_n}{Skip plotting the first \code{skip_n} iterations. Useful when
 extreme early values make it difficult to observe later behavior.}
