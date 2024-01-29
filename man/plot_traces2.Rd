@@ -5,7 +5,7 @@
 \title{Plot traces from fitted objects}
 \usage{
 plot_traces2(
-  fitr_list,
+  traces_tbl,
   plotted_params = ".ALL",
   log_y = NULL,
   logit_y = NULL,
@@ -15,7 +15,7 @@ plot_traces2(
 )
 }
 \arguments{
-\item{fitr_list}{List of \code{mif2d.ppomp} or \code{ibpfd_spatPomp} objects.}
+\item{traces_tbl}{Data frame in format of \code{tidy_traces()} output.}
 
 \item{plotted_params}{String specifying which traces should be plotted. This
 includes log-likelihoods and shared parameters. Set to \code{".ALL"} to plot all

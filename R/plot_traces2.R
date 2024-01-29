@@ -1,6 +1,6 @@
 #' Plot traces from fitted objects
 #'
-#' @param fitr_list List of `mif2d.ppomp` or `ibpfd_spatPomp` objects.
+#' @param traces_tbl Data frame in format of `tidy_traces()` output.
 #' @param plotted_params String specifying which traces should be plotted. This
 #'   includes log-likelihoods and shared parameters. Set to `".ALL"` to plot all
 #'   traces.
@@ -20,9 +20,8 @@
 #'
 #' @return Returns `NULL`.
 #' @export
-#'
 plot_traces2 = function(
-    fitr_list,
+    traces_tbl,
     plotted_params = ".ALL",
     log_y = NULL,
     logit_y = NULL,
@@ -30,24 +29,27 @@ plot_traces2 = function(
     lq = 0,
     pseudo_shared_param = NULL
 ){
-  stopifnot(inherits(fitr_list[[1]], what = "mif2d.ppomp"))
-
-  unit_names = names(fitr_list[[1]]@unit.objects)
+  stopifnot(
+    c("rep", "unit", "name", "iteration", "value") %in% colnames(traces_tbl)
+  )
+  unit_names = setdiff(unique(traces_tbl$unit), "SHARED")
 
   specific_params = union(
-    rownames(fitr_list[[1]]@specific), c("unitLoglik", pseudo_shared_param)
+    dplyr::filter(traces_tbl, .data$unit != "SHARED")[,"name", drop = TRUE] |>
+      unique(),
+    c("unitLoglik", pseudo_shared_param)
   )
-  shared_params =
-    setdiff(
-      union(names(fitr_list[[1]]@shared), "loglik"),
-      paste0(pseudo_shared_param, seq_along(unit_names))
-    )
+  shared_params = setdiff(
+    dplyr::filter(traces_tbl, .data$unit == "SHARED")[,"name", drop = TRUE] |>
+      unique(),
+    paste0(pseudo_shared_param, seq_along(unit_names))
+  )
   if(plotted_params != ".ALL"){
     specific_params = intersect(specific_params, plotted_params)
     shared_params = intersect(shared_params, plotted_params)
   }
 
-  traces_tbl = tidy_traces(fitr_list)
+
   if(!is.null(pseudo_shared_param)){
     stopifnot(length(pseudo_shared_param) == 1)
     psp_regex = paste0("^",pseudo_shared_param,"[1-9][0-9]*$")
