@@ -14,7 +14,7 @@ model_mechanics_009 = function(shared_params = "mu"){
     double rate[6], trans[6];
 
     // Population-varying parameters
-    double gamma = exp(iota_2*std_log_pop_1950 + iota_1);
+    double iota = exp(iota_2*std_log_pop_1950 + iota_1);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
