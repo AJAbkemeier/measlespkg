@@ -70,6 +70,18 @@ clean_ur_measles = function(){
     "cases"
   ] = NA
 
+  # Hull 1956-06-22    72
+  # Hull 1956-06-29    94
+  # Hull 1956-07-06     0
+  # Hull 1956-07-13    91
+  # Hull 1956-07-20    87
+
+  urm$measles[
+    urm$measles$unit == "Hull" &
+      urm$measles$date == "1956-07-06",
+    "cases"
+  ] = NA
+
   # 1 Hornsey 1957-01-27    51
   # 2 Hornsey 1957-02-03    70
   # 3 Hornsey 1957-02-10    88
