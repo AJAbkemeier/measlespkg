@@ -1,20 +1,16 @@
-#' panelPOMP model with log-log relationship between iota and
-#' the standardized 1950 population, as well as between psi and the
+#' panelPOMP model with log-log relationship between psi and the
 #' standardized 1950 population
 #'
-#' @name model_mechanics_009
+#' @name model_mechanics_010
 #' @param shared_params Character vector of parameters to be treated as shared.
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-model_mechanics_009 = function(shared_params = "mu"){
+model_mechanics_010 = function(shared_params = "mu"){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
-
-    // Population-varying parameters
-    double iota = exp(iota_2*std_log_pop_1950 + iota_1);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -106,17 +102,15 @@ model_mechanics_009 = function(shared_params = "mu"){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "sigma"),
+    log = c("sigmaSE","R0", "mu", "alpha", "iota", "sigma"),
     logit = c("cohort","amplitude", "rho"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
 
   paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", "iota_2", "iota_1", "gamma",
+                 "S_0","E_0","I_0","R_0", "iota", "gamma",
                  "psi_2", "psi_1", "sigma")
-  full_shared_params = union(
-    shared_params, c("iota_2", "iota_1", "psi_2", "psi_1")
-  )
+  full_shared_params = union(shared_params, c("psi_2", "psi_1"))
   states = c("S", "E", "I", "R", "W", "C")
 
   if(!all(shared_params %in% paramnames)){
