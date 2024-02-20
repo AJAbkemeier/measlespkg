@@ -102,7 +102,7 @@ model_mechanics_010 = function(shared_params = "mu"){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE","R0", "mu", "alpha", "iota", "sigma"),
+    log = c("sigmaSE","R0", "mu", "alpha", "iota", "sigma", "gamma"),
     logit = c("cohort","amplitude", "rho"),
     barycentric = c("S_0","E_0","I_0","R_0")
   )
