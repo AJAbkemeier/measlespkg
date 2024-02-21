@@ -4,6 +4,8 @@
 #'   shared parameter and a weighted unit-specific parameter.
 #' @param U Number of units in the model.
 #' @param shared_params Character vector of parameters to be treated as shared.
+#' @param predictors Character vector of linear predictors to be used in the
+#'   reparameterization.
 #' @param reg Number between 0 and 1 determining the strength of the
 #'   reparameterization constraint imposed at each observation step. Setting
 #'   this equal to 1 enforces the constraint exactly.
@@ -11,10 +13,17 @@
 #' @return List of objects required for `make_measlesPomp`.
 #' @export
 #'
-model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
+model_mechanics_001w = function(
+    param,
+    U,
+    shared_params = "mu",
+    predictors = NULL,
+    reg = 1
+  ){
   basic_params = c("R0", "mu", "sigma", "gamma", "alpha", "iota", "rho",
                    "sigmaSE", "psi", "cohort", "amplitude", "S_0", "E_0",
                    "I_0", "R_0")
+  slope_params = if(!is.null(predictors))paste0("slp_", predictors) else NULL
   log_params = c("sigma","gamma","sigmaSE","psi","R0", "mu", "alpha", "iota")
   logit_params = c("cohort","amplitude", "rho")
   barycentric_params = c("S_0","E_0","I_0","R_0")
@@ -25,28 +34,43 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
   params = paste0(param, 1:U)
   T_params = paste0("T_", params)
 
-  set_param_str = c("
+  set_param_str = function(z){
+    c("
     double param_sp;\n
     int unit_num_int = round(unit_num); \n
     if(unit_num_int == 1){
       param_sp = ",paste0(param,1),";
     }
     ",
-    sapply(2:U, function(i){
+    sapply(2:(U-1), function(i){
       paste0("
       else if(unit_num_int == ",i,"){
         param_sp = ",paste0(param,i),";
       }
       ")
     }),
-    sapply(basic_params_trunc, function(x) paste0("double _",x," = ", x,";\n")),
-    "double _",param," = ",param,"_sh + w*param_sp;\n",
+    "
+      else {
+        param_sp = ",paste0(param,U),";
+      }
+    ",
+    sapply(z, function(x) paste0("double _",x," = ", x,";\n")),
+    "double _",param," = w*param_sp + ",param,"_sh",
+    if(!is.null(predictors)) c(" + ",
+       paste(paste0(slope_params,"*", predictors), collapse = " + ")),
+    ";\n",
     if(param %in% log_params) paste0("_",param," = exp(_",param,");"),
     if(param %in% logit_params) paste0("_",param," = expit(_",param,");")
-  ) |> paste0(collapse = "")
+    ) |> paste0(collapse = "")
+  }
+
 
   rproc <- pomp::Csnippet(paste0(
-    set_param_str,
+    set_param_str(intersect(
+      basic_params_trunc,
+      c("gamma", "alpha", "sigma", "R0", "cohort", "amplitude", "sigmaSE",
+        "iota", "mu")
+    )),
   "
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
@@ -100,7 +124,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
   "))
 
   dmeas <- pomp::Csnippet(paste0(
-    set_param_str,
+    set_param_str(intersect(basic_params_trunc, c("rho", "psi"))),
   "
     double m = _rho*C;
     double v = m*(1.0 - _rho + _psi*_psi*m);
@@ -119,7 +143,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
   "))
 
   rmeas <- pomp::Csnippet(paste0(
-    set_param_str,
+    set_param_str(intersect(basic_params_trunc, c("rho", "psi"))),
   "
     double m = _rho*C;
     double v = m*(1.0-_rho+_psi*_psi*m);
@@ -133,7 +157,7 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
   "))
 
   rinit <- pomp::Csnippet(paste0(
-    set_param_str,
+    set_param_str(intersect(basic_params_trunc, c("S_0", "E_0", "I_0", "R_0"))),
   "
     double m = pop/(_S_0 + _E_0 + _I_0 + _R_0);
     S = nearbyint(m*_S_0);
@@ -157,12 +181,14 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
     )),
     fromEst = pomp::Csnippet(paste0(
       "
-      double param_mean = (",paste0(T_params, collapse = " + "),")/",U,";
-      double norm = sqrt(pow(",paste0(T_params, collapse = " - param_mean, 2) + pow("),", 2));
+      double param_center = (",paste0(T_params, collapse = " + "),")/",U,
+      if(!is.null(predictors)) paste0(" + ",
+      paste(paste0(slope_params,"*", predictors), collapse = " + ")),";\n
+      double norm = sqrt(pow(",paste0(T_params, collapse = " - param_center, 2) + pow(")," - param_center, 2));
     ",
       sapply(1:U, function(i){
         paste0("
-          ",param,i," = (1-",reg,")*T_",param,i," + ",reg,"*(T_",param,i," - param_mean)/norm;
+          ",param,i," = (1-",reg,")*T_",param,i," + ",reg,"*(T_",param,i," - param_center)/norm;
         ")
       }) |> paste0(collapse = ""),
       "if(T_w == -INFINITY){
@@ -176,9 +202,9 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
     barycentric = barycentric_params[barycentric_params != param]
   )
 
-  paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho",
-                 "sigmaSE","psi","cohort","amplitude",
-                 "S_0","E_0","I_0","R_0", paste0(param,"_sh"), "w", params)
+  paramnames = c("R0","mu","sigma","gamma","alpha","iota", "rho", "sigmaSE",
+                 "psi","cohort","amplitude", "S_0","E_0","I_0","R_0",
+                 paste0(param,"_sh"), "w", params, slope_params)
   paramnames = setdiff(paramnames, param)
   states = c("S", "E", "I", "R", "W", "C")
 
@@ -194,7 +220,9 @@ model_mechanics_001w = function(param, U, shared_params = "mu", reg = 1){
       call. = FALSE
     )
   }
-  full_shared_params = union(shared_params, c("w", paste0(param,"_sh"), params))
+  full_shared_params = union(
+    shared_params, c("w", paste0(param,"_sh"), params, slope_params)
+  )
   out = panel_mechanics(
     rproc = rproc,
     dmeas = dmeas,

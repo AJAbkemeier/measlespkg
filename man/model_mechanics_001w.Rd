@@ -4,7 +4,13 @@
 \alias{model_mechanics_001w}
 \title{He10 POMP model for UK measles with an auxiliary weight parameter}
 \usage{
-model_mechanics_001w(param, U, shared_params = "mu", reg = 1)
+model_mechanics_001w(
+  param,
+  U,
+  shared_params = "mu",
+  predictors = NULL,
+  reg = 1
+)
 }
 \arguments{
 \item{param}{Name of the parameter you would like to express in terms of a
@@ -13,6 +19,9 @@ shared parameter and a weighted unit-specific parameter.}
 \item{U}{Number of units in the model.}
 
 \item{shared_params}{Character vector of parameters to be treated as shared.}
+
+\item{predictors}{Character vector of linear predictors to be used in the
+reparameterization.}
 
 \item{reg}{Number between 0 and 1 determining the strength of the
 reparameterization constraint imposed at each observation step. Setting
