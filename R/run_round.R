@@ -130,17 +130,21 @@ run_round_helper.panelPomp = function(
     z = initial_pparams_list,
     .packages = "panelPomp"
   ) %dopar% {
-    panelPomp::mif2(
-      x,
-      Np = np_fitr,
-      cooling.fraction.50 = cooling_frac,
-      rw.sd = rw_sd_obj,
-      cooling.type = "geometric",
-      Nmif = N_fitr,
-      shared.start = z$shared,
-      specific.start = z$specific,
-      block = panel_block
+    use_shared = !is.null(z$shared)
+    use_specific = !is.null(z$specific)
+    args = c(list(
+        x,
+        Np = np_fitr,
+        cooling.fraction.50 = cooling_frac,
+        rw.sd = rw_sd_obj,
+        cooling.type = "geometric",
+        Nmif = N_fitr,
+        block = panel_block
+      ),
+      list(shared.start = z$shared)[use_shared],
+      list(specific.start = z$specific)[use_specific]
     )
+    do.call(panelPomp::mif2, args = args)
   }
   mif2_out
 }
