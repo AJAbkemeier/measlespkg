@@ -1,0 +1,2 @@
+\newcommand{\He2010}{D. He, E.L. Ionides, and A.A. King. Plug-and-play inference for disease dynamics: measles in large and small populations as a case study.  \emph{Journal of the Royal Society Interface} \bold{7}, 271--283, 2010.}
+\newcommand{\Korevaar2020}{Korevaar H, Metcalf CJ, Grenfell BT. 2020 Structure, space and size: competing drivers of variation in urban and rural measles transmission. J. R. Soc. Interface 17: 20200010. http://dx.doi.org/10.1098/rsif.2020.0010}

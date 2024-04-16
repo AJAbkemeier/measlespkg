@@ -1,4 +1,4 @@
-#' MLE's obtained by AK after fitting He10 model
+#' MLE's obtained by Aaron King after fitting the He10 model.
 #'
 #' @format ## `AK_mles`
 #' A 20 x 19 tibble. All columns after the first 5 are estimated parameters.
@@ -30,5 +30,7 @@
 #'   \item{sigmaSE}{Standard error of gamma white noise applied to rate of
 #'   people transitioning from S to E}
 #' }
+#'
+#' @source <https://kingaa.github.io/sbied/measles/index.html>
 #'
 "AK_mles"

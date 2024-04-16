@@ -3,7 +3,7 @@
 \docType{data}
 \name{AK_mles}
 \alias{AK_mles}
-\title{MLE's obtained by AK after fitting He10 model}
+\title{MLE's obtained by Aaron King after fitting the He10 model.}
 \format{
 \subsection{\code{AK_mles}}{
 
@@ -38,10 +38,13 @@ people transitioning from S to E}
 }
 }
 }
+\source{
+\url{https://kingaa.github.io/sbied/measles/index.html}
+}
 \usage{
 AK_mles
 }
 \description{
-MLE's obtained by AK after fitting He10 model
+MLE's obtained by Aaron King after fitting the He10 model.
 }
 \keyword{datasets}

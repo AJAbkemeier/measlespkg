@@ -3,7 +3,7 @@
 \docType{data}
 \name{He10_mles}
 \alias{He10_mles}
-\title{MLE's obtained by He after fitting the He10 model}
+\title{MLE's from the He et. al 2010 paper}
 \format{
 \subsection{\code{He10_mles}}{
 
@@ -34,6 +34,9 @@ who are added on the 251st day of the year}
 He10_mles
 }
 \description{
-MLE's obtained by He after fitting the He10 model
+MLE's from the He et. al 2010 paper
+}
+\references{
+\He2010
 }
 \keyword{datasets}

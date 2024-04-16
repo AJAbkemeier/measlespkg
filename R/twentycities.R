@@ -1,4 +1,4 @@
-#' He10 20 UK cities weekly reported measles data
+#' He et al. 2010 twenty UK cities weekly reported measles data
 #'
 #' @format ## `twentycities`
 #' A list of 3 data frames.
@@ -22,6 +22,7 @@
 #'   \item{long}{Longitude of city}
 #'   \item{lat}{Latitude of city}
 #' }
+#'
 #'
 #' @source <https://kingaa.github.io/pomp/vignettes/twentycities.rda>
 "twentycities"

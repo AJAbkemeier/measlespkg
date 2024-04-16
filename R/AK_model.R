@@ -1,12 +1,15 @@
-#' Create panelPomp object using AK's re-fitting of He10's model.
+#' Create panelPomp object using Aaron King's re-fitting of the He10 model.
 #'
-#' @description AK's model is like He10's model EXCEPT that population and
-#' births are interpolated using smooth splines and the interpolated covariates
-#' are shifted +0.5 years. In contrast, He10 uses linear interpolation and
-#' makes no shift. In addition, AK's MLE's are different.
+#' @description Aaron King's model is like He et al. 2010 model EXCEPT that
+#'   population and births are interpolated using smooth splines and the
+#'   interpolated covariates are shifted +0.5 years. In contrast, He et al. use
+#'   linear interpolation and make no shift. In addition, Aaron King's MLE's are
+#'   different.
 #'
 #' @return panelPomp object.
 #' @export
+#'
+#' @source <https://kingaa.github.io/sbied/measles/index.html>
 #'
 #' @examples
 #' \dontrun{

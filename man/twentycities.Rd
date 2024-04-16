@@ -3,7 +3,7 @@
 \docType{data}
 \name{twentycities}
 \alias{twentycities}
-\title{He10 20 UK cities weekly reported measles data}
+\title{He et al. 2010 twenty UK cities weekly reported measles data}
 \format{
 \subsection{\code{twentycities}}{
 
@@ -45,6 +45,6 @@ A list of 3 data frames.
 twentycities
 }
 \description{
-He10 20 UK cities weekly reported measles data
+He et al. 2010 twenty UK cities weekly reported measles data
 }
 \keyword{datasets}

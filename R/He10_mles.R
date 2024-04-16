@@ -1,7 +1,8 @@
-#' MLE's obtained by He after fitting the He10 model
+#' MLE's from the He et. al 2010 paper
 #'
 #' @format ## `He10_mles`
 #' A 20 x 12 tibble. All columns after the first 2 are estimated parameters.
+#'
 #'
 #' \describe{
 #'   \item{unit}{City name}
@@ -22,5 +23,8 @@
 #'   \item{rho}{Probability that person transitioning from I to R is recorded}
 #'   \item{psi}{Measurement overdispersion parameter}
 #' }
+#'
+#' @references
+#' \He2010
 #'
 "He10_mles"

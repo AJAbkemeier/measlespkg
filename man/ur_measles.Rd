@@ -39,10 +39,16 @@ unit names are for urban areas. NOTE: not all units have coordinates.
 }
 }
 }
+\source{
+\url{https://rs.figshare.com/collections/Supplementary_material_from_Structure_space_and_size_competing_drivers_of_variation_in_urban_and_rural_measles_transmission_/5036567/1}
+}
 \usage{
 ur_measles
 }
 \description{
 Weekly reported measles data for 1422 locations in the UK
+}
+\references{
+\Korevaar2020
 }
 \keyword{datasets}
