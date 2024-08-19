@@ -27,8 +27,8 @@ toy_mechanics_001w = function(U){
     set_mu_str,
     "
     double mu_tilde = mu_sh + w*mu_sp;
-    if(ISNA(cases)) {lik = 0;} else {
-      lik = dnorm(cases, mu_tilde, sigma, 1);
+    if(ISNA(Y)) {lik = 0;} else {
+      lik = dnorm(Y, mu_tilde, sigma, 1);
     }
     if (!give_log) lik = exp(lik);
   "))
@@ -37,7 +37,7 @@ toy_mechanics_001w = function(U){
     set_mu_str,
     "
     double mu_tilde = mu_sh + w*mu_sp;
-    cases = rnorm(mu_tilde, sigma);
+    Y = rnorm(mu_tilde, sigma);
   "))
 
   rinit <- pomp::Csnippet("
@@ -74,7 +74,11 @@ toy_mechanics_001w = function(U){
     log = c("sigma")
   )
 
+  states = "X"
+
   paramnames = c("sigma", "w", "mu_sh", mus)
+
+  full_shared_params = c("w", "mu_sh", mus)
 
   list(
     rproc = rproc,
@@ -83,6 +87,9 @@ toy_mechanics_001w = function(U){
     rinit = rinit,
     pt = pt,
     paramnames = paramnames,
+    shared_params = full_shared_params,
+    specific_params = setdiff(paramnames, full_shared_params),
+    states = states,
     pseudo_sp = mus
   )
 }

@@ -30,7 +30,7 @@ TOP_N_FITS   = switch(RUN_LEVEL, 1,  12, 12)
 DATA = clean_twentycities()
 # Units to select from data
 UNITS = unique(twentycities$measles$unit)
-MODEL = model_mechanics_001w("gamma", length(UNITS))
+MODEL = model_mechanics_001w("gamma", predictors = "std_log_pop_1950", length(UNITS))
 # Time step
 DT = 1/365.25
 BLOCK_MIF2 = TRUE
@@ -83,7 +83,8 @@ INITIAL_RW_SD = c(
   cohort = DEFAULT_SD*0.5,
   alpha = DEFAULT_SD*10^(-2),
   mu = 0,
-  w = DEFAULT_SD,
+  slp_std_log_pop_1950 = DEFAULT_SD*0.125,
+  w = DEFAULT_SD/32,
   sapply(MODEL$pseudo_sp, function(x) DEFAULT_SD/4)
 )
 if(!is.null(EVAL_PARAM))
@@ -136,6 +137,7 @@ bounds_tbl = tibble::tribble(
   "alpha",       0.935,          1.05,
   "cohort",        0.1,           0.7,
   "gamma_sh",  log(25),      log(320),
+  "slp_std_log_pop_1950",  -1,      1,
   "mu",           0.02,          0.02,
   "w",             2.5,             4
 ) |> dplyr::bind_rows(

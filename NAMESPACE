@@ -2,6 +2,8 @@
 
 S3method(make_measlesPomp,panel_mechanics)
 S3method(make_measlesPomp,spat_mechanics)
+S3method(measlespkg::run_round_helper,panelPomp)
+S3method(measlespkg::run_round_helper,spatPomp)
 S3method(tidy_results,EL_list)
 S3method(tidy_results,fit_results)
 export("%>%")

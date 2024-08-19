@@ -25,7 +25,11 @@ make_toyPomp = function(
         rmeasure = rmeas,
         partrans = pt,
         statenames = states,
-        paramnames = paramnames
+        paramnames = paramnames,
+        covar = pomp::covariate_table(
+          data.frame(time = nrow(data_list[[i]]), unit_num = i),
+          times = "time"
+        )
       )
   })
   names(pomp_list) = units

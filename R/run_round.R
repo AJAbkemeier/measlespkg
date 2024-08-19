@@ -115,6 +115,7 @@ run_round_helper = function(
   UseMethod("run_round_helper")
 }
 
+#' @exportS3Method measlespkg::run_round_helper
 run_round_helper.panelPomp = function(
     x,
     initial_pparams_list,
@@ -149,6 +150,7 @@ run_round_helper.panelPomp = function(
   mif2_out
 }
 
+#' @exportS3Method measlespkg::run_round_helper
 run_round_helper.spatPomp = function(
     x,
     initial_pparams_list,
