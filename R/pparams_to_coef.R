@@ -1,6 +1,6 @@
-#' Convert list of `pparams` into `coef` format
+#' Convert list of parameters into vector format
 #'
-#' @param pparams List of parameters in format of [panelPomp::pparams].
+#' @param pparams List of specific/shared parameters.
 #'
 #' @return Named vector of parameters in format used by `coef()`.
 #' @export

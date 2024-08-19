@@ -210,8 +210,8 @@ measlesPomp_mod = make_measlesPomp(
 
 if(!is.null(sim_obs)){
   for(u in UNITS){
-    measlesPomp_mod@unit.objects[[u]]@data = sim_obs[u,, drop = FALSE]
-    rownames(measlesPomp_mod@unit.objects[[u]]@data) = "cases"
+    measlesPomp_mod@unit_objects[[u]]@data = sim_obs[u,, drop = FALSE]
+    rownames(measlesPomp_mod@unit_objects[[u]]@data) = "cases"
   }
 }
 

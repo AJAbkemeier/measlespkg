@@ -6,8 +6,8 @@
 #'
 #' @param x A `panelPomp` or `spatPomp` object.
 #' @param initial_pparams_list List of initial parameters in the format of
-#'   [panelPomp::pparams()]. Each entry in the list specifies the initial
-#'   parameters for one replication of the fitting algorithm.
+#'   `panelPomp::coef()` with `format = "list`. Each entry in the list specifies
+#'   the initial parameters for one replication of the fitting algorithm.
 #' @param write_results_to File path to save Rds file containing results to.
 #' @param ncores Number of cores to use.
 #' @param np_fitr Number of particles to use when running the fitting algorithm.
@@ -80,7 +80,7 @@ run_round = function(
     if(print_times) print(Sys.time() - start_t)
     if(!is.null(rparam)){
       for(i in seq_along(fitr_out)){
-        pp = panelPomp::pparams(fitr_out[[i]])
+        pp = panelPomp::coef(fitr_out[[i]], format = "list")
         rparams = paste0(rparam,seq_along(fitr_out[[i]]))
         param_avg = mean(pp$shared[rparams])
         param_norm = sqrt(sum((pp$shared[rparams] - param_avg)^2))

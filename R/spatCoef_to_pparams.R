@@ -8,7 +8,8 @@
 #' @param units Character vector of unit names in the order they are enumerated
 #'   in `spatCoef`.
 #'
-#' @return Parameters in the format of [panelPomp::pparams].
+#' @return Parameters in the format of `panelPomp::coef()` with
+#'   `format = "list"`.
 #' @export
 #'
 spatCoef_to_pparams = function(spatCoef, units){

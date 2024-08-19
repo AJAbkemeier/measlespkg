@@ -24,10 +24,10 @@ mass_sample_pparams = function(
   units = names(model_obj)
 
   for(i in seq_along(model_obj)){
-    model_obj@unit.objects[[i]]@times = model_obj@unit.objects[[i]]@times[1:Nt]
-    obs_matrix = t(pomp::obs(model_obj@unit.objects[[i]])[1:Nt])
-    rownames(obs_matrix) = rownames(model_obj@unit.objects[[i]]@data)
-    model_obj@unit.objects[[i]]@data = obs_matrix
+    model_obj@unit_objects[[i]]@times = model_obj@unit_objects[[i]]@times[1:Nt]
+    obs_matrix = t(pomp::obs(model_obj@unit_objects[[i]])[1:Nt])
+    rownames(obs_matrix) = rownames(model_obj@unit_objects[[i]]@data)
+    model_obj@unit_objects[[i]]@data = obs_matrix
   }
 
   doParallel::registerDoParallel(cores = ncores)
@@ -41,7 +41,7 @@ mass_sample_pparams = function(
   ) %dopar% {
     panelPomp::coef(model_obj) = pparams_to_coef(pparams_list[[j]])
     pp = panelPomp::pfilter(model_obj, Np = Np)
-    panelPomp::unitlogLik(pp)
+    panelPomp::unitLogLik(pp)
   } -> ull_matrix
 
   if(rank_scheme[[1]] == "total_ll"){

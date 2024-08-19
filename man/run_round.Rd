@@ -28,8 +28,8 @@ run_round(
 \item{x}{A \code{panelPomp} or \code{spatPomp} object.}
 
 \item{initial_pparams_list}{List of initial parameters in the format of
-\code{\link[panelPomp:pparams]{panelPomp::pparams()}}. Each entry in the list specifies the initial
-parameters for one replication of the fitting algorithm.}
+\code{panelPomp::coef()} with \verb{format = "list}. Each entry in the list specifies
+the initial parameters for one replication of the fitting algorithm.}
 
 \item{write_results_to}{File path to save Rds file containing results to.}
 

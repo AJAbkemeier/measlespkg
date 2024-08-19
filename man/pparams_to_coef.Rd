@@ -2,16 +2,16 @@
 % Please edit documentation in R/pparams_to_coef.R
 \name{pparams_to_coef}
 \alias{pparams_to_coef}
-\title{Convert list of \code{pparams} into \code{coef} format}
+\title{Convert list of parameters into vector format}
 \usage{
 pparams_to_coef(pparams)
 }
 \arguments{
-\item{pparams}{List of parameters in format of \link[panelPomp:pparams]{panelPomp::pparams}.}
+\item{pparams}{List of specific/shared parameters.}
 }
 \value{
 Named vector of parameters in format used by \code{coef()}.
 }
 \description{
-Convert list of \code{pparams} into \code{coef} format
+Convert list of parameters into vector format
 }

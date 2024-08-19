@@ -42,7 +42,7 @@ duplicating the parameters of a \code{spatPomp} object. If the parameters belong
 to a \code{panelPomp} object, leave as \code{NULL}.}
 }
 \value{
-List of parameters in the form of \code{\link[panelPomp:pparams]{panelPomp::pparams()}}.
+List of specific/shared parameters.
 }
 \description{
 Duplicate top fits from \code{EL_list}

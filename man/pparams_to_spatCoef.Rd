@@ -2,16 +2,16 @@
 % Please edit documentation in R/pparams_to_spatCoef.R
 \name{pparams_to_spatCoef}
 \alias{pparams_to_spatCoef}
-\title{Convert list of \code{pparams} into \code{coef.spatPomp} format}
+\title{Convert list of parameters into vector format}
 \usage{
 pparams_to_spatCoef(pparams)
 }
 \arguments{
-\item{pparams}{List of parameters in format of \link[panelPomp:pparams]{panelPomp::pparams}.}
+\item{pparams}{List of specific/shared parameters in format.}
 }
 \value{
 Named vector of parameters in format used by \code{coef.spatPomp}.
 }
 \description{
-Convert list of \code{pparams} into \code{coef.spatPomp} format
+Convert list of parameters into vector format
 }

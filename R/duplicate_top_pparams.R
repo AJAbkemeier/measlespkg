@@ -18,7 +18,7 @@
 #'   duplicating the parameters of a `spatPomp` object. If the parameters belong
 #'   to a `panelPomp` object, leave as `NULL`.
 #'
-#' @return List of parameters in the form of [panelPomp::pparams()].
+#' @return List of specific/shared parameters.
 #' @export
 #'
 #' @examples

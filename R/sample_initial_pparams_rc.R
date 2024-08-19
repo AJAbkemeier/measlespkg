@@ -50,7 +50,7 @@
 #' )
 #' sample_initial_pparams_rc(
 #'   sh_rc = sh_rc,
-#'   sp_c = panelPomp::pparams(AK_mod)$specific,
+#'   sp_c = panelPomp::coef(AK_mod, format = "list")$specific,
 #'   sp_r = specific_radii,
 #'   n_draws = 3
 #' )

@@ -17,7 +17,8 @@ base parameter names but gamma1 would not be.}
 in \code{spatCoef}.}
 }
 \value{
-Parameters in the format of \link[panelPomp:pparams]{panelPomp::pparams}.
+Parameters in the format of \code{panelPomp::coef()} with
+\code{format = "list"}.
 }
 \description{
 Convert \code{coef.spatPomp} to \code{pparams} format

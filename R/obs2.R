@@ -12,7 +12,7 @@
 #' }
 obs2 = function(x){
   if(inherits(x, "panelPomp")){
-    out = panelPomp::unitobjects(x) |> sapply(pomp::obs) |> t()
+    out = panelPomp::unit_objects(x) |> sapply(pomp::obs) |> t()
   } else {
     out = pomp::obs(x)
   }
