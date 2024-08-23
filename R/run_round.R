@@ -133,7 +133,8 @@ run_round_helper.panelPomp = function(
   ) %dopar% {
     use_shared = !is.null(z$shared)
     use_specific = !is.null(z$specific)
-    args = c(list(
+    args = c(
+      list(
         x,
         Np = np_fitr,
         cooling.fraction.50 = cooling_frac,

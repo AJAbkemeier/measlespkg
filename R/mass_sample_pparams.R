@@ -22,12 +22,15 @@ mass_sample_pparams = function(
 ){
   stopifnot(rank_scheme[[1]] %in% c("total_ll", "ull"))
   units = names(model_obj)
+  uo = tryCatch(
+    model_obj@unit_objects, error = function(x) model_obj@unit.objects
+  )
 
   for(i in seq_along(model_obj)){
-    model_obj@unit_objects[[i]]@times = model_obj@unit_objects[[i]]@times[1:Nt]
-    obs_matrix = t(pomp::obs(model_obj@unit_objects[[i]])[1:Nt])
-    rownames(obs_matrix) = rownames(model_obj@unit_objects[[i]]@data)
-    model_obj@unit_objects[[i]]@data = obs_matrix
+    uo[[i]]@times = uo[[i]]@times[1:Nt]
+    obs_matrix = t(pomp::obs(uo[[i]])[1:Nt])
+    rownames(obs_matrix) = rownames(uo[[i]]@data)
+    uo[[i]]@data = obs_matrix
   }
 
   doParallel::registerDoParallel(cores = ncores)

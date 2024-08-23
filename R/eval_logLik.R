@@ -78,8 +78,10 @@ eval_logLik = function(
         out = panelPomp::pfilter(x, Np = np_pf)
         out = list(
           ull = panelPomp::unitLogLik(out),
-          cll = sapply(out@unit_objects, function(u){
-            u@cond.logLik
+          cll = sapply(
+            tryCatch(out@unit_objects, error = function(x) out@unit.objects),
+            function(u){
+              u@cond.logLik
           }) |> t() |> `rownames<-`(units)
         )
       } else if (pType == "spatPomp"){

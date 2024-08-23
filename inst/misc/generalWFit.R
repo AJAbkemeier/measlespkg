@@ -190,10 +190,13 @@ measlesPomp_mod = make_measlesPomp(
   dt = DT
 )
 
+uo = tryCatch(
+  measlesPomp_mod@unit_objects, error = function(x) measlesPomp_mod@unit.objects
+)
 if(!is.null(sim_obs)){
   for(u in UNITS){
-    measlesPomp_mod@unit_objects[[u]]@data = sim_obs[u,, drop = FALSE]
-    rownames(measlesPomp_mod@unit_objects[[u]]@data) = "cases"
+    uo[[u]]@data = sim_obs[u,, drop = FALSE]
+    rownames(uo[[u]]@data) = "cases"
   }
 }
 
