@@ -43,7 +43,7 @@
 run_round = function(
     x,
     initial_pparams_list,
-    write_results_to,
+    write_results_to = NULL,
     ncores,
     np_fitr,
     cooling_frac,
@@ -62,45 +62,85 @@ run_round = function(
   doParallel::registerDoParallel(cores = ncores)
   RNGkind("L'Ecuyer-CMRG")
   doRNG::registerDoRNG()
-  fit_results = pomp::bake(file = write_results_to, {
-    if(print_times) start_t = Sys.time()
-    fitr_out = run_round_helper(
-      x = x,
-      initial_pparams_list = initial_pparams_list,
-      np_fitr = np_fitr,
-      cooling_frac = cooling_frac,
-      rw_sd_obj = rw_sd_obj,
-      N_fitr = N_fitr,
-      panel_block = panel_block,
-      spat_block_size = spat_block_size,
-      spat_sharedParNames = spat_sharedParNames,
-      spat_unitParNames = spat_unitParNames,
-      spat_regression = spat_regression
-    )
-    if(print_times) print(Sys.time() - start_t)
-    if(!is.null(rparam)){
-      for(i in seq_along(fitr_out)){
-        pp = panelPomp::coef(fitr_out[[i]], format = "list")
-        rparams = paste0(rparam,seq_along(fitr_out[[i]]))
-        param_avg = mean(pp$shared[rparams])
-        param_norm = sqrt(sum((pp$shared[rparams] - param_avg)^2))
-        fitr_out[[i]]@shared[rparams] =
-          (pp$shared[rparams] - param_avg)/param_norm
-      }
-    }
-    if(print_times) start_t = Sys.time()
-    EL_out = eval_logLik(
-      model_obj_list = fitr_out,
-      ncores = ncores,
-      np_pf = np_eval,
-      nreps = nreps_eval,
-      seed = NULL,
-      block_size = spat_block_size
-    )
-    if(print_times) print(Sys.time() - start_t)
-    new_fit_results(fitr_out = fitr_out, EL_out = EL_out)
-  })
+  fit_results = if(is.null(write_results_to)){
+    rrh(x = x, initial_pparams_list = initial_pparams_list, ncores = ncores,
+        np_fitr = np_fitr, cooling_frac = cooling_frac, rw_sd_obj = rw_sd_obj,
+        N_fitr = N_fitr, panel_block = panel_block, np_eval = np_eval,
+        nreps_eval = nreps_eval, print_times = print_times,
+        spat_block_size = spat_block_size,
+        spat_sharedParNames = spat_sharedParNames,
+        spat_unitParNames= spat_unitParNames, spat_regression = spat_regression,
+        rparam = rparam)
+  } else {
+    pomp::bake(file = write_results_to, {
+      rrh(x = x, initial_pparams_list = initial_pparams_list, ncores = ncores,
+          np_fitr = np_fitr, cooling_frac = cooling_frac, rw_sd_obj = rw_sd_obj,
+          N_fitr = N_fitr, panel_block = panel_block, np_eval = np_eval,
+          nreps_eval = nreps_eval, print_times = print_times,
+          spat_block_size = spat_block_size,
+          spat_sharedParNames = spat_sharedParNames,
+          spat_unitParNames= spat_unitParNames,
+          spat_regression = spat_regression,
+          rparam = rparam)
+    })
+  }
   fit_results
+}
+
+rrh = function(
+    x,
+    initial_pparams_list,
+    ncores,
+    np_fitr,
+    cooling_frac,
+    rw_sd_obj,
+    N_fitr,
+    panel_block,
+    np_eval,
+    nreps_eval,
+    print_times,
+    spat_block_size,
+    spat_sharedParNames,
+    spat_unitParNames,
+    spat_regression,
+    rparam
+){
+  if(print_times) start_t = Sys.time()
+  fitr_out = run_round_helper(
+    x = x,
+    initial_pparams_list = initial_pparams_list,
+    np_fitr = np_fitr,
+    cooling_frac = cooling_frac,
+    rw_sd_obj = rw_sd_obj,
+    N_fitr = N_fitr,
+    panel_block = panel_block,
+    spat_block_size = spat_block_size,
+    spat_sharedParNames = spat_sharedParNames,
+    spat_unitParNames = spat_unitParNames,
+    spat_regression = spat_regression
+  )
+  if(print_times) print(Sys.time() - start_t)
+  if(!is.null(rparam)){
+    for(i in seq_along(fitr_out)){
+      pp = panelPomp::coef(fitr_out[[i]], format = "list")
+      rparams = paste0(rparam,seq_along(fitr_out[[i]]))
+      param_avg = mean(pp$shared[rparams])
+      param_norm = sqrt(sum((pp$shared[rparams] - param_avg)^2))
+      fitr_out[[i]]@shared[rparams] =
+        (pp$shared[rparams] - param_avg)/param_norm
+    }
+  }
+  if(print_times) start_t = Sys.time()
+  EL_out = eval_logLik(
+    model_obj_list = fitr_out,
+    ncores = ncores,
+    np_pf = np_eval,
+    nreps = nreps_eval,
+    seed = NULL,
+    block_size = spat_block_size
+  )
+  if(print_times) print(Sys.time() - start_t)
+  new_fit_results(fitr_out = fitr_out, EL_out = EL_out)
 }
 
 run_round_helper = function(

@@ -7,7 +7,7 @@
 run_round(
   x,
   initial_pparams_list,
-  write_results_to,
+  write_results_to = NULL,
   ncores,
   np_fitr,
   cooling_frac,
