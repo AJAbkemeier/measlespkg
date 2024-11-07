@@ -103,12 +103,12 @@ model_mechanics_011 = function(shared_params = "mu"){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE", "R0", "mu", "alpha", "psi", "sigma", "gamma"),
+    log = c("sigmaSE", "R0", "mu", "psi", "sigma", "gamma"),
     logit = c("cohort", "amplitude", "rho"),
     barycentric = c("S_0", "E_0", "I_0", "R_0")
   )
 
-  paramnames = c("R0","mu","alpha", "rho","sigmaSE","cohort","amplitude",
+  paramnames = c("R0","mu", "rho","sigmaSE","cohort","amplitude",
                  "S_0","E_0","I_0","R_0", "gamma", "psi", "iota_2", "iota_1",
                  "sigma")
   full_shared_params = union(
