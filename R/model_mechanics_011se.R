@@ -1,19 +1,21 @@
-#' panelPOMP model with log-log relationship between iota and the
+#' panelPOMP model with log-log relationship between noisy iota and the
 #' standardized 1950 population
 #'
-#' @name model_mechanics_011
-#' @param shared_params Character vector of parameters to be treated as shared.
+#' @name model_mechanics_011se
+#' @param shared_params Character vector of parameters to be treated as shared
+#'   in addition to those hard-coded as shared.
 #'
 #' @return List of objects required for `make_measlesPomp()`.
 #' @export
 #'
-model_mechanics_011 = function(shared_params = "mu"){
+model_mechanics_011se = function(shared_params = "mu"){
   rproc <- pomp::Csnippet("
     double beta, br, seas, foi, dw, births;
     double rate[6], trans[6];
 
     // Population-varying parameters
     double iota = exp(iota_2*std_log_pop_1950 + iota_1);
+    double niota = rgammawn(iotaSE/sqrt(iota), iota);
 
     // cohort effect
     if (fabs(t-floor(t)-251.0/365.0) < 0.5*dt)
@@ -35,7 +37,7 @@ model_mechanics_011 = function(shared_params = "mu"){
     beta = R0*seas*(1.0-exp(-(gamma+mu)*dt))/dt;
 
     // expected force of infection
-    foi = beta*(I+iota)/pop;
+    foi = beta*(I+niota)/pop;
 
     // white noise (extrademographic stochasticity)
     dw = rgammawn(sigmaSE,dt);
@@ -103,16 +105,16 @@ model_mechanics_011 = function(shared_params = "mu"){
   ")
 
   pt <- pomp::parameter_trans(
-    log = c("sigmaSE", "R0", "mu", "psi", "sigma", "gamma"),
+    log = c("sigmaSE", "R0", "mu", "psi", "sigma", "gamma", "iotaSE"),
     logit = c("cohort", "amplitude", "rho"),
     barycentric = c("S_0", "E_0", "I_0", "R_0")
   )
 
-  paramnames = c("R0","mu","rho","sigmaSE","cohort","amplitude",
+  paramnames = c("R0","mu","rho","sigmaSE","cohort","amplitude", "iotaSE",
                  "S_0","E_0","I_0","R_0", "gamma", "psi", "iota_2", "iota_1",
                  "sigma")
   full_shared_params = union(
-    shared_params, c("iota_2", "iota_1")
+    shared_params, c("iota_2", "iota_1", "iotaSE")
   )
   states = c("S", "E", "I", "R", "W", "C")
 
