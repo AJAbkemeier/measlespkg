@@ -17,6 +17,7 @@ Imports:
     foreach,
     ggplot2,
     gridExtra,
+    haitipkg,
     magrittr,
     panelPomp,
     pomp,
