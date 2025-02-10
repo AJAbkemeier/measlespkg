@@ -1,7 +1,7 @@
 #' Weekly reported measles data for 1422 locations in the UK
 #'
 #' @format ## `ur_measles`
-#' A list of 3 tibbles. Unit names ending in `.RD` are for rural areas; other
+#' A list of 3 data frames Unit names ending in `.RD` are for rural areas; other
 #' unit names are for urban areas. NOTE: not all units have coordinates.
 #'
 #' ## `ur_measles$measles`:

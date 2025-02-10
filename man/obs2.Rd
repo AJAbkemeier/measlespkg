@@ -2,19 +2,19 @@
 % Please edit documentation in R/obs2.R
 \name{obs2}
 \alias{obs2}
-\title{Extract the data matrix from a pomp/panelPomp/spatPomp object.}
+\title{Extract the data matrix from a pomp or panelPomp object.}
 \usage{
 obs2(x)
 }
 \arguments{
-\item{x}{An object of class \code{pomp}, \code{panelPomp}, or \code{spatPomp}.}
+\item{x}{An object of class \code{pomp} or \code{panelPomp}.}
 }
 \value{
 A matrix of observations with rows corresponding to units and columns
 corresponding to time points.
 }
 \description{
-Extract the data matrix from a pomp/panelPomp/spatPomp object.
+Extract the data matrix from a pomp or panelPomp object.
 }
 \examples{
 \dontrun{

@@ -4,6 +4,11 @@ library(tibble)
 load("R/sysdata.rda")
 urr = urban_rural_raw
 
+# The raw data stores the observation dates as years with a decimal indicating
+# how far into the year the observation was recorded. Rounding issues cause the
+# conversion from numeric to date to produce dates which are not all spaced 7
+# days apart, so we instead assign dates by adding multiples of 7 days to the
+# first date.
 dates = as.Date("1944-01-07") + 7*(0:(nrow(urr$measles_urban) - 1))
 
 measles = cbind(urr$measles_rural, urr$measles_urban)

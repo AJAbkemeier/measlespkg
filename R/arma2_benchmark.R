@@ -1,6 +1,7 @@
-#' Produce log-ARMA log-likelihood benchmark for panelPomp and spatPomp models
+#' Produce log-ARMA log-likelihood benchmark for panelPomp models
 #'
-#' @param xpomp A panelPomp or spatPomp object.
+#' @param x A panelPomp object or a matrix of data where each row is a unit and
+#'  each column is a time.
 #' @param order A triple (p, d, q) for the ARIMA model fitted to the data.
 #'   Function code assumes that d will be set to 0.
 #' @param na.rm Should NA's be removed when summing conditional log likelihoods
@@ -10,8 +11,19 @@
 #'   containing the total log likelihood, and a matrix of conditional log
 #'   likelihoods.
 #' @export
-arma_benchmark2 = function (xpomp, order = c(2, 0, 1), na.rm = FALSE) {
-  x <- obs2(xpomp)
+#'
+arma2_benchmark <- function(x, order = c(2, 0, 1), na.rm = FALSE) {
+  UseMethod("arma2_benchmark")
+}
+
+#' @exportS3Method measlespkg::arma2_benchmark
+arma2_benchmark.panelPomp = function (x, order = c(2, 0, 1), na.rm = FALSE) {
+  x <- obs2(x)
+  arma2_benchmark.matrix(x, order = order, na.rm = na.rm)
+}
+
+#' @exportS3Method measlespkg::arma2_benchmark
+arma2_benchmark.matrix = function (x, order = c(2, 0, 1), na.rm = FALSE) {
   fit <- apply(x, 1, function(y, order){
     arima2::arima(log(y + 1), order = order)
   }, order = order)
@@ -23,3 +35,4 @@ arma_benchmark2 = function (xpomp, order = c(2, 0, 1), na.rm = FALSE) {
   })) - log(x + 1)
   list(unit = unit, total = total, cond = cond)
 }
+

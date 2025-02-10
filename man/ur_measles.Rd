@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{ur_measles}}{
 
-A list of 3 tibbles. Unit names ending in \code{.RD} are for rural areas; other
+A list of 3 data frames Unit names ending in \code{.RD} are for rural areas; other
 unit names are for urban areas. NOTE: not all units have coordinates.
 }
 

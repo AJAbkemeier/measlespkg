@@ -140,7 +140,7 @@ make_measlesPomp.panel_mechanics = function(
 
   ## ----pomp-construction-----------------------------------------------
   lapply(seq_along(units), function(i){
-    time = covar_list[[i]][[1]]
+    time = covar_list[[i]]$time
     dat_list[[i]] |>
       pomp::pomp(
         t0 = with(dat_list[[i]], 2*time[1] - time[2]),
